@@ -735,7 +735,7 @@
             loadStudentsFromStorage();
         };
         
-        // Load students from main system (GitHub Pages compatible)
+        // Load students from main system (Mobile & GitHub Pages compatible)
         function loadStudentsFromStorage() {
             try {
                 // Method 1: Try localStorage first
@@ -750,7 +750,19 @@
                     return;
                 }
                 
-                // Method 2: Try to load from main system via iframe
+                // Method 2: Try sessionStorage
+                let sessionStudents = sessionStorage.getItem('students');
+                if (sessionStudents) {
+                    students = JSON.parse(sessionStudents);
+                    console.log('✅ Loaded students from sessionStorage:', students.length);
+                    
+                    if (students.length > 0 && students[0].subjects) {
+                        analyzeStudentStructure(students[0]);
+                    }
+                    return;
+                }
+                
+                // Method 3: Try to load from main system via iframe
                 console.log('🔄 Loading from main system via iframe...');
                 loadFromMainSystem();
                 
@@ -761,41 +773,121 @@
             }
         }
         
-        // Load from main system via iframe (GitHub Pages compatible)
+        // Load from main system via iframe (Mobile & GitHub Pages compatible)
         function loadFromMainSystem() {
+            console.log('🔄 Attempting to load from main system...');
+            
+            // Try multiple methods for mobile compatibility
+            tryMethod1();
+        }
+        
+        // Method 1: Direct iframe load
+        function tryMethod1() {
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.src = './index.html';
+            iframe.timeout = setTimeout(() => {
+                console.log('⏰ Method 1 timeout, trying Method 2...');
+                document.body.removeChild(iframe);
+                tryMethod2();
+            }, 10000); // 10 second timeout
             
             iframe.onload = function() {
+                clearTimeout(iframe.timeout);
                 try {
                     const iframeWindow = iframe.contentWindow;
                     if (iframeWindow.students && iframeWindow.students.length > 0) {
                         students = iframeWindow.students;
-                        console.log('✅ Loaded students from main system:', students.length);
+                        console.log('✅ Loaded students from main system (Method 1):', students.length);
                         
                         // Save to localStorage for future use
                         localStorage.setItem('students', JSON.stringify(students));
+                        sessionStorage.setItem('students', JSON.stringify(students));
                         
                         if (students.length > 0 && students[0].subjects) {
                             analyzeStudentStructure(students[0]);
                         }
                     } else {
-                        console.log('❌ No students found in main system');
+                        console.log('❌ No students found in main system (Method 1)');
+                        document.body.removeChild(iframe);
+                        tryMethod2();
                     }
                 } catch (e) {
-                    console.error('❌ Error accessing iframe data:', e);
+                    console.error('❌ Error accessing iframe data (Method 1):', e);
+                    document.body.removeChild(iframe);
+                    tryMethod2();
                 }
-                
-                document.body.removeChild(iframe);
             };
             
             iframe.onerror = function() {
-                console.error('❌ Error loading main system iframe');
+                clearTimeout(iframe.timeout);
+                console.error('❌ Error loading main system iframe (Method 1)');
                 document.body.removeChild(iframe);
+                tryMethod2();
             };
             
             document.body.appendChild(iframe);
+        }
+        
+        // Method 2: Fetch and parse
+        function tryMethod2() {
+            console.log('🔄 Trying Method 2: Fetch and parse...');
+            
+            fetch('./index.html')
+                .then(response => response.text())
+                .then(html => {
+                    // Try to extract students data from the HTML
+                    const studentsMatch = html.match(/const students = \[([\s\S]*?)\];/);
+                    if (studentsMatch) {
+                        try {
+                            const studentsData = JSON.parse('[' + studentsMatch[1] + ']');
+                            if (studentsData && studentsData.length > 0) {
+                                students = studentsData;
+                                console.log('✅ Loaded students from HTML (Method 2):', students.length);
+                                
+                                // Save to storage
+                                localStorage.setItem('students', JSON.stringify(students));
+                                sessionStorage.setItem('students', JSON.stringify(students));
+                                
+                                if (students.length > 0 && students[0].subjects) {
+                                    analyzeStudentStructure(students[0]);
+                                }
+                                return;
+                            }
+                        } catch (e) {
+                            console.error('❌ Error parsing students from HTML:', e);
+                        }
+                    }
+                    
+                    console.log('❌ Method 2 failed, showing no data message');
+                    showNoDataMessage();
+                })
+                .catch(error => {
+                    console.error('❌ Error fetching HTML (Method 2):', error);
+                    showNoDataMessage();
+                });
+        }
+        
+        // Show no data message with instructions
+        function showNoDataMessage() {
+            const resultsDiv = document.getElementById('searchResults');
+            if (resultsDiv) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <h3>لا توجد بيانات طلاب</h3>
+                        <p>يرجى اتباع الخطوات التالية:</p>
+                        <ol style="text-align: right; margin: 15px 20px;">
+                            <li>افتح المنظومة الرئيسية (<strong>index.html</strong>) أولاً</li>
+                            <li>تأكد من وجود بيانات طلاب في النظام</li>
+                            <li>أضف بعض الطلاب إذا لم يوجد</li>
+                            <li>عد لفتح صفحة البحث مرة أخرى</li>
+                        </ol>
+                        <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                            <strong>ملاحظة:</strong> على الهواتف، قد تحتاج لفتح المنظومة الرئيسية أولاً ثم صفحة البحث
+                        </p>
+                    </div>
+                `;
+            }
         }
     </script>
 </body>
