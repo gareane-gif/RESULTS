@@ -868,7 +868,7 @@
                 });
         }
         
-        // Show no data message with instructions
+        // Show no data message with instructions and manual data entry
         function showNoDataMessage() {
             const resultsDiv = document.getElementById('searchResults');
             if (resultsDiv) {
@@ -882,12 +882,134 @@
                             <li>أضف بعض الطلاب إذا لم يوجد</li>
                             <li>عد لفتح صفحة البحث مرة أخرى</li>
                         </ol>
+                        
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                            <h4 style="color: #856404; margin-bottom: 10px;">🔧 حل بديل للهواتف:</h4>
+                            <p style="color: #856404; font-size: 14px; margin-bottom: 15px;">إذا لم تعمل الطرق السابقة، يمكنك:</p>
+                            <ol style="text-align: right; margin: 10px 20px; color: #856404; font-size: 13px;">
+                                <li>في المنظومة الرئيسية، انسخ بيانات الطلاب من Console</li>
+                                <li>الصقها هنا في الحقل أدناه</li>
+                                <li>أو استخدم زر "إنشاء بيانات تجريبية"</li>
+                            </ol>
+                            <textarea id="manualDataInput" placeholder="الصق بيانات الطلاب هنا..." style="width: 100%; height: 100px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 12px;"></textarea>
+                            <div style="text-align: center; margin-top: 10px;">
+                                <button onclick="loadManualData()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 0 5px;">تحميل البيانات</button>
+                                <button onclick="createTestData()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 0 5px;">إنشاء بيانات تجريبية</button>
+                            </div>
+                        </div>
+                        
                         <p style="color: #666; font-size: 14px; margin-top: 10px;">
                             <strong>ملاحظة:</strong> على الهواتف، قد تحتاج لفتح المنظومة الرئيسية أولاً ثم صفحة البحث
                         </p>
                     </div>
                 `;
             }
+        }
+        
+        // Load manual data from textarea
+        function loadManualData() {
+            const manualDataInput = document.getElementById('manualDataInput');
+            const dataText = manualDataInput.value.trim();
+            
+            if (!dataText) {
+                alert('الرجاء لصق بيانات الطلاب أولاً');
+                return;
+            }
+            
+            try {
+                // Try to parse as JSON
+                const parsedData = JSON.parse(dataText);
+                if (Array.isArray(parsedData) && parsedData.length > 0) {
+                    students = parsedData;
+                    console.log('✅ Loaded manual data:', students.length);
+                    
+                    // Save to storage
+                    localStorage.setItem('students', JSON.stringify(students));
+                    sessionStorage.setItem('students', JSON.stringify(students));
+                    
+                    if (students.length > 0 && students[0].subjects) {
+                        analyzeStudentStructure(students[0]);
+                    }
+                    
+                    // Clear the input and show success
+                    manualDataInput.value = '';
+                    const resultsDiv = document.getElementById('searchResults');
+                    resultsDiv.innerHTML = `
+                        <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
+                            <h4 style="color: #155724; margin-bottom: 10px;">✅ تم تحميل البيانات بنجاح!</h4>
+                            <p style="color: #155724;">عدد الطلاب: ${students.length}</p>
+                            <p style="color: #155724; font-size: 14px;">يمكنك الآن البحث عن الطلاب</p>
+                        </div>
+                    `;
+                } else {
+                    alert('البيانات يجب أن تكون مصفوفة من الطلاب');
+                }
+            } catch (error) {
+                alert('خطأ في تحليل البيانات: ' + error.message);
+                console.error('Error parsing manual data:', error);
+            }
+        }
+        
+        // Create test data for mobile users
+        function createTestData() {
+            const testStudents = [
+                {
+                    id: 'CO242001',
+                    name: 'أحمد محمد علي',
+                    department: 'هندسة حاسوب',
+                    semester: 2,
+                    subjects: [
+                        { name: 'برمجة 2 (مطالب)', units: 3, classwork: 25, final: 55, total: 80 },
+                        { name: 'رياضيات متقدمة', units: 3, classwork: 20, final: 45, total: 65 },
+                        { name: 'قواعد بيانات', units: 2, classwork: 15, final: 35, total: 50 },
+                        { name: 'شبكات حاسوب', units: 3, classwork: 18, final: 42, total: 60 }
+                    ]
+                },
+                {
+                    id: 'CO242002',
+                    name: 'فاطمة عبدالله سالم',
+                    department: 'هندسة حاسوب',
+                    semester: 2,
+                    subjects: [
+                        { name: 'برمجة 2 (مطالب)', units: 3, classwork: 10, final: 25, total: 35 },
+                        { name: 'رياضيات متقدمة', units: 3, classwork: 22, final: 48, total: 70 },
+                        { name: 'قواعد بيانات', units: 2, classwork: 18, final: 37, total: 55 },
+                        { name: 'شبكات حاسوب', units: 3, classwork: 20, final: 40, total: 60 }
+                    ]
+                },
+                {
+                    id: 'CO242003',
+                    name: 'محمد خالد عمر',
+                    department: 'هندسة حاسوب',
+                    semester: 2,
+                    subjects: [
+                        { name: 'برمجة 2 (مطالب)', units: 3, classwork: 28, final: 62, total: 90 },
+                        { name: 'رياضيات متقدمة', units: 3, classwork: 25, final: 55, total: 80 },
+                        { name: 'قواعد بيانات', units: 2, classwork: 20, final: 45, total: 65 },
+                        { name: 'شبكات حاسوب', units: 3, classwork: 22, final: 48, total: 70 }
+                    ]
+                }
+            ];
+            
+            students = testStudents;
+            console.log('✅ Created test data:', students.length);
+            
+            // Save to storage
+            localStorage.setItem('students', JSON.stringify(students));
+            sessionStorage.setItem('students', JSON.stringify(students));
+            
+            if (students.length > 0 && students[0].subjects) {
+                analyzeStudentStructure(students[0]);
+            }
+            
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = `
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
+                    <h4 style="color: #155724; margin-bottom: 10px;">✅ تم إنشاء بيانات تجريبية!</h4>
+                    <p style="color: #155724;">عدد الطلاب: ${students.length}</p>
+                    <p style="color: #155724; font-size: 14px;">يمكنك الآن البحث عن الطلاب (CO242001, CO242002, CO242003)</p>
+                </div>
+            `;
         }
     </script>
 </body>
