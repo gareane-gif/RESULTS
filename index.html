@@ -2594,6 +2594,7 @@
             if (customSubjects) {
                 const parsed = JSON.parse(customSubjects);
                 Object.assign(departmentSubjects, parsed);
+                console.log('📚 Loaded custom subjects:', Object.keys(parsed));
             }
         }
 
@@ -2736,6 +2737,9 @@
                     // Update global variables
                     students = importData.students || [];
                     settings = importData.settings || { failRuleEnabled: true };
+                    
+                    // Load custom subjects after import
+                    loadCustomSubjects();
                     
                     // Refresh all UI components
                     window.refreshStudents();
@@ -5823,7 +5827,7 @@
             if (users.length === 0) {
                 const defaultAdmin = {
                     id: 'admin_default',
-                    name: 'المدير',
+                    name: 'admin',
                     email: 'admin@institute.edu',
                     password: btoa('admin123'),
                     role: 'admin',
@@ -5849,9 +5853,43 @@
                 
                 // Show confirmation that default user was created
                 console.log('✅ تم إنشاء المستخدم الافتراضي بنجاح');
-                console.log('👤 اسم المستخدم: المدير');
+                console.log('👤 اسم المستخدم: admin');
                 console.log('🔑 كلمة المرور: admin123');
                 console.log('📧 أو الإيميل: admin@institute.edu');
+                console.log('🔑 كلمة المرور: admin123');
+            }
+            
+            // Also create 'المدير' user for compatibility
+            const managerExists = users.find(u => u.name === 'المدير');
+            if (!managerExists) {
+                const managerUser = {
+                    id: 'manager_default',
+                    name: 'المدير',
+                    email: 'manager@institute.edu',
+                    password: btoa('admin123'),
+                    role: 'admin',
+                    status: 'active',
+                    permissions: {
+                        add_students: true,
+                        edit_students: true,
+                        delete_students: true,
+                        export_excel: true,
+                        import_excel: true,
+                        manage_departments: true,
+                        manage_users: true,
+                        view_statistics: true,
+                        block_students: true,
+                        backup_restore: true
+                    },
+                    createdDate: new Date().toLocaleString('ar-SA'),
+                    lastLogin: null,
+                    createdBy: 'System'
+                };
+                users.push(managerUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                console.log('✅ تم إنشاء مستخدم المدير للتوافق');
+                console.log('👤 اسم المستخدم: المدير');
                 console.log('🔑 كلمة المرور: admin123');
             }
             
