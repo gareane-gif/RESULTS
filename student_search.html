@@ -686,23 +686,67 @@
             loadStudentsFromStorage();
         };
         
-        // Load students from localStorage
+        // Load students from main system (GitHub Pages compatible)
         function loadStudentsFromStorage() {
             try {
-                const storedStudents = localStorage.getItem('students');
+                // Method 1: Try localStorage first
+                let storedStudents = localStorage.getItem('students');
                 if (storedStudents) {
                     students = JSON.parse(storedStudents);
-                    console.log('✅ Loaded students:', students.length);
+                    console.log('✅ Loaded students from localStorage:', students.length);
                     
                     if (students.length > 0 && students[0].subjects) {
                         analyzeStudentStructure(students[0]);
                     }
-                } else {
-                    console.log('❌ No students found in localStorage');
+                    return;
                 }
+                
+                // Method 2: Try to load from main system via iframe
+                console.log('🔄 Loading from main system via iframe...');
+                loadFromMainSystem();
+                
             } catch (error) {
                 console.error('❌ Error loading students:', error);
+                // Try iframe as fallback
+                loadFromMainSystem();
             }
+        }
+        
+        // Load from main system via iframe (GitHub Pages compatible)
+        function loadFromMainSystem() {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = './index.html';
+            
+            iframe.onload = function() {
+                try {
+                    const iframeWindow = iframe.contentWindow;
+                    if (iframeWindow.students && iframeWindow.students.length > 0) {
+                        students = iframeWindow.students;
+                        console.log('✅ Loaded students from main system:', students.length);
+                        
+                        // Save to localStorage for future use
+                        localStorage.setItem('students', JSON.stringify(students));
+                        
+                        if (students.length > 0 && students[0].subjects) {
+                            analyzeStudentStructure(students[0]);
+                        }
+                    } else {
+                        console.log('❌ No students found in main system');
+                    }
+                } catch (e) {
+                    console.error('❌ Error accessing iframe data:', e);
+                }
+                
+                document.body.removeChild(iframe);
+            };
+            
+            iframe.onerror = function() {
+                console.error('❌ Error loading main system iframe');
+                document.body.removeChild(iframe);
+            };
+            
+            document.body.appendChild(iframe);
         }
     </script>
 </body>
