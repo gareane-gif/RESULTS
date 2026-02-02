@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بحث عن نتيجة الطالب - متكيف</title>
+    <title>نتائج الطلاب - المعهد العالي للعلوم والتقنية</title>
     <style>
         * {
             margin: 0;
@@ -15,10 +15,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 10px;
             margin: 0;
         }
         
@@ -26,143 +23,137 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            padding: 50px;
+            padding: 30px;
             max-width: 1200px;
             width: 100%;
-            text-align: center;
-            margin: 0 auto;
+            margin: 20px auto;
         }
         
         .header {
-            margin-bottom: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
         }
         
         .header h1 {
             color: #2c3e50;
-            font-size: 32px;
+            font-size: 28px;
             margin-bottom: 10px;
             font-weight: 700;
         }
         
         .header p {
             color: #7f8c8d;
-            font-size: 18px;
-        }
-        
-        .adaptive-status {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            text-align: right;
-            border: 2px solid #2196f3;
-        }
-        
-        .adaptive-status h3 {
-            color: #1565c0;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .status-item {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-right: 4px solid #2196f3;
-        }
-        
-        .status-item strong {
-            color: #1565c0;
-            display: block;
-            margin-bottom: 5px;
-        }
-        
-        .field-mapping {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: left;
-            font-family: monospace;
-            font-size: 12px;
+            font-size: 16px;
         }
         
         .search-section {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
+            padding: 25px;
+            margin-bottom: 25px;
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-align: right;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #2c3e50;
             font-weight: 600;
             font-size: 16px;
         }
         
-        .form-group input {
-            width: 100%;
-            padding: 18px;
-            border: 2px solid #e1e8ed;
-            border-radius: 12px;
-            font-size: 18px;
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input-field {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
             text-align: center;
             background: white;
+            transition: border-color 0.3s;
         }
         
-        .form-group input:focus {
+        .search-input-field:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
         }
         
-        .search-btn {
-            width: 100%;
-            padding: 18px;
+        .search-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 20px;
-            font-weight: 600;
+            border-radius: 10px;
             cursor: pointer;
-            margin: 10px 0;
-            transition: all 0.3s ease;
+            font-weight: bold;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
         
-        .search-btn:hover {
+        .search-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         
-        .search-btn.success {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        .quick-search-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
         }
         
-        .search-btn.warning {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        .quick-btn {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+        
+        .clear-btn {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .clear-btn:hover {
+            background: #ffeaa7;
+            border-color: #ffb300;
         }
         
         .student-card {
             background: white;
             border: 2px solid #e9ecef;
             border-radius: 15px;
-            padding: 30px;
+            padding: 25px;
             margin-bottom: 20px;
             text-align: right;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
@@ -171,12 +162,13 @@
         .student-card h3 {
             color: #2c3e50;
             margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 22px;
+            text-align: center;
         }
         
         .student-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -212,15 +204,17 @@
         .subjects-table th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             font-weight: 600;
+            font-size: 14px;
         }
         
         .subjects-table td {
-            padding: 12px 15px;
+            padding: 10px;
             text-align: center;
             border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
         }
         
         .subjects-table tr:nth-child(even) {
@@ -252,36 +246,178 @@
             100% { transform: rotate(360deg); }
         }
         
-        .debug-section {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-            font-family: monospace;
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .header p {
+                font-size: 14px;
+            }
+            
+            .search-section {
+                padding: 20px;
+            }
+            
+            .search-input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-input-field {
+                min-width: 100%;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+            
+            .search-button {
+                width: 100%;
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .quick-search-buttons {
+                justify-content: stretch;
+            }
+            
+            .quick-btn {
+                flex: 1;
+                min-width: 80px;
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+            
+            .student-card {
+                padding: 20px;
+            }
+            
+            .student-card h3 {
+                font-size: 20px;
+            }
+            
+            .student-info {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .info-item {
+                padding: 12px;
+            }
+            
+            .subjects-table {
+                font-size: 12px;
+            }
+            
+            .subjects-table th,
+            .subjects-table td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                margin: 5px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .search-section {
+                padding: 15px;
+            }
+            
+            .search-input-field {
+                padding: 12px;
+                font-size: 16px;
+            }
+            
+            .search-button {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .quick-btn {
+                padding: 10px 6px;
+                font-size: 11px;
+            }
+            
+            .quick-search-buttons {
+                gap: 8px;
+            }
+            
+            .student-card {
+                padding: 15px;
+            }
+            
+            .student-card h3 {
+                font-size: 18px;
+            }
+            
+            .info-item {
+                padding: 10px;
+            }
+            
+            .subjects-table th,
+            .subjects-table td {
+                padding: 6px 2px;
+                font-size: 11px;
+            }
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
             font-size: 12px;
-            max-height: 400px;
-            overflow-y: auto;
+            font-weight: bold;
+        }
+        
+        .status-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 بحث عن نتيجة الطالب</h1>
+            <h1>🎓 نتائج الطلاب</h1>
             <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
         </div>
         
         <div class="search-section">
             <div class="form-group">
                 <label for="searchId">الرقم الدراسي:</label>
-                <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي">
+                <div class="search-input-group">
+                    <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" class="search-input-field">
+                    <button onclick="searchStudent()" class="search-button">
+                        <span>🔍</span>
+                        <span>بحث</span>
+                    </button>
+                </div>
+                
+                <!-- Quick Search Buttons -->
+                <div class="quick-search-buttons">
+                    <button onclick="clearSearch()" class="quick-btn clear-btn">مسح البحث</button>
+                </div>
             </div>
-            <button class="search-btn" onclick="searchStudent()">🔍 بحث</button>
         </div>
         
-        <div id="debugInfo" class="debug-section" style="display: none;"></div>
         <div id="searchResults"></div>
         <div id="studentResultDisplay"></div>
     </div>
@@ -295,41 +431,49 @@
             total: null
         };
         
-        // Adaptive load - discovers field names automatically
-        function adaptiveLoad() {
-            const studentsCount = document.getElementById('studentsCount');
-            const adaptiveStatus = document.getElementById('adaptiveStatus');
-            const fieldsDiscovered = document.getElementById('fieldsDiscovered');
-            const dataSource = document.getElementById('dataSource');
-            
-            adaptiveStatus.innerHTML = 'جاري التكيف... <span class="loading"></span>';
-            
+        // Quick search function
+        function quickSearch(studentId) {
+            document.getElementById('searchId').value = studentId;
+            searchStudent();
+        }
+        
+        // Clear search function
+        function clearSearch() {
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('studentResultDisplay').innerHTML = '';
+        }
+        
+        // Load students from localStorage
+        function loadStudentsFromStorage() {
             try {
-                // Load students data
-                const storedStudents = localStorage.getItem('students');
+                // Try localStorage first
+                let storedStudents = localStorage.getItem('students');
                 if (storedStudents) {
                     students = JSON.parse(storedStudents);
-                    console.log('📊 Loaded students:', students.length);
+                    console.log('✅ Loaded students from localStorage:', students.length);
                     
-                    if (students.length > 0) {
-                        // Analyze first student to discover field names
+                    if (students.length > 0 && students[0].subjects) {
                         analyzeStudentStructure(students[0]);
-                        
-                        studentsCount.textContent = students.length;
-                        adaptiveStatus.textContent = 'تم التكيف';
-                        fieldsDiscovered.textContent = Object.values(fieldMapping).filter(f => f !== null).length;
-                        dataSource.textContent = 'localStorage';
-                        
-                        console.log('✅ Adaptive load successful:', fieldMapping);
-                    } else {
-                        adaptiveStatus.textContent = 'لا توجد بيانات';
                     }
-                } else {
-                    adaptiveStatus.textContent = 'لا توجد بيانات في localStorage';
+                    return;
                 }
+                
+                // Try sessionStorage
+                let sessionStudents = sessionStorage.getItem('students');
+                if (sessionStudents) {
+                    students = JSON.parse(sessionStudents);
+                    console.log('✅ Loaded students from sessionStorage:', students.length);
+                    
+                    if (students.length > 0 && students[0].subjects) {
+                        analyzeStudentStructure(students[0]);
+                    }
+                    return;
+                }
+                
+                console.log('❌ No students found in storage');
             } catch (error) {
-                console.error('❌ Error in adaptive load:', error);
-                adaptiveStatus.textContent = 'خطأ في التكيف';
+                console.error('❌ Error loading students:', error);
             }
         }
         
@@ -358,9 +502,6 @@
             };
             
             console.log('🗺️ Field mapping discovered:', fieldMapping);
-            
-            // Show field mapping
-            updateFieldMappingDisplay();
         }
         
         // Discover the best field name for a type
@@ -394,79 +535,6 @@
             return null;
         }
         
-        // Update field mapping display
-        function updateFieldMappingDisplay() {
-            const fieldMappingDiv = document.getElementById('fieldMapping');
-            const fieldMappingContent = document.getElementById('fieldMappingContent');
-            
-            if (Object.values(fieldMapping).some(f => f !== null)) {
-                fieldMappingDiv.style.display = 'block';
-                
-                let mappingHTML = '';
-                for (const [type, field] of Object.entries(fieldMapping)) {
-                    if (field) {
-                        mappingHTML += `<div style="margin: 5px 0; padding: 5px; background: #e8f5e8; border-radius: 4px;">
-                            ${type} → ${field}
-                        </div>`;
-                    }
-                }
-                
-                fieldMappingContent.innerHTML = mappingHTML;
-            }
-        }
-        
-        // Show field analysis
-        function showFieldAnalysis() {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.style.display = 'block';
-            
-            let analysisHTML = '<strong>🔍 تحليل الحقول:</strong><br><br>';
-            
-            if (students.length > 0 && students[0].subjects) {
-                const firstSubject = students[0].subjects[0];
-                analysisHTML += '<strong>حقول المادة الأولى:</strong><br>';
-                
-                for (const [key, value] of Object.entries(firstSubject)) {
-                    const type = typeof value;
-                    const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
-                    analysisHTML += `<div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 4px;">
-                        ${key} (${type}): ${displayValue}
-                    </div>`;
-                }
-                
-                analysisHTML += '<br><strong>خرائط الحقول المكتشفة:</strong><br>';
-                for (const [type, field] of Object.entries(fieldMapping)) {
-                    analysisHTML += `<div style="margin: 5px 0; padding: 5px; background: ${field ? '#e8f5e8' : '#ffebee'}; border-radius: 4px;">
-                        ${type}: ${field || 'غير مكتشف'}
-                    </div>`;
-                }
-            } else {
-                analysisHTML += 'لا توجد بيانات للتحليل';
-            }
-            
-            debugDiv.innerHTML = analysisHTML;
-        }
-        
-        // Show debug info
-        function showDebugInfo() {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
-            
-            if (debugDiv.style.display === 'block') {
-                let debugHTML = '<strong>📊 معلومات التشخيص:</strong><br><br>';
-                
-                debugHTML += `<strong>عدد الطلاب:</strong> ${students.length}<br>`;
-                debugHTML += `<strong>خرائط الحقول:</strong> ${JSON.stringify(fieldMapping, null, 2)}<br><br>`;
-                
-                if (students.length > 0) {
-                    debugHTML += '<strong>أول طالب:</strong><br>';
-                    debugHTML += JSON.stringify(students[0], null, 2);
-                }
-                
-                debugDiv.innerHTML = debugHTML;
-            }
-        }
-        
         // Search student function
         function searchStudent() {
             const searchId = document.getElementById('searchId').value.trim();
@@ -483,7 +551,7 @@
             }
             
             if (students.length === 0) {
-                resultsDiv.innerHTML = '<div class="no-results"><h3>لا توجد بيانات طلاب</h3><p>الرجاء التحميل المتكيف أولاً</p></div>';
+                resultsDiv.innerHTML = '<div class="no-results"><h3>لا توجد بيانات طلاب</h3></div>';
                 return;
             }
             
@@ -496,38 +564,26 @@
                         <h3>الطالب غير موجود</h3>
                         <p>الرقم الدراسي: ${searchId}</p>
                         <p>عدد الطلاب المتاح: ${students.length}</p>
-                        <details style="margin-top: 15px;">
-                            <summary style="cursor: pointer; color: #667eea;">عرض أرقام الطلاب المتاحة</summary>
-                            <div style="text-align: right; margin-top: 10px; max-height: 200px; overflow-y: auto;">
-                                ${students.map(s => `<div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 4px;">${s.id} - ${s.name}</div>`).join('')}
-                            </div>
-                        </details>
                     </div>
                 `;
                 return;
             }
             
             // Check if student result is blocked
-            console.log('🔍 Checking if student is blocked:', student.id);
             const blockedInfo = isStudentBlocked(student.id);
-            console.log('🚫 Blocked info found:', blockedInfo);
             
             if (blockedInfo) {
-                console.log('❌ Student result is blocked, showing blocked message');
                 resultsDiv.innerHTML = `
                     <div class="no-results">
                         <h3>🚫 نتيجة الطالب محجوبة</h3>
                         <p><strong>الرقم الدراسي:</strong> ${student.id}</p>
                         <p><strong>اسم الطالب:</strong> ${student.name}</p>
                         <p><strong>السبب:</strong> ${blockedInfo.reason || 'غير محدد'}</p>
-                        <p><strong>تاريخ الحجب:</strong> ${blockedInfo.date ? new Date(blockedInfo.date).toLocaleDateString('ar-SA') : 'غير محدد'}</p>
                         <p style="color: #666; font-size: 14px; margin-top: 10px;">يرجى التواصل مع لجنة الامتحانات</p>
                     </div>
                 `;
                 return;
             }
-            
-            console.log('✅ Student result is not blocked, displaying result');
             
             // Display student result
             displayStudentResult(student);
@@ -537,16 +593,7 @@
         function isStudentBlocked(studentId) {
             try {
                 const blockedStudents = JSON.parse(localStorage.getItem('blockedStudents') || '[]');
-                console.log('🔍 All blocked students:', blockedStudents);
-                console.log('🔍 Looking for student ID:', studentId);
-                
-                const blockedInfo = blockedStudents.find(blocked => {
-                    console.log('🔍 Comparing:', blocked.studentId, 'with', studentId);
-                    return blocked.studentId === studentId;
-                });
-                
-                console.log('🚫 Found blocked info:', blockedInfo);
-                return blockedInfo;
+                return blockedStudents.find(blocked => blocked.studentId === studentId);
             } catch (error) {
                 console.error('❌ Error checking blocked status:', error);
                 return null;
@@ -578,8 +625,6 @@
                     const final = fieldMapping.final ? parseInt(subject[fieldMapping.final]) || 0 : 0;
                     const total = fieldMapping.total ? parseInt(subject[fieldMapping.total]) || 0 : (classwork + final);
                     
-                    console.log(`Subject ${index + 1}: ${subject.name}, Total: ${total}, Units: ${units}`);
-                    
                     totalUnits += units;
                     totalClassWork += classwork;
                     totalFinal += final;
@@ -597,9 +642,6 @@
                         if (subject.name && subject.name.includes('(مطالب)')) {
                             failedRequiredSubjects++;
                             hasFailedRequired = true;
-                            console.log(`Failed required subject: ${subject.name}`);
-                        } else {
-                            console.log(`Failed non-required subject: ${subject.name}`);
                         }
                     } else {
                         passedSubjects++;
@@ -613,15 +655,11 @@
             // Rule 1: If failed any "مطالب" subject, student fails
             if (hasFailedRequired) {
                 studentStatus = 'راسب';
-                console.log('Student failed due to required subject');
             } else {
                 // Rule 2: Pass if failed subjects <= 2 AND GPA >= 50
                 const passed = failedSubjects <= 2 && parseFloat(semesterGPA) >= 50;
                 studentStatus = passed ? 'منقول' : 'راسب';
-                console.log(`Student status: ${studentStatus} (Failed: ${failedSubjects}, GPA: ${semesterGPA})`);
             }
-            
-            console.log(`Final student status: ${studentStatus} (Failed required: ${failedRequiredSubjects}, Failed total: ${failedSubjects})`);
             
             const evaluation = getEvaluation(parseFloat(semesterGPA));
             
@@ -635,7 +673,7 @@
                                 <th>المادة</th>
                                 <th>الوحدات</th>
                                 <th>أعمال الفصل</th>
-                                <th>الاختبار النهائي</th>
+                                <th>النهائي</th>
                                 <th>المجموع</th>
                                 <th>التقدير</th>
                             </tr>
@@ -686,12 +724,12 @@
                             <p>${student.semester || 'غير محدد'}</p>
                         </div>
                         <div class="info-item">
-                            <strong>المعدل التراكمي:</strong>
+                            <strong>المعدل:</strong>
                             <p style="color: #007bff; font-weight: bold; font-size: 18px;">${semesterGPA}</p>
                         </div>
                         <div class="info-item">
                             <strong>الحالة:</strong>
-                            <p style="color: ${studentStatus === 'راسب' ? '#dc3545' : '#28a745'}; font-weight: bold; font-size: 18px;">${studentStatus}</p>
+                            <p><span class="status-badge ${studentStatus === 'راسب' ? 'status-failed' : 'status-passed'}">${studentStatus}</span></p>
                         </div>
                         <div class="info-item">
                             <strong>المواد الناجحة:</strong>
@@ -775,361 +813,6 @@
                     console.error('❌ Error parsing URL parameters:', error);
                 }
             }
-        }
-        
-        // Load students from main system (Mobile & GitHub Pages compatible)
-        function loadStudentsFromStorage() {
-            try {
-                // Method 1: Try localStorage first
-                let storedStudents = localStorage.getItem('students');
-                if (storedStudents) {
-                    students = JSON.parse(storedStudents);
-                    console.log('✅ Loaded students from localStorage:', students.length);
-                    
-                    if (students.length > 0 && students[0].subjects) {
-                        analyzeStudentStructure(students[0]);
-                    }
-                    return;
-                }
-                
-                // Method 2: Try sessionStorage
-                let sessionStudents = sessionStorage.getItem('students');
-                if (sessionStudents) {
-                    students = JSON.parse(sessionStudents);
-                    console.log('✅ Loaded students from sessionStorage:', students.length);
-                    
-                    if (students.length > 0 && students[0].subjects) {
-                        analyzeStudentStructure(students[0]);
-                    }
-                    return;
-                }
-                
-                // Method 3: Try to load from main system via iframe
-                console.log('🔄 Loading from main system via iframe...');
-                loadFromMainSystem();
-                
-            } catch (error) {
-                console.error('❌ Error loading students:', error);
-                // Try iframe as fallback
-                loadFromMainSystem();
-            }
-        }
-        
-        // Load from main system via iframe (Mobile & GitHub Pages compatible)
-        function loadFromMainSystem() {
-            console.log('🔄 Attempting to load from main system...');
-            
-            // Try multiple methods for mobile compatibility
-            tryMethod1();
-        }
-        
-        // Method 1: Direct iframe load
-        function tryMethod1() {
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = './index.html';
-            iframe.timeout = setTimeout(() => {
-                console.log('⏰ Method 1 timeout, trying Method 2...');
-                document.body.removeChild(iframe);
-                tryMethod2();
-            }, 10000); // 10 second timeout
-            
-            iframe.onload = function() {
-                clearTimeout(iframe.timeout);
-                try {
-                    const iframeWindow = iframe.contentWindow;
-                    if (iframeWindow.students && iframeWindow.students.length > 0) {
-                        students = iframeWindow.students;
-                        console.log('✅ Loaded students from main system (Method 1):', students.length);
-                        
-                        // Save to localStorage for future use
-                        localStorage.setItem('students', JSON.stringify(students));
-                        sessionStorage.setItem('students', JSON.stringify(students));
-                        
-                        if (students.length > 0 && students[0].subjects) {
-                            analyzeStudentStructure(students[0]);
-                        }
-                    } else {
-                        console.log('❌ No students found in main system (Method 1)');
-                        document.body.removeChild(iframe);
-                        tryMethod2();
-                    }
-                } catch (e) {
-                    console.error('❌ Error accessing iframe data (Method 1):', e);
-                    document.body.removeChild(iframe);
-                    tryMethod2();
-                }
-            };
-            
-            iframe.onerror = function() {
-                clearTimeout(iframe.timeout);
-                console.error('❌ Error loading main system iframe (Method 1)');
-                document.body.removeChild(iframe);
-                tryMethod2();
-            };
-            
-            document.body.appendChild(iframe);
-        }
-        
-        // Method 2: Fetch and parse
-        function tryMethod2() {
-            console.log('🔄 Trying Method 2: Fetch and parse...');
-            
-            fetch('./index.html')
-                .then(response => response.text())
-                .then(html => {
-                    // Try to extract students data from the HTML
-                    const studentsMatch = html.match(/const students = \[([\s\S]*?)\];/);
-                    if (studentsMatch) {
-                        try {
-                            const studentsData = JSON.parse('[' + studentsMatch[1] + ']');
-                            if (studentsData && studentsData.length > 0) {
-                                students = studentsData;
-                                console.log('✅ Loaded students from HTML (Method 2):', students.length);
-                                
-                                // Save to storage
-                                localStorage.setItem('students', JSON.stringify(students));
-                                sessionStorage.setItem('students', JSON.stringify(students));
-                                
-                                if (students.length > 0 && students[0].subjects) {
-                                    analyzeStudentStructure(students[0]);
-                                }
-                                return;
-                            }
-                        } catch (e) {
-                            console.error('❌ Error parsing students from HTML:', e);
-                        }
-                    }
-                    
-                    console.log('❌ Method 2 failed, showing no data message');
-                    showNoDataMessage();
-                })
-                .catch(error => {
-                    console.error('❌ Error fetching HTML (Method 2):', error);
-                    showNoDataMessage();
-                });
-        }
-        
-        // Show no data message with instructions and manual data entry
-        function showNoDataMessage() {
-            const resultsDiv = document.getElementById('searchResults');
-            if (resultsDiv) {
-                resultsDiv.innerHTML = `
-                    <div class="no-results">
-                        <h3>لا توجد بيانات طلاب</h3>
-                        <p>يرجى اتباع الخطوات التالية:</p>
-                        <ol style="text-align: right; margin: 15px 20px;">
-                            <li>افتح المنظومة الرئيسية (<strong>index.html</strong>) أولاً</li>
-                            <li>تأكد من وجود بيانات طلاب في النظام</li>
-                            <li>أضف بعض الطلاب إذا لم يوجد</li>
-                            <li>عد لفتح صفحة البحث مرة أخرى</li>
-                        </ol>
-                        
-                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
-                            <h4 style="color: #856404; margin-bottom: 10px;">🔧 حلول للهواتف والمتصفحات المختلفة:</h4>
-                            <p style="color: #856404; font-size: 14px; margin-bottom: 15px;">اختر أحد الحلول التالية:</p>
-                            
-                            <div style="margin: 15px 0;">
-                                <h5 style="color: #856404; margin-bottom: 8px;">📱 الحل 1: رابط مباشر (موصى به للهواتف)</h5>
-                                <ol style="text-align: right; margin: 10px 20px; color: #856404; font-size: 13px;">
-                                    <li>في المنظومة الرئيسية، افتح Console (F12)</li>
-                                    <li>اكتب: <code>copy(window.location.href + '?students=' + encodeURIComponent(JSON.stringify(students)))</code></li>
-                                    <li>الصق الرابط في متصفح جديد</li>
-                                </ol>
-                                <button onclick="generateDirectLink()" style="background: #17a2b8; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">إنشاء رابط مباشر</button>
-                                <div id="directLinkContainer" style="margin-top: 10px;"></div>
-                            </div>
-                            
-                            <div style="margin: 15px 0;">
-                                <h5 style="color: #856404; margin-bottom: 8px;">✏️ الحل 2: نسخ ولصق يدوي</h5>
-                                <ol style="text-align: right; margin: 10px 20px; color: #856404; font-size: 13px;">
-                                    <li>في المنظومة الرئيسية، افتح Console (F12)</li>
-                                    <li>اكتب: <code>copy(JSON.stringify(students))</code></li>
-                                    <li>الصق البيانات هنا في الحقل أدناه</li>
-                                </ol>
-                                <textarea id="manualDataInput" placeholder="الصق بيانات الطلاب هنا..." style="width: 100%; height: 80px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 11px;"></textarea>
-                                <button onclick="loadManualData()" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">تحميل البيانات</button>
-                            </div>
-                            
-                            <div style="margin: 15px 0;">
-                                <h5 style="color: #856404; margin-bottom: 8px;">🧪 الحل 3: بيانات تجريبية (للاختبار)</h5>
-                                <p style="color: #856404; font-size: 13px;">للاختبار السريع، اضغط الزر التالي:</p>
-                                <button onclick="createTestData()" style="background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">إنشاء بيانات تجريبية</button>
-                            </div>
-                        </div>
-                        
-                        <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                            <strong>ملاحظة:</strong> على الهواتف، قد تحتاج لفتح المنظومة الرئيسية أولاً ثم صفحة البحث
-                        </p>
-                    </div>
-                `;
-            }
-        }
-        
-        // Generate direct link with data
-        function generateDirectLink() {
-            const container = document.getElementById('directLinkContainer');
-            
-            // Try to get current students data
-            let studentsData = students;
-            
-            // If no students, create sample data
-            if (!studentsData || studentsData.length === 0) {
-                studentsData = [
-                    {
-                        id: 'SAMPLE001',
-                        name: 'طالب تجريبي',
-                        department: 'قسم تجريبي',
-                        semester: 1,
-                        subjects: [
-                            { name: 'مادة تجريبية', units: 3, classwork: 20, final: 30, total: 50 }
-                        ]
-                    }
-                ];
-            }
-            
-            try {
-                const encodedData = encodeURIComponent(JSON.stringify(studentsData));
-                const directLink = `${window.location.origin}${window.location.pathname}?students=${encodedData}`;
-                
-                container.innerHTML = `
-                    <div style="background: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px; padding: 10px; margin-top: 10px;">
-                        <p style="color: #0066cc; font-size: 12px; margin-bottom: 8px;">📋 الرابط المباشر:</p>
-                        <input type="text" value="${directLink}" readonly style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 10px; direction: ltr;" onclick="this.select()">
-                        <button onclick="copyDirectLink('${directLink}')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-top: 5px;">نسخ الرابط</button>
-                        <button onclick="openDirectLink('${directLink}')" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-top: 5px;">فتح الرابط</button>
-                    </div>
-                `;
-            } catch (error) {
-                container.innerHTML = `<p style="color: #dc3545; font-size: 12px;">❌ خطأ في إنشاء الرابط: ${error.message}</p>`;
-            }
-        }
-        
-        // Copy direct link to clipboard
-        function copyDirectLink(link) {
-            navigator.clipboard.writeText(link).then(() => {
-                alert('✅ تم نسخ الرابط إلى الحافظة');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = link;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('✅ تم نسخ الرابط إلى الحافظة');
-            });
-        }
-        
-        // Open direct link in new tab
-        function openDirectLink(link) {
-            window.open(link, '_blank');
-        }
-        
-        // Load manual data from textarea
-        function loadManualData() {
-            const manualDataInput = document.getElementById('manualDataInput');
-            const dataText = manualDataInput.value.trim();
-            
-            if (!dataText) {
-                alert('الرجاء لصق بيانات الطلاب أولاً');
-                return;
-            }
-            
-            try {
-                // Try to parse as JSON
-                const parsedData = JSON.parse(dataText);
-                if (Array.isArray(parsedData) && parsedData.length > 0) {
-                    students = parsedData;
-                    console.log('✅ Loaded manual data:', students.length);
-                    
-                    // Save to storage
-                    localStorage.setItem('students', JSON.stringify(students));
-                    sessionStorage.setItem('students', JSON.stringify(students));
-                    
-                    if (students.length > 0 && students[0].subjects) {
-                        analyzeStudentStructure(students[0]);
-                    }
-                    
-                    // Clear the input and show success
-                    manualDataInput.value = '';
-                    const resultsDiv = document.getElementById('searchResults');
-                    resultsDiv.innerHTML = `
-                        <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
-                            <h4 style="color: #155724; margin-bottom: 10px;">✅ تم تحميل البيانات بنجاح!</h4>
-                            <p style="color: #155724;">عدد الطلاب: ${students.length}</p>
-                            <p style="color: #155724; font-size: 14px;">يمكنك الآن البحث عن الطلاب</p>
-                        </div>
-                    `;
-                } else {
-                    alert('البيانات يجب أن تكون مصفوفة من الطلاب');
-                }
-            } catch (error) {
-                alert('خطأ في تحليل البيانات: ' + error.message);
-                console.error('Error parsing manual data:', error);
-            }
-        }
-        
-        // Create test data for mobile users
-        function createTestData() {
-            const testStudents = [
-                {
-                    id: 'CO242001',
-                    name: 'أحمد محمد علي',
-                    department: 'هندسة حاسوب',
-                    semester: 2,
-                    subjects: [
-                        { name: 'برمجة 2 (مطالب)', units: 3, classwork: 25, final: 55, total: 80 },
-                        { name: 'رياضيات متقدمة', units: 3, classwork: 20, final: 45, total: 65 },
-                        { name: 'قواعد بيانات', units: 2, classwork: 15, final: 35, total: 50 },
-                        { name: 'شبكات حاسوب', units: 3, classwork: 18, final: 42, total: 60 }
-                    ]
-                },
-                {
-                    id: 'CO242002',
-                    name: 'فاطمة عبدالله سالم',
-                    department: 'هندسة حاسوب',
-                    semester: 2,
-                    subjects: [
-                        { name: 'برمجة 2 (مطالب)', units: 3, classwork: 10, final: 25, total: 35 },
-                        { name: 'رياضيات متقدمة', units: 3, classwork: 22, final: 48, total: 70 },
-                        { name: 'قواعد بيانات', units: 2, classwork: 18, final: 37, total: 55 },
-                        { name: 'شبكات حاسوب', units: 3, classwork: 20, final: 40, total: 60 }
-                    ]
-                },
-                {
-                    id: 'CO242003',
-                    name: 'محمد خالد عمر',
-                    department: 'هندسة حاسوب',
-                    semester: 2,
-                    subjects: [
-                        { name: 'برمجة 2 (مطالب)', units: 3, classwork: 28, final: 62, total: 90 },
-                        { name: 'رياضيات متقدمة', units: 3, classwork: 25, final: 55, total: 80 },
-                        { name: 'قواعد بيانات', units: 2, classwork: 20, final: 45, total: 65 },
-                        { name: 'شبكات حاسوب', units: 3, classwork: 22, final: 48, total: 70 }
-                    ]
-                }
-            ];
-            
-            students = testStudents;
-            console.log('✅ Created test data:', students.length);
-            
-            // Save to storage
-            localStorage.setItem('students', JSON.stringify(students));
-            sessionStorage.setItem('students', JSON.stringify(students));
-            
-            if (students.length > 0 && students[0].subjects) {
-                analyzeStudentStructure(students[0]);
-            }
-            
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = `
-                <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
-                    <h4 style="color: #155724; margin-bottom: 10px;">✅ تم إنشاء بيانات تجريبية!</h4>
-                    <p style="color: #155724;">عدد الطلاب: ${students.length}</p>
-                    <p style="color: #155724; font-size: 14px;">يمكنك الآن البحث عن الطلاب (CO242001, CO242002, CO242003)</p>
-                </div>
-            `;
         }
     </script>
 </body>
