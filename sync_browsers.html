@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزامنة البيانات بين المتصفحات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            direction: rtl;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ffeaa7;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #bee5eb;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            border: 1px solid #dee2e6;
+        }
+        .data-preview {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .browser-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        .step {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #bbdefb;
+        }
+        .step-number {
+            background: #1976d2;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 مزامنة البيانات بين المتصفحات</h1>
+        
+        <div class="warning">
+            <h3>⚠️ المشكلة</h3>
+            <p>localStorage يعمل بشكل منفصل لكل متصفح. عندما تفتح المنظومة على Edge، ترى بيانات مختلفة عن التي تراها على Chrome.</p>
+        </div>
+        
+        <div class="section">
+            <h3>🌐 معلومات المتصفح الحالي</h3>
+            <div class="browser-info" id="browserInfo"></div>
+            <div class="browser-info" id="localStorageInfo"></div>
+        </div>
+        
+        <div class="section">
+            <h3>📊 بيانات الحالية في هذا المتصفح</h3>
+            <div id="currentData"></div>
+        </div>
+        
+        <div class="section">
+            <h3>🔧 أدوات المزامنة</h3>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>تصدير البيانات من هذا المتصفح</strong>
+                <p>قم بتصدير جميع بيانات الطلاب والمواد من هذا المتصفح</p>
+                <button class="btn btn-success" onclick="exportData()">📤 تصدير البيانات</button>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>استيراد البيانات إلى هذا المتصفح</strong>
+                <p>قم باستيراد بيانات من متصفح آخر</p>
+                <input type="file" id="importFile" accept=".json" style="margin: 10px 0;">
+                <button class="btn btn-warning" onclick="importData()">📥 استيراد البيانات</button>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>مزامنة تلقائية</strong>
+                <p>استخدم هذه الطريقة لمزامنة البيانات بين المتصفحات</p>
+                <button class="btn" onclick="generateSyncCode()">🔑 إنشاء رمز مزامنة</button>
+                <button class="btn" onclick="applySyncCode()">🔓 تطبيق رمز مزامنة</button>
+                <textarea id="syncCode" placeholder="ضع رمز المزامنة هنا" style="width: 100%; height: 100px; margin: 10px 0; padding: 10px; border-radius: 5px; border: 1px solid #ddd;"></textarea>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>📋 الحلول المقترحة</h3>
+            
+            <div class="info">
+                <h4>🎯 الحل 1: استخدام ملف مشترك (موصى به)</h4>
+                <p>قم بتصدير البيانات من متصفح وحفظها في ملف، ثم استيرادها في المتصفح الآخر.</p>
+            </div>
+            
+            <div class="info">
+                <h4>🎯 الحل 2: استخدام رمز المزامنة</h4>
+                <p>إنشاء رمز مزامنة من متصفح ونسخه إلى المتصفح الآخر.</p>
+            </div>
+            
+            <div class="info">
+                <h4>🎯 الحل 3: استخدام خادم خارجي</h4>
+                <p>تخزين البيانات في خادم خارجي (يتطلب اتصال بالإنترنت).</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>🛠️ أدوات إضافية</h3>
+            <button class="btn" onclick="clearCurrentData()">🗑️ مسح بيانات هذا المتصفح</button>
+            <button class="btn btn-danger" onclick="clearAllData()">💥 مسح كل البيانات</button>
+            <button class="btn btn-success" onclick="createBackup()">💾 إنشاء نسخة احتياطية</button>
+        </div>
+        
+        <div id="messages"></div>
+    </div>
+
+    <script>
+        function showMessage(message, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.innerHTML = message;
+            messagesDiv.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        function getBrowserInfo() {
+            const userAgent = navigator.userAgent;
+            let browserName = 'غير معروف';
+            
+            if (userAgent.indexOf('Chrome') > -1) {
+                browserName = 'Google Chrome';
+            } else if (userAgent.indexOf('Safari') > -1) {
+                browserName = 'Safari';
+            } else if (userAgent.indexOf('Firefox') > -1) {
+                browserName = 'Mozilla Firefox';
+            } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident/') > -1) {
+                browserName = 'Internet Explorer';
+            } else if (userAgent.indexOf('Edge') > -1) {
+                browserName = 'Microsoft Edge';
+            }
+            
+            return browserName;
+        }
+        
+        function loadBrowserInfo() {
+            const browserInfo = document.getElementById('browserInfo');
+            const localStorageInfo = document.getElementById('localStorageInfo');
+            
+            browserInfo.innerHTML = `
+                <strong>المتصفح:</strong> ${getBrowserInfo()}<br>
+                <strong>نظام التشغيل:</strong> ${navigator.platform}<br>
+                <strong>اللغة:</strong> ${navigator.language}
+            `;
+            
+            let localStorageSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    localStorageSize += localStorage[key].length + key.length;
+                }
+            }
+            
+            localStorageInfo.innerHTML = `
+                <strong>حجم localStorage:</strong> ${(localStorageSize / 1024).toFixed(2)} KB<br>
+                <strong>عدد العناصر:</strong> ${localStorage.length}
+            `;
+        }
+        
+        function loadCurrentData() {
+            const currentDataDiv = document.getElementById('currentData');
+            
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const settings = JSON.parse(localStorage.getItem('adminSettings')) || {};
+            const departments = JSON.parse(localStorage.getItem('departments')) || [];
+            const departmentSubjects = JSON.parse(localStorage.getItem('departmentSubjects')) || {};
+            
+            let html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: #007bff;">${students.length}</div>
+                        <div style="color: #666;">عدد الطلاب</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: #28a745;">${departments.length}</div>
+                        <div style="color: #666;">عدد الأقسام</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: #17a2b8;">${Object.keys(departmentSubjects).length}</div>
+                        <div style="color: #666;">أقسام بمواد</div>
+                    </div>
+                </div>
+            `;
+            
+            if (students.length > 0) {
+                html += '<h4>👤 آخر 5 طلاب:</h4>';
+                html += '<div class="data-preview">';
+                students.slice(-5).forEach((student, index) => {
+                    html += `
+                        <div style="padding: 10px; margin-bottom: 5px; background: white; border-radius: 5px; border: 1px solid #ddd;">
+                            <strong>${index + 1}. ${student.name}</strong> - ${student.id} - ${student.department} - ${student.subjects ? student.subjects.length : 0} مواد
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            
+            currentDataDiv.innerHTML = html;
+        }
+        
+        function exportData() {
+            const data = {
+                students: JSON.parse(localStorage.getItem('students')) || [],
+                settings: JSON.parse(localStorage.getItem('adminSettings')) || {},
+                departments: JSON.parse(localStorage.getItem('departments')) || [],
+                departmentSubjects: JSON.parse(localStorage.getItem('departmentSubjects')) || {},
+                blockedStudents: JSON.parse(localStorage.getItem('blockedStudents')) || [],
+                exportDate: new Date().toISOString(),
+                browser: getBrowserInfo()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `browser_sync_${getBrowserInfo().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showMessage('تم تصدير البيانات بنجاح', 'success');
+        }
+        
+        function importData() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('الرجاء اختيار ملف أولاً', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // استيراد البيانات
+                    if (data.students) {
+                        localStorage.setItem('students', JSON.stringify(data.students));
+                    }
+                    if (data.settings) {
+                        localStorage.setItem('adminSettings', JSON.stringify(data.settings));
+                    }
+                    if (data.departments) {
+                        localStorage.setItem('departments', JSON.stringify(data.departments));
+                    }
+                    if (data.departmentSubjects) {
+                        localStorage.setItem('departmentSubjects', JSON.stringify(data.departmentSubjects));
+                    }
+                    if (data.blockedStudents) {
+                        localStorage.setItem('blockedStudents', JSON.stringify(data.blockedStudents));
+                    }
+                    
+                    showMessage(`تم استيراد البيانات بنجاح من ${data.browser || 'متصفح غير معروف'}`, 'success');
+                    loadCurrentData();
+                    
+                } catch (error) {
+                    showMessage('خطأ في قراءة الملف: ' + error.message, 'error');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        function generateSyncCode() {
+            const data = {
+                students: JSON.parse(localStorage.getItem('students')) || [],
+                settings: JSON.parse(localStorage.getItem('adminSettings')) || {},
+                departments: JSON.parse(localStorage.getItem('departments')) || [],
+                departmentSubjects: JSON.parse(localStorage.getItem('departmentSubjects')) || {},
+                blockedStudents: JSON.parse(localStorage.getItem('blockedStudents')) || [],
+                timestamp: new Date().toISOString(),
+                browser: getBrowserInfo()
+            };
+            
+            const syncCode = btoa(JSON.stringify(data));
+            document.getElementById('syncCode').value = syncCode;
+            
+            showMessage('تم إنشاء رمز المزامنة بنجاح', 'success');
+        }
+        
+        function applySyncCode() {
+            const syncCode = document.getElementById('syncCode').value.trim();
+            
+            if (!syncCode) {
+                showMessage('الرجاء إدخال رمز المزامنة', 'error');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(atob(syncCode));
+                
+                // تطبيق البيانات
+                if (data.students) {
+                    localStorage.setItem('students', JSON.stringify(data.students));
+                }
+                if (data.settings) {
+                    localStorage.setItem('adminSettings', JSON.stringify(data.settings));
+                }
+                if (data.departments) {
+                    localStorage.setItem('departments', JSON.stringify(data.departments));
+                }
+                if (data.departmentSubjects) {
+                    localStorage.setItem('departmentSubjects', JSON.stringify(data.departmentSubjects));
+                }
+                if (data.blockedStudents) {
+                    localStorage.setItem('blockedStudents', JSON.stringify(data.blockedStudents));
+                }
+                
+                showMessage(`تم تطبيق البيانات بنجاح من ${data.browser || 'متصفح غير معروف'} (${new Date(data.timestamp).toLocaleString()})`, 'success');
+                loadCurrentData();
+                
+            } catch (error) {
+                showMessage('رمز المزامنة غير صالح: ' + error.message, 'error');
+            }
+        }
+        
+        function clearCurrentData() {
+            if (confirm('هل أنت متأكد من مسح بيانات هذا المتصفح فقط؟')) {
+                localStorage.clear();
+                showMessage('تم مسح بيانات هذا المتصفح بنجاح', 'success');
+                loadCurrentData();
+            }
+        }
+        
+        function clearAllData() {
+            if (confirm('هل أنت متأكد من مسح كل البيانات؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                localStorage.clear();
+                showMessage('تم مسح كل البيانات بنجاح', 'success');
+                loadCurrentData();
+            }
+        }
+        
+        function createBackup() {
+            const backup = {
+                timestamp: new Date().toISOString(),
+                browser: getBrowserInfo(),
+                data: {}
+            };
+            
+            // نسخ احتياطي لكل البيانات
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                backup.data[key] = localStorage.getItem(key);
+            }
+            
+            const backupStr = JSON.stringify(backup, null, 2);
+            const backupUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(backupStr);
+            
+            const backupFileDefaultName = `backup_${getBrowserInfo().replace(/\s+/g, '_')}_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', backupUri);
+            linkElement.setAttribute('download', backupFileDefaultName);
+            linkElement.click();
+            
+            showMessage('تم إنشاء نسخة احتياطية بنجاح', 'success');
+        }
+        
+        // تحميل البيانات عند فتح الصفحة
+        window.onload = function() {
+            loadBrowserInfo();
+            loadCurrentData();
+        };
+    </script>
+</body>
+</html>

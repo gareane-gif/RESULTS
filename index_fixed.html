@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة إدارة نتائج الطلاب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            background: white;
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+
+        .subjects-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .subject-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .subject-item input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .student-info h3 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .student-info p {
+            color: #666;
+            margin: 4px 0;
+            font-size: 0.95em;
+        }
+
+        .subjects-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .subjects-table th,
+        .subjects-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+
+        .subjects-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .subjects-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .search-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-input input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 18px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .gpa-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .gpa-excellent {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .gpa-very-good {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .gpa-good {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #333;
+        }
+
+        .gpa-pass {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+
+        .gpa-fail {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .blocked-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            border: 2px solid #dc3545;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .subject-item {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .student-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-input {
+                flex-direction: column;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 منظومة إدارة نتائج الطلاب</h1>
+            <p>نظام شامل لإدارة نتائج الطلاب والبحث عنها</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('add-student')">➕ إضافة طالب</button>
+            <button class="tab" onclick="showTab('list')">📋 قائمة الطلاب</button>
+            <button class="tab" onclick="showTab('search-student')">🔍 بحث طالب</button>
+            <button class="tab" onclick="showTab('block-student')">🚫 حجب نتيجة</button>
+        </div>
+
+        <!-- Add Student Tab -->
+        <div id="add-student" class="tab-content active">
+            <h2>إضافة طالب جديد</h2>
+            <form id="studentForm">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="studentId">الرقم الدراسي:</label>
+                        <input type="text" id="studentId" required placeholder="مثال: CO242001">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentName">اسم الطالب:</label>
+                        <input type="text" id="studentName" required placeholder="أدخل اسم الطالب الكامل">
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="department">القسم:</label>
+                        <input type="text" id="department" required placeholder="مثال: علوم الحاسوب">
+                    </div>
+                    <div class="form-group">
+                        <label for="semester">الفصل الدراسي:</label>
+                        <select id="semester" required>
+                            <option value="">اختر الفصل</option>
+                            <option value="1">الفصل الأول</option>
+                            <option value="2">الفصل الثاني</option>
+                            <option value="3">الفصل الثالث</option>
+                            <option value="4">الفصل الرابع</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="subjects-container">
+                    <h3>المواد الدراسية</h3>
+                    <div id="subjectsContainer">
+                        <div class="subject-item">
+                            <input type="text" placeholder="اسم المادة" class="subject-name">
+                            <input type="number" placeholder="الوحدات" class="subject-units" min="1" max="6">
+                            <input type="number" placeholder="الأعمال" class="subject-classwork" min="0" max="40">
+                            <input type="number" placeholder="النهائي" class="subject-final" min="0" max="60">
+                            <input type="number" placeholder="الإجمالي" class="subject-total" min="0" max="100" readonly>
+                            <button type="button" onclick="removeSubject(this)" class="btn btn-danger">حذف</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addSubject()" class="btn btn-info">➕ إضافة مادة</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success">✅ إضافة الطالب</button>
+                    <button type="button" onclick="clearForm()" class="btn btn-warning">🔄 مسح النموذج</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Students List Tab -->
+        <div id="list" class="tab-content">
+            <h2>قائمة الطلاب</h2>
+            <div style="margin-bottom: 20px;">
+                <button onclick="displayStudents()" class="btn btn-info">🔄 تحديث القائمة</button>
+            </div>
+            <div id="allStudentsList"></div>
+        </div>
+
+        <!-- Search Student Tab -->
+        <div id="search-student" class="tab-content">
+            <div class="search-section">
+                <h2>🔍 البحث عن طالب</h2>
+                <div class="search-input">
+                    <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي أو اسم الطالب">
+                    <button onclick="searchStudent()" class="btn">🔍 بحث</button>
+                </div>
+                <div id="searchResults"></div>
+            </div>
+        </div>
+
+        <!-- Block Student Tab -->
+        <div id="block-student" class="tab-content">
+            <h2>حجب نتيجة طالب</h2>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="blockStudentId">الرقم الدراسي:</label>
+                    <input type="text" id="blockStudentId" placeholder="أدخل الرقم الدراسي">
+                </div>
+                <div class="form-group">
+                    <label for="blockReason">سبب الحجب:</label>
+                    <textarea id="blockReason" placeholder="أدخل سبب الحجب" rows="3"></textarea>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="blockStudent()" class="btn btn-danger">🚫 حجب النتيجة</button>
+                <button onclick="unblockStudent()" class="btn btn-success">✅ رفع الحجب</button>
+                <button onclick="loadBlockedStudents()" class="btn btn-info">📋 عرض المحجوبين</button>
+            </div>
+            <div id="blockedStudentsList" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+    <script>
+        // Initialize data
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let blockedStudents = JSON.parse(localStorage.getItem('blockedStudents')) || [];
+
+        // Initialize on page load
+        window.onload = function() {
+            console.log('🎓 Fixed Student Management System Loaded');
+        };
+
+        // Tab Management
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabId === 'list') {
+                displayStudents();
+            }
+        }
+
+        // Subject Management
+        function addSubject() {
+            const container = document.getElementById('subjectsContainer');
+            const subjectDiv = document.createElement('div');
+            subjectDiv.className = 'subject-item';
+            subjectDiv.innerHTML = `
+                <input type="text" placeholder="اسم المادة" class="subject-name">
+                <input type="number" placeholder="الوحدات" class="subject-units" min="1" max="6">
+                <input type="number" placeholder="الأعمال" class="subject-classwork" min="0" max="40">
+                <input type="number" placeholder="النهائي" class="subject-final" min="0" max="60">
+                <input type="number" placeholder="الإجمالي" class="subject-total" min="0" max="100" readonly>
+                <button type="button" onclick="removeSubject(this)" class="btn btn-danger">حذف</button>
+            `;
+            container.appendChild(subjectDiv);
+            
+            const classworkInput = subjectDiv.querySelector('.subject-classwork');
+            const finalInput = subjectDiv.querySelector('.subject-final');
+            const totalInput = subjectDiv.querySelector('.subject-total');
+            
+            classworkInput.addEventListener('input', () => calculateSubjectTotal(subjectDiv));
+            finalInput.addEventListener('input', () => calculateSubjectTotal(subjectDiv));
+        }
+        
+        function removeSubject(button) {
+            button.parentElement.remove();
+        }
+        
+        function calculateSubjectTotal(subjectDiv) {
+            const classwork = parseFloat(subjectDiv.querySelector('.subject-classwork').value) || 0;
+            const final = parseFloat(subjectDiv.querySelector('.subject-final').value) || 0;
+            const total = classwork + final;
+            subjectDiv.querySelector('.subject-total').value = total;
+        }
+
+        // Form Management
+        function clearForm() {
+            document.getElementById('studentForm').reset();
+            const container = document.getElementById('subjectsContainer');
+            container.innerHTML = `
+                <div class="subject-item">
+                    <input type="text" placeholder="اسم المادة" class="subject-name">
+                    <input type="number" placeholder="الوحدات" class="subject-units" min="1" max="6">
+                    <input type="number" placeholder="الأعمال" class="subject-classwork" min="0" max="40">
+                    <input type="number" placeholder="نهائي" class="subject-final" min="0" max="60">
+                    <input type="number" placeholder="الإجمالي" class="subject-total" min="0" max="100" readonly>
+                    <button type="button" onclick="removeSubject(this)" class="btn btn-danger">حذف</button>
+                </div>
+            `;
+        }
+
+        // Student Management
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('studentId').value;
+            const studentName = document.getElementById('studentName').value;
+            const department = document.getElementById('department').value;
+            const semester = document.getElementById('semester').value;
+            
+            if (students.some(s => s.id === studentId)) {
+                showStatus('الرقم الدراسي موجود بالفعل', 'error');
+                return;
+            }
+            
+            const subjects = [];
+            const subjectItems = document.querySelectorAll('.subject-item');
+            
+            subjectItems.forEach(item => {
+                const name = item.querySelector('.subject-name').value;
+                const units = parseInt(item.querySelector('.subject-units').value) || 0;
+                const classwork = parseFloat(item.querySelector('.subject-classwork').value) || 0;
+                const final = parseFloat(item.querySelector('.subject-final').value) || 0;
+                const total = parseFloat(item.querySelector('.subject-total').value) || 0;
+                
+                if (name && units > 0) {
+                    subjects.push({ name, units, classwork, final, total });
+                }
+            });
+            
+            if (subjects.length === 0) {
+                showStatus('الرجاء إضافة مادة واحدة على الأقل', 'error');
+                return;
+            }
+            
+            const student = {
+                id: studentId,
+                name: studentName,
+                department: department,
+                semester: semester,
+                subjects: subjects,
+                addedDate: new Date().toISOString()
+            };
+            
+            students.push(student);
+            localStorage.setItem('students', JSON.stringify(students));
+            
+            clearForm();
+            showStatus(`تم إضافة الطالب ${studentName} بنجاح`, 'success');
+        });
+
+        // Display Students
+        function displayStudents() {
+            const listDiv = document.getElementById('allStudentsList');
+            
+            if (students.length === 0) {
+                listDiv.innerHTML = '<div class="no-results">لا توجد بيانات طلاب</div>';
+                return;
+            }
+            
+            let html = '';
+            students.forEach(student => {
+                const gpa = calculateGPA(student.subjects);
+                const status = calculateSemesterStatus(student.subjects, gpa);
+                const isBlocked = blockedStudents.some(b => b.studentId === student.id);
+                
+                html += `
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-info">
+                                <h3>${student.name}</h3>
+                                <p><strong>الرقم:</strong> ${student.id}</p>
+                                <p><strong>القسم:</strong> ${student.department}</p>
+                                <p><strong>الفصل:</strong> ${student.semester}</p>
+                                <p><strong>المعدل:</strong> ${gpa.toFixed(2)}%</p>
+                                <p><strong>الحالة:</strong> <span style="color: ${status === 'منقول' ? 'green' : 'red'}; font-weight: bold;">${status}</span></p>
+                                ${isBlocked ? '<p style="color: red; font-weight: bold;">🚫 نتيجة محجوبة</p>' : ''}
+                            </div>
+                            <div>
+                                <button onclick="deleteStudent('${student.id}')" class="btn btn-danger">🗑️ حذف</button>
+                            </div>
+                        </div>
+                        <table class="subjects-table">
+                            <thead>
+                                <tr>
+                                    <th>المادة</th>
+                                    <th>وحدات</th>
+                                    <th>أعمال</th>
+                                    <th>نهائي</th>
+                                    <th>إجمالي</th>
+                                    <th>تقدير</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${student.subjects.map(subject => `
+                                    <tr>
+                                        <td>${subject.name}</td>
+                                        <td>${subject.units}</td>
+                                        <td>${subject.classwork}</td>
+                                        <td>${subject.final}</td>
+                                        <td>${subject.total}</td>
+                                        <td>${getGrade(subject.total)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+            
+            listDiv.innerHTML = html;
+        }
+
+        // Search Student
+        function searchStudent() {
+            const searchTerm = document.getElementById('searchId').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '<div class="no-results">الرجاء إدخال الرقم الدراسي أو اسم الطالب</div>';
+                return;
+            }
+            
+            const student = students.find(s => 
+                s.id === searchTerm || 
+                s.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            if (!student) {
+                resultsDiv.innerHTML = '<div class="no-results">الطالب غير موجود</div>';
+                return;
+            }
+            
+            const blocked = blockedStudents.find(b => b.studentId === student.id);
+            
+            if (blocked) {
+                resultsDiv.innerHTML = `
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-info">
+                                <h3>${student.name}</h3>
+                                <p><strong>الرقم:</strong> ${student.id}</p>
+                                <p><strong>القسم:</strong> ${student.department}</p>
+                                <p><strong>الفصل:</strong> ${student.semester}</p>
+                            </div>
+                        </div>
+                        <div class="blocked-message">
+                            <h3>🚫 النتيجة محجوبة</h3>
+                            <p><strong>السبب:</strong> ${blocked.reason}</p>
+                            <p><strong>التاريخ:</strong> ${new Date(blocked.date).toLocaleDateString('ar-SA')}</p>
+                            <p style="margin-top: 15px;">يرجى التواصل مع لجنة الامتحانات</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const gpa = calculateGPA(student.subjects);
+            const status = calculateSemesterStatus(student.subjects, gpa);
+            const passedSubjects = student.subjects.filter(s => s.total >= 50).length;
+            const failedSubjects = student.subjects.filter(s => s.total < 50).length;
+            
+            resultsDiv.innerHTML = `
+                <div class="student-card">
+                    <div class="student-header">
+                        <div class="student-info">
+                            <h3>${student.name}</h3>
+                            <p><strong>الرقم:</strong> ${student.id}</p>
+                            <p><strong>القسم:</strong> ${student.department}</p>
+                            <p><strong>الفصل:</strong> ${student.semester}</p>
+                            <p><strong>المعدل:</strong> ${gpa.toFixed(2)}%</p>
+                            <p><strong>الحالة:</strong> <span style="color: ${status === 'منقول' ? 'green' : 'red'}; font-weight: bold;">${status}</span></p>
+                        </div>
+                    </div>
+                    <div class="gpa-display gpa-${getGpaClass(gpa)}">
+                        المعدل العام: ${gpa.toFixed(2)}%
+                        <br>
+                        الحالة: ${status}
+                    </div>
+                    <div class="grid-2">
+                        <div>
+                            <strong>المواد الناجحة:</strong>
+                            <p style="color: #28a745; font-weight: bold;">${passedSubjects}</p>
+                        </div>
+                        <div>
+                            <strong>المواد الراسبة:</strong>
+                            <p style="color: #dc3545; font-weight: bold;">${failedSubjects}</p>
+                        </div>
+                    </div>
+                    <table class="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>وحدات</th>
+                                <th>أعمال</th>
+                                <th>نهائي</th>
+                                <th>إجمالي</th>
+                                <th>تقدير</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${student.subjects.map(subject => `
+                                <tr>
+                                    <td>${subject.name}</td>
+                                    <td>${subject.units}</td>
+                                    <td>${subject.classwork}</td>
+                                    <td>${subject.final}</td>
+                                    <td>${subject.total}</td>
+                                    <td>${getGrade(subject.total)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Delete Student
+        function deleteStudent(studentId) {
+            if (!confirm('هل أنت متأكد من حذف هذا الطالب؟')) return;
+            
+            students = students.filter(s => s.id !== studentId);
+            localStorage.setItem('students', JSON.stringify(students));
+            displayStudents();
+            showStatus('تم حذف الطالب بنجاح', 'success');
+        }
+
+        // Block Student Functions
+        function blockStudent() {
+            const studentId = document.getElementById('blockStudentId').value.trim();
+            const reason = document.getElementById('blockReason').value.trim();
+            
+            if (!studentId || !reason) {
+                showStatus('الرجاء إدخال الرقم الدراسي وسبب الحجب', 'error');
+                return;
+            }
+            
+            const student = students.find(s => s.id === studentId);
+            if (!student) {
+                showStatus('الطالب غير موجود', 'error');
+                return;
+            }
+            
+            const existingBlock = blockedStudents.find(b => b.studentId === studentId);
+            if (existingBlock) {
+                existingBlock.reason = reason;
+                existingBlock.date = new Date().toISOString();
+            } else {
+                blockedStudents.push({
+                    studentId: studentId,
+                    studentName: student.name,
+                    reason: reason,
+                    date: new Date().toISOString()
+                });
+            }
+            
+            localStorage.setItem('blockedStudents', JSON.stringify(blockedStudents));
+            showStatus('تم حجب نتيجة الطالب بنجاح', 'success');
+            
+            document.getElementById('blockStudentId').value = '';
+            document.getElementById('blockReason').value = '';
+        }
+
+        function unblockStudent() {
+            const studentId = document.getElementById('blockStudentId').value.trim();
+            
+            if (!studentId) {
+                showStatus('الرجاء إدخال الرقم الدراسي', 'error');
+                return;
+            }
+            
+            const initialLength = blockedStudents.length;
+            blockedStudents = blockedStudents.filter(b => b.studentId !== studentId);
+            
+            if (blockedStudents.length === initialLength) {
+                showStatus('الطالب غير محجوب', 'error');
+                return;
+            }
+            
+            localStorage.setItem('blockedStudents', JSON.stringify(blockedStudents));
+            showStatus('تم رفع حجب نتيجة الطالب بنجاح', 'success');
+            
+            document.getElementById('blockStudentId').value = '';
+        }
+
+        function loadBlockedStudents() {
+            const listDiv = document.getElementById('blockedStudentsList');
+            
+            if (blockedStudents.length === 0) {
+                listDiv.innerHTML = '<div class="no-results">لا يوجد طلاب محجوبون</div>';
+                return;
+            }
+            
+            let html = '';
+            blockedStudents.forEach(blocked => {
+                html += `
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-info">
+                                <h3>${blocked.studentName}</h3>
+                                <p><strong>الرقم:</strong> ${blocked.studentId}</p>
+                                <p><strong>السبب:</strong> ${blocked.reason}</p>
+                                <p><strong>التاريخ:</strong> ${new Date(blocked.date).toLocaleDateString('ar-SA')}</p>
+                            </div>
+                            <div>
+                                <button onclick="unblockStudentById('${blocked.studentId}')" class="btn btn-success">✅ رفع الحجب</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listDiv.innerHTML = html;
+        }
+
+        function unblockStudentById(studentId) {
+            blockedStudents = blockedStudents.filter(b => b.studentId !== studentId);
+            localStorage.setItem('blockedStudents', JSON.stringify(blockedStudents));
+            loadBlockedStudents();
+            showStatus('تم رفع الحجب بنجاح', 'success');
+        }
+
+        // Utility Functions
+        function calculateGPA(subjects) {
+            if (subjects.length === 0) return 0;
+            
+            const totalUnits = subjects.reduce((sum, subject) => sum + subject.units, 0);
+            const weightedSum = subjects.reduce((sum, subject) => sum + (subject.total * subject.units), 0);
+            
+            return weightedSum / totalUnits;
+        }
+
+        function calculateSemesterStatus(subjects, gpa) {
+            const failedRequired = subjects.some(subject => 
+                subject.name.includes('(مطالب)') && subject.total < 50
+            );
+            
+            if (failedRequired) {
+                return 'راسب';
+            }
+            
+            const failedCount = subjects.filter(subject => subject.total < 50).length;
+            
+            if (failedCount > 2 || gpa < 50) {
+                return 'راسب';
+            } else {
+                return 'منقول';
+            }
+        }
+
+        function getGrade(score) {
+            const numScore = parseFloat(score) || 0;
+            if (numScore >= 90) return 'ممتاز';
+            if (numScore >= 80) return 'جيد جداً';
+            if (numScore >= 70) return 'جيد';
+            if (numScore >= 60) return 'مقبول';
+            if (numScore >= 50) return 'مقبول';
+            return 'ضعيف';
+        }
+
+        function getGpaClass(gpa) {
+            if (gpa >= 90) return 'excellent';
+            if (gpa >= 80) return 'very-good';
+            if (gpa >= 70) return 'good';
+            if (gpa >= 60) return 'pass';
+            return 'fail';
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

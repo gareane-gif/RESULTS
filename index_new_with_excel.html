@@ -304,8 +304,194 @@
             flex: 1;
             padding: 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-input button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .search-input button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Responsive Search Styles */
+        .search-input-mobile {
+            max-width: 100%;
+            margin: 20px 0;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input-field {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: border-color 0.3s;
+        }
+
+        .search-input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-icon {
+            font-size: 18px;
+        }
+
+        .search-text {
+            font-size: 16px;
+        }
+
+        .quick-search-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .clear-btn {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .clear-btn:hover {
+            background: #ffeaa7;
+            border-color: #ffb300;
+        }
+
+        .search-results {
+            margin-top: 20px;
+            min-height: 50px;
+        }
+
+        .student-result-display {
+            margin-top: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .search-input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .search-input-field {
+                min-width: 100%;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+
+            .search-button {
+                width: 100%;
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .quick-search-buttons {
+                justify-content: stretch;
+            }
+
+            .quick-btn {
+                flex: 1;
+                min-width: 80px;
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+
+            .search-results {
+                margin-top: 15px;
+            }
+
+            .student-result-display {
+                margin-top: 15px;
+                border-radius: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-input-mobile {
+                margin: 15px 0;
+            }
+
+            .search-input-field {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .search-button {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .quick-btn {
+                padding: 10px 6px;
+                font-size: 11px;
+            }
+
+            .quick-search-buttons {
+                gap: 8px;
+            }
         }
 
         .no-results {
@@ -1115,15 +1301,31 @@
             <div id="search-student" class="tab-content">
                 <div class="search-section">
                     <h2>🔍 البحث عن طالب</h2>
-                    <div class="search-input">
-                        <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي">
-                        <button onclick="searchStudent()">بحث</button>
+                    
+                    <!-- Mobile-Responsive Search Input -->
+                    <div class="search-input-mobile">
+                        <div class="search-input-group">
+                            <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" class="search-input-field">
+                            <button onclick="searchStudent()" class="search-button">
+                                <span class="search-icon">🔍</span>
+                                <span class="search-text">بحث</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Quick Search Buttons -->
+                        <div class="quick-search-buttons">
+                            <button onclick="quickSearch('AC242012')" class="quick-btn">AC242012</button>
+                            <button onclick="quickSearch('SE242012')" class="quick-btn">SE242012</button>
+                            <button onclick="clearSearch()" class="quick-btn clear-btn">مسح</button>
+                        </div>
                     </div>
-                    <div id="searchResults"></div>
+                    
+                    <!-- Search Results -->
+                    <div id="searchResults" class="search-results"></div>
                 </div>
                 
                 <!-- Student Result Display -->
-                <div id="studentResultDisplay" style="display: none;">
+                <div id="studentResultDisplay" class="student-result-display" style="display: none;">
                     <!-- سيتم عرض نتيجة الطالب هنا -->
                 </div>
             </div>
@@ -3553,6 +3755,20 @@
             
             // Reset selected subjects
             selectedSubjects = [];
+        }
+
+        // Quick search function
+        function quickSearch(studentId) {
+            document.getElementById('searchId').value = studentId;
+            searchStudent();
+        }
+
+        // Clear search function
+        function clearSearch() {
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('studentResultDisplay').style.display = 'none';
+            document.getElementById('studentResultDisplay').innerHTML = '';
         }
 
         // Enhanced searchStudent to check for blocked students

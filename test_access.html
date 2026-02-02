@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة اختبار الدخول</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        
+        .status {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        
+        .btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .test-results {
+            text-align: right;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 صفحة اختبار الدخول للمنظومة</h1>
+        
+        <div id="status" class="status info">
+            جاري فحص النظام...
+        </div>
+        
+        <div id="testResults"></div>
+        
+        <div>
+            <button onclick="testSystem()" class="btn">🔍 فحص النظام</button>
+            <button onclick="testLocalStorage()" class="btn btn-success">💾 اختبار التخزين</button>
+            <button onclick="clearData()" class="btn btn-danger">🗑️ مسح البيانات</button>
+            <button onclick="openMainSystem()" class="btn btn-success">🚀 فتح المنظومة الرئيسية</button>
+        </div>
+    </div>
+
+    <script>
+        // Test system functionality
+        function testSystem() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('testResults');
+            
+            statusDiv.innerHTML = 'جاري الفحص...';
+            statusDiv.className = 'status info';
+            
+            let tests = [];
+            
+            // Test 1: Browser compatibility
+            try {
+                const userAgent = navigator.userAgent;
+                tests.push({
+                    name: 'توافق المتصفح',
+                    status: 'pass',
+                    details: `المتصفح: ${userAgent}`
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'توافق المتصفح',
+                    status: 'fail',
+                    details: error.message
+                });
+            }
+            
+            // Test 2: localStorage availability
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                tests.push({
+                    name: 'localStorage',
+                    status: 'pass',
+                    details: 'يعمل بشكل صحيح'
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'localStorage',
+                    status: 'fail',
+                    details: error.message
+                });
+            }
+            
+            // Test 3: JavaScript functionality
+            try {
+                const testArray = [1, 2, 3];
+                const testObject = { name: 'test' };
+                JSON.stringify(testArray);
+                JSON.parse(JSON.stringify(testObject));
+                tests.push({
+                    name: 'وظائف JavaScript',
+                    status: 'pass',
+                    details: 'جميع الوظائف الأساسية تعمل'
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'وظائف JavaScript',
+                    status: 'fail',
+                    details: error.message
+                });
+            }
+            
+            // Test 4: Check existing data
+            try {
+                const students = JSON.parse(localStorage.getItem('students') || '[]');
+                const blocked = JSON.parse(localStorage.getItem('blockedStudents') || '[]');
+                tests.push({
+                    name: 'البيانات المخزنة',
+                    status: 'pass',
+                    details: `${students.length} طالب، ${blocked.length} محجوب`
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'البيانات المخزنة',
+                    status: 'fail',
+                    details: error.message
+                });
+            }
+            
+            // Test 5: File access
+            try {
+                const currentUrl = window.location.href;
+                tests.push({
+                    name: 'مسار الملف',
+                    status: 'pass',
+                    details: `المسار: ${currentUrl}`
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'مسار الملف',
+                    status: 'fail',
+                    details: error.message
+                });
+            }
+            
+            // Display results
+            let html = '<div class="test-results"><h3>📋 نتائج الفحص:</h3>';
+            
+            tests.forEach(test => {
+                const cssClass = test.status === 'pass' ? 'test-pass' : 'test-fail';
+                const icon = test.status === 'pass' ? '✅' : '❌';
+                html += `
+                    <div class="test-item ${cssClass}">
+                        <strong>${icon} ${test.name}:</strong> ${test.details}
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+            
+            // Update status
+            const passedTests = tests.filter(t => t.status === 'pass').length;
+            const totalTests = tests.length;
+            
+            if (passedTests === totalTests) {
+                statusDiv.innerHTML = `✅ جميع الاختبارات نجحت (${passedTests}/${totalTests})`;
+                statusDiv.className = 'status success';
+            } else {
+                statusDiv.innerHTML = `⚠️ بعض الاختبارات فشلت (${passedTests}/${totalTests})`;
+                statusDiv.className = 'status error';
+            }
+        }
+        
+        // Test localStorage
+        function testLocalStorage() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                // Test write
+                const testData = {
+                    test: true,
+                    timestamp: new Date().toISOString(),
+                    random: Math.random()
+                };
+                
+                localStorage.setItem('systemTest', JSON.stringify(testData));
+                
+                // Test read
+                const readData = JSON.parse(localStorage.getItem('systemTest'));
+                
+                // Verify data
+                if (readData && readData.test === true) {
+                    statusDiv.innerHTML = '✅ localStorage يعمل بشكل مثالي';
+                    statusDiv.className = 'status success';
+                    
+                    // Clean up
+                    localStorage.removeItem('systemTest');
+                } else {
+                    throw new Error('البيانات المقروءة لا تطابق البيانات المكتوبة');
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = `❌ خطأ في localStorage: ${error.message}`;
+                statusDiv.className = 'status error';
+            }
+        }
+        
+        // Clear data
+        function clearData() {
+            if (confirm('هل أنت متأكد من مسح جميع البيانات؟')) {
+                try {
+                    localStorage.clear();
+                    const statusDiv = document.getElementById('status');
+                    statusDiv.innerHTML = '✅ تم مسح جميع البيانات بنجاح';
+                    statusDiv.className = 'status success';
+                } catch (error) {
+                    const statusDiv = document.getElementById('status');
+                    statusDiv.innerHTML = `❌ خطأ في مسح البيانات: ${error.message}`;
+                    statusDiv.className = 'status error';
+                }
+            }
+        }
+        
+        // Open main system
+        function openMainSystem() {
+            try {
+                // Try different file names
+                const possibleFiles = [
+                    'index.html',
+                    'index_simple.html',
+                    'index_working.html',
+                    'index_complete.html',
+                    'index_full.html'
+                ];
+                
+                let opened = false;
+                
+                possibleFiles.forEach(file => {
+                    if (!opened) {
+                        try {
+                            window.open(file, '_blank');
+                            opened = true;
+                        } catch (error) {
+                            console.log(`Could not open ${file}:`, error);
+                        }
+                    }
+                });
+                
+                const statusDiv = document.getElementById('status');
+                if (opened) {
+                    statusDiv.innerHTML = '✅ تم فتح المنظومة في نافذة جديدة';
+                    statusDiv.className = 'status success';
+                } else {
+                    statusDiv.innerHTML = '❌ لم يتمكن فتح أي ملف للمنظومة';
+                    statusDiv.className = 'status error';
+                }
+                
+            } catch (error) {
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = `❌ خطأ في فتح المنظومة: ${error.message}`;
+                statusDiv.className = 'status error';
+            }
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            console.log('🔧 Test page loaded successfully');
+            
+            // Quick browser check
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '✅ الصفحة محملة بنجاح - اضغط "فحص النظام" للمزيد من التفاصيل';
+            statusDiv.className = 'status success';
+        };
+    </script>
+</body>
+</html>

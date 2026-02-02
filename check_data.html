@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فحص بيانات الطلاب والمواد</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .student-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+        }
+        .subject-item {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #bbdefb;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ffeaa7;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 فحص بيانات الطلاب والمواد</h1>
+        
+        <div class="section">
+            <h3>📊 إحصائيات البيانات</h3>
+            <div id="statistics"></div>
+        </div>
+        
+        <div class="section">
+            <h3>🎓 قائمة الطلاب</h3>
+            <div id="studentsList"></div>
+        </div>
+        
+        <div class="section">
+            <h3>📚 تفاصيل المواد لكل طالب</h3>
+            <div id="subjectsDetails"></div>
+        </div>
+        
+        <div class="section">
+            <h3>🔧 أدوات التحكم</h3>
+            <button class="btn" onclick="loadData()">تحميل البيانات</button>
+            <button class="btn btn-danger" onclick="clearStudents()">حذف جميع الطلاب</button>
+            <button class="btn btn-success" onclick="exportData()">تصدير البيانات</button>
+            <button class="btn" onclick="clearAllData()">مسح كل البيانات</button>
+        </div>
+        
+        <div class="section">
+            <h3>📋 بيانات localStorage</h3>
+            <div id="localStorageData"></div>
+        </div>
+        
+        <div id="messages"></div>
+    </div>
+
+    <script>
+        function showMessage(message, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messagesDiv.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        function loadData() {
+            loadStatistics();
+            loadStudents();
+            loadSubjectsDetails();
+            loadLocalStorageData();
+        }
+        
+        function loadStatistics() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const settings = JSON.parse(localStorage.getItem('adminSettings')) || {};
+            const departments = JSON.parse(localStorage.getItem('departments')) || [];
+            const departmentSubjects = JSON.parse(localStorage.getItem('departmentSubjects')) || {};
+            const blockedStudents = JSON.parse(localStorage.getItem('blockedStudents')) || [];
+            
+            const statsDiv = document.getElementById('statistics');
+            statsDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: #007bff;">${students.length}</div>
+                        <div style="color: #666;">عدد الطلاب</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: #28a745;">${departments.length}</div>
+                        <div style="color: #666;">عدد الأقسام</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: #17a2b8;">${Object.keys(departmentSubjects).length}</div>
+                        <div style="color: #666;">أقسام بمواد</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border: 8px; border: 1px solid #ddd;">
+                        <div style="font-size: 24px; font-weight: bold; color: #dc3545;">${blockedStudents.length}</div>
+                        <div style="color: #666;">طلاب محجوبين</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function loadStudents() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const studentsDiv = document.getElementById('studentsList');
+            
+            if (students.length === 0) {
+                studentsDiv.innerHTML = '<div class="warning">⚠️ لا يوجد طلاب في النظام</div>';
+                return;
+            }
+            
+            let html = '';
+            students.forEach(student => {
+                const hasSubjects = student.subjects && student.subjects.length > 0;
+                html += `
+                    <div class="student-item">
+                        <h4>👤 ${student.name}</h4>
+                        <p><strong>الرقم:</strong> ${student.id}</p>
+                        <p><strong>القسم:</strong> ${student.department}</p>
+                        <p><strong>الفصل:</strong> ${student.semester}</p>
+                        <p><strong>عدد المواد:</strong> <span style="color: ${hasSubjects ? '#28a745' : '#dc3545'}; font-weight: bold;">${student.subjects ? student.subjects.length : 0}</span></p>
+                        <p><strong>تاريخ الإضافة:</strong> ${student.addedDate || 'غير محدد'}</p>
+                        <p><strong>لديه مواد:</strong> ${hasSubjects ? '✅ نعم' : '❌ لا'}</p>
+                    </div>
+                `;
+            });
+            
+            studentsDiv.innerHTML = html;
+        }
+        
+        function loadSubjectsDetails() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const subjectsDiv = document.getElementById('subjectsDetails');
+            
+            let totalSubjects = 0;
+            let studentsWithSubjects = 0;
+            let subjectsByDepartment = {};
+            
+            students.forEach(student => {
+                if (student.subjects && student.subjects.length > 0) {
+                    studentsWithSubjects++;
+                    totalSubjects += student.subjects.length;
+                    
+                    const dept = student.department || 'غير محدد';
+                    if (!subjectsByDepartment[dept]) {
+                        subjectsByDepartment[dept] = [];
+                    }
+                    
+                    student.subjects.forEach(subject => {
+                        subjectsByDepartment[dept].push({
+                            studentName: student.name,
+                            studentId: student.id,
+                            subjectName: subject.name,
+                            units: subject.units,
+                            total: subject.total,
+                            evaluation: subject.evaluation
+                        });
+                    });
+                }
+            });
+            
+            let html = `
+                <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px;">
+                    <h4>📊 إحصائيات المواد</h4>
+                    <p><strong>إجمالي المواد:</strong> ${totalSubjects}</p>
+                    <p><strong>طلاب لديهم مواد:</strong> ${studentsWithSubjects}</p>
+                    <p><strong>متوسط المواد لكل طالب:</strong> ${studentsWithSubjects > 0 ? (totalSubjects / studentsWithSubjects).toFixed(2) : 0}</p>
+                </div>
+            `;
+            
+            // عرض المواد حسب القسم
+            Object.keys(subjectsByDepartment).forEach(dept => {
+                html += `
+                    <div class="student-item">
+                        <h4>🏛️ ${dept}</h4>
+                        <p><strong>عدد المواد:</strong> ${subjectsByDepartment[dept].length}</p>
+                `;
+                
+                subjectsByDepartment[dept].forEach((item, index) => {
+                    html += `
+                        <div class="subject-item">
+                            <strong>${index + 1}. ${item.subjectName}</strong> (${item.units} وحدات) - الطالب: ${item.studentName} - المجموع: ${item.total}
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            });
+            
+            subjectsDiv.innerHTML = html;
+        }
+        
+        function loadLocalStorageData() {
+            const dataDiv = document.getElementById('localStorageData');
+            
+            const allKeys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                allKeys.push(localStorage.key(i));
+            }
+            
+            let html = '<h4>🔑 مفاتاحيل localStorage:</h4>';
+            html += '<ul>';
+            allKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                const size = new Blob([value]).size;
+                html += `<li><strong>${key}:</strong> (${size} bytes) - ${value ? 'موجود' : 'فارغ'}</li>`;
+            });
+            html += '</ul>';
+            
+            // عرض بيانات الطلاب بالتفصيل
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            html += '<h4>👤 بيانات الطلاب الكاملة:</h4>';
+            html += '<pre>' + JSON.stringify(students, null, 2) + '</pre>';
+            
+            dataDiv.innerHTML = html;
+        }
+        
+        function clearStudents() {
+            if (!confirm('هل أنت متأكد من حذف جميع الطلاب؟')) {
+                localStorage.removeItem('students');
+                showMessage('تم حذف جميع الطلاب بنجاح', 'success');
+                loadData();
+            }
+        }
+        
+        function exportData() {
+            const data = {
+                students: JSON.parse(localStorage.getItem('students')) || [],
+                settings: JSON.parse(localStorage.getItem('adminSettings')) || {},
+                departments: JSON.parse(localStorage.getItem('departments')) || [],
+                departmentSubjects: JSON.parse(localStorage.getItem('departmentSubjects')) || {},
+                blockedStudents: JSON.parse(localStorage.getItem('blockedStudents')) || [],
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `students_data_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showMessage('تم تصدير البيانات بنجاح', 'success');
+        }
+        
+        function clearAllData() {
+            if (!confirm('هل أنت متأكد من مسح كل البيانات؟')) {
+                localStorage.clear();
+                showMessage('تم مسح كل البيانات بنجاح', 'success');
+                loadData();
+            }
+        }
+        
+        // تحميل البيانات عند فتح الصفحة
+        window.onload = function() {
+            loadData();
+        };
+    </script>
+</body>
+</html>
