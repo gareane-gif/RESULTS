@@ -269,39 +269,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 بحث عن نتيجة الطالب - متكيف</h1>
-            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة - يكتشف الحقول تلقائياً</p>
-        </div>
-        
-        <div class="adaptive-status">
-            <h3>🧠 حالة التكيف الذكي</h3>
-            <div class="status-grid">
-                <div class="status-item">
-                    <strong>عدد الطلاب:</strong>
-                    <span id="studentsCount">0</span>
-                </div>
-                <div class="status-item">
-                    <strong>حالة التكيف:</strong>
-                    <span id="adaptiveStatus">لم يتم التكيف</span>
-                </div>
-                <div class="status-item">
-                    <strong>الحقول المكتشفة:</strong>
-                    <span id="fieldsDiscovered">0</span>
-                </div>
-                <div class="status-item">
-                    <strong>مصدر البيانات:</strong>
-                    <span id="dataSource">غير محدد</span>
-                </div>
-            </div>
-            
-            <div class="field-mapping" id="fieldMapping" style="display: none;">
-                <strong>🔍 خرائط الحقول المكتشفة:</strong>
-                <div id="fieldMappingContent"></div>
-            </div>
-            
-            <button class="search-btn success" onclick="adaptiveLoad()">🧠 تحميل متكيف</button>
-            <button class="search-btn warning" onclick="showFieldAnalysis()">🔍 تحليل الحقول</button>
-            <button class="search-btn success" onclick="showDebugInfo()">📊 معلومات التشخيص</button>
+            <h1>🎓 بحث عن نتيجة الطالب</h1>
+            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
         </div>
         
         <div class="search-section">
@@ -646,8 +615,8 @@
                             <p style="color: #007bff; font-weight: bold; font-size: 18px;">${semesterGPA}</p>
                         </div>
                         <div class="info-item">
-                            <strong>التقدير:</strong>
-                            <p style="color: #28a745; font-weight: bold; font-size: 18px;">${evaluation}</p>
+                            <strong>الحالة:</strong>
+                            <p style="color: ${failedSubjects > 0 ? '#dc3545' : '#28a745'}; font-weight: bold; font-size: 18px;">${failedSubjects > 0 ? 'راسب' : 'منقول'}</p>
                         </div>
                         <div class="info-item">
                             <strong>المواد الناجحة:</strong>
@@ -686,8 +655,8 @@
         
         // Initialize
         window.onload = function() {
-            console.log('🧠 Adaptive Student Search Page Loaded');
-            // Auto-adaptive load
+            console.log('🎓 Student Search Page Loaded');
+            // Auto-load students
             adaptiveLoad();
         };
     </script>
