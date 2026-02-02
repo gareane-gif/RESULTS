@@ -731,9 +731,51 @@
         // Initialize
         window.onload = function() {
             console.log('🎓 Student Search Page Loaded');
+            
+            // Check for URL parameters first
+            checkURLParameters();
+            
             // Auto-load students from localStorage
             loadStudentsFromStorage();
         };
+        
+        // Check URL parameters for data
+        function checkURLParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentsData = urlParams.get('students');
+            
+            if (studentsData) {
+                try {
+                    const decodedData = decodeURIComponent(studentsData);
+                    const parsedData = JSON.parse(decodedData);
+                    
+                    if (Array.isArray(parsedData) && parsedData.length > 0) {
+                        students = parsedData;
+                        console.log('✅ Loaded students from URL parameters:', students.length);
+                        
+                        // Save to storage
+                        localStorage.setItem('students', JSON.stringify(students));
+                        sessionStorage.setItem('students', JSON.stringify(students));
+                        
+                        if (students.length > 0 && students[0].subjects) {
+                            analyzeStudentStructure(students[0]);
+                        }
+                        
+                        // Show success message
+                        const resultsDiv = document.getElementById('searchResults');
+                        resultsDiv.innerHTML = `
+                            <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
+                                <h4 style="color: #155724; margin-bottom: 10px;">✅ تم تحميل البيانات من الرابط!</h4>
+                                <p style="color: #155724;">عدد الطلاب: ${students.length}</p>
+                                <p style="color: #155724; font-size: 14px;">يمكنك الآن البحث عن الطلاب</p>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('❌ Error parsing URL parameters:', error);
+                }
+            }
+        }
         
         // Load students from main system (Mobile & GitHub Pages compatible)
         function loadStudentsFromStorage() {
@@ -884,17 +926,35 @@
                         </ol>
                         
                         <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
-                            <h4 style="color: #856404; margin-bottom: 10px;">🔧 حل بديل للهواتف:</h4>
-                            <p style="color: #856404; font-size: 14px; margin-bottom: 15px;">إذا لم تعمل الطرق السابقة، يمكنك:</p>
-                            <ol style="text-align: right; margin: 10px 20px; color: #856404; font-size: 13px;">
-                                <li>في المنظومة الرئيسية، انسخ بيانات الطلاب من Console</li>
-                                <li>الصقها هنا في الحقل أدناه</li>
-                                <li>أو استخدم زر "إنشاء بيانات تجريبية"</li>
-                            </ol>
-                            <textarea id="manualDataInput" placeholder="الصق بيانات الطلاب هنا..." style="width: 100%; height: 100px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 12px;"></textarea>
-                            <div style="text-align: center; margin-top: 10px;">
-                                <button onclick="loadManualData()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 0 5px;">تحميل البيانات</button>
-                                <button onclick="createTestData()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 0 5px;">إنشاء بيانات تجريبية</button>
+                            <h4 style="color: #856404; margin-bottom: 10px;">🔧 حلول للهواتف والمتصفحات المختلفة:</h4>
+                            <p style="color: #856404; font-size: 14px; margin-bottom: 15px;">اختر أحد الحلول التالية:</p>
+                            
+                            <div style="margin: 15px 0;">
+                                <h5 style="color: #856404; margin-bottom: 8px;">📱 الحل 1: رابط مباشر (موصى به للهواتف)</h5>
+                                <ol style="text-align: right; margin: 10px 20px; color: #856404; font-size: 13px;">
+                                    <li>في المنظومة الرئيسية، اضغط زر "فتح صفحة البحث بالبيانات"</li>
+                                    <li>سيتم فتح صفحة البحث مع البيانات تلقائياً</li>
+                                    <li>إذا لم يوجد الزر، انسخ الرابط من الأسفل</li>
+                                </ol>
+                                <button onclick="generateDirectLink()" style="background: #17a2b8; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">إنشاء رابط مباشر</button>
+                                <div id="directLinkContainer" style="margin-top: 10px;"></div>
+                            </div>
+                            
+                            <div style="margin: 15px 0;">
+                                <h5 style="color: #856404; margin-bottom: 8px;">✏️ الحل 2: نسخ ولصق يدوي</h5>
+                                <ol style="text-align: right; margin: 10px 20px; color: #856404; font-size: 13px;">
+                                    <li>في المنظومة الرئيسية، افتح Console (F12)</li>
+                                    <li>اكتب: <code>copy(JSON.stringify(students))</code></li>
+                                    <li>الصق البيانات هنا في الحقل أدناه</li>
+                                </ol>
+                                <textarea id="manualDataInput" placeholder="الصق بيانات الطلاب هنا..." style="width: 100%; height: 80px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 11px;"></textarea>
+                                <button onclick="loadManualData()" style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">تحميل البيانات</button>
+                            </div>
+                            
+                            <div style="margin: 15px 0;">
+                                <h5 style="color: #856404; margin-bottom: 8px;">🧪 الحل 3: بيانات تجريبية (للاختبار)</h5>
+                                <p style="color: #856404; font-size: 13px;">للاختبار السريع، اضغط الزر التالي:</p>
+                                <button onclick="createTestData()" style="background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">إنشاء بيانات تجريبية</button>
                             </div>
                         </div>
                         
@@ -906,7 +966,65 @@
             }
         }
         
-        // Load manual data from textarea
+        // Generate direct link with data
+        function generateDirectLink() {
+            const container = document.getElementById('directLinkContainer');
+            
+            // Try to get current students data
+            let studentsData = students;
+            
+            // If no students, create sample data
+            if (!studentsData || studentsData.length === 0) {
+                studentsData = [
+                    {
+                        id: 'SAMPLE001',
+                        name: 'طالب تجريبي',
+                        department: 'قسم تجريبي',
+                        semester: 1,
+                        subjects: [
+                            { name: 'مادة تجريبية', units: 3, classwork: 20, final: 30, total: 50 }
+                        ]
+                    }
+                ];
+            }
+            
+            try {
+                const encodedData = encodeURIComponent(JSON.stringify(studentsData));
+                const directLink = `${window.location.origin}${window.location.pathname}?students=${encodedData}`;
+                
+                container.innerHTML = `
+                    <div style="background: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px; padding: 10px; margin-top: 10px;">
+                        <p style="color: #0066cc; font-size: 12px; margin-bottom: 8px;">📋 الرابط المباشر:</p>
+                        <input type="text" value="${directLink}" readonly style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 10px; direction: ltr;" onclick="this.select()">
+                        <button onclick="copyDirectLink('${directLink}')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-top: 5px;">نسخ الرابط</button>
+                        <button onclick="openDirectLink('${directLink}')" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-top: 5px;">فتح الرابط</button>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = `<p style="color: #dc3545; font-size: 12px;">❌ خطأ في إنشاء الرابط: ${error.message}</p>`;
+            }
+        }
+        
+        // Copy direct link to clipboard
+        function copyDirectLink(link) {
+            navigator.clipboard.writeText(link).then(() => {
+                alert('✅ تم نسخ الرابط إلى الحافظة');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = link;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ تم نسخ الرابط إلى الحافظة');
+            });
+        }
+        
+        // Open direct link in new tab
+        function openDirectLink(link) {
+            window.open(link, '_blank');
+        }
         function loadManualData() {
             const manualDataInput = document.getElementById('manualDataInput');
             const dataText = manualDataInput.value.trim();
