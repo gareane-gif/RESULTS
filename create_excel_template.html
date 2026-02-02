@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء قالب Excel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            direction: rtl;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .template-preview {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <img src="C:/Users/Arkan/Desktop/50.png" alt="شعار المعهد" style="width: 80px; height: 80px; margin-bottom: 15px; border-radius: 10px;">
+            <h1>📊 إنشاء قالب Excel</h1>
+            <p style="color: #666;">المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
+        </div>
+        <p>هذه الصفحة تقوم بإنشاء ملف Excel صحيح ومتوافق مع منظومة الطلاب</p>
+        
+        <div class="info">
+            <h3>📋 معلومات القالب:</h3>
+            <p>القالب يحتوي على بيانات تجريبية لطالبين مع جميع المواد والدرجات</p>
+            <p>يمكنك تعديل البيانات أو إضافة المزيد من الطلاب بعد التحميل</p>
+        </div>
+
+        <div class="template-preview">
+            <h3>👀 معاينة البيانات:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الرقم الدراسي</th>
+                        <th>اسم الطالب</th>
+                        <th>القسم</th>
+                        <th>المادة</th>
+                        <th>الوحدات</th>
+                        <th>أعمال الفصل</th>
+                        <th>الاختبار النهائي</th>
+                        <th>المجموع</th>
+                        <th>التقدير</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SE242001</td>
+                        <td>أحمد محمد علي</td>
+                        <td>المساحة</td>
+                        <td>رياضيات هندسية</td>
+                        <td>3</td>
+                        <td>20</td>
+                        <td>30</td>
+                        <td>75</td>
+                        <td>جيد</td>
+                    </tr>
+                    <tr>
+                        <td>SE242001</td>
+                        <td>أحمد محمد علي</td>
+                        <td>المساحة</td>
+                        <td>فيزياء هندسية</td>
+                        <td>3</td>
+                        <td>18</td>
+                        <td>32</td>
+                        <td>85</td>
+                        <td>جيد جدا</td>
+                    </tr>
+                    <tr>
+                        <td>SE242001</td>
+                        <td>أحمد محمد علي</td>
+                        <td>المساحة</td>
+                        <td>رسم هندسي</td>
+                        <td>2</td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>90</td>
+                        <td>ممتاز</td>
+                    </tr>
+                    <tr>
+                        <td>CO242002</td>
+                        <td>محمد خالد أحمد</td>
+                        <td>الحاسوب</td>
+                        <td>برمجة 1</td>
+                        <td>4</td>
+                        <td>22</td>
+                        <td>38</td>
+                        <td>65</td>
+                        <td>مقبول</td>
+                    </tr>
+                    <tr>
+                        <td>CO242002</td>
+                        <td>محمد خالد أحمد</td>
+                        <td>الحاسوب</td>
+                        <td>هياكل بيانات</td>
+                        <td>3</td>
+                        <td>30</td>
+                        <td>35</td>
+                        <td>95</td>
+                        <td>ممتاز</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center;">
+            <button onclick="createTemplate()">📥 إنشاء وتحميل قالب Excel</button>
+            <button onclick="createEmptyTemplate()">📄 إنشاء قالب فارغ</button>
+        </div>
+
+        <div class="info">
+            <h3>📝 كيفية الاستخدام:</h3>
+            <ol>
+                <li>اضغط على "إنشاء وتحميل قالب Excel" للحصول على ملف جاهز</li>
+                <li>افتح المنظومة: <code>index_new_with_excel.html</code></li>
+                <li>اذهب لتب "استيراد وتصدير Excel"</li>
+                <li>اضغط "استيراد من Excel" واختر الملف الذي تم تحميله</li>
+                <li>شاهد النتائج في تب "قائمة الطلاب" أو "بحث عن طالب"</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function createTemplate() {
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Create template data with sample students
+            const templateData = [
+                ['الرقم الدراسي', 'اسم الطالب', 'القسم', 'المادة', 'الوحدات', 'أعمال الفصل', 'الاختبار النهائي', 'المجموع', 'التقدير', 'تاريخ الإضافة'],
+                ['SE242001', 'أحمد محمد علي', 'المساحة', 'رياضيات هندسية', 3, '20', '30', '75', 'جيد', '29/01/2026 17:30'],
+                ['SE242001', 'أحمد محمد علي', 'المساحة', 'فيزياء هندسية', 3, '18', '32', '85', 'جيد جدا', '29/01/2026 17:30'],
+                ['SE242001', 'أحمد محمد علي', 'المساحة', 'رسم هندسي', 2, '25', '25', '90', 'ممتاز', '29/01/2026 17:30'],
+                ['CO242002', 'محمد خالد أحمد', 'الحاسوب', 'برمجة 1', 4, '22', '38', '65', 'مقبول', '29/01/2026 17:30'],
+                ['CO242002', 'محمد خالد أحمد', 'الحاسوب', 'هياكل بيانات', 3, '30', '35', '95', 'ممتاز', '29/01/2026 17:30']
+            ];
+
+            // Create worksheet
+            const ws = XLSX.utils.aoa_to_sheet(templateData);
+            
+            // Set column widths
+            ws['!cols'] = [
+                { width: 15 }, // الرقم الدراسي
+                { width: 20 }, // اسم الطالب
+                { width: 15 }, // القسم
+                { width: 20 }, // المادة
+                { width: 10 }, // الوحدات
+                { width: 12 }, // أعمال الفصل
+                { width: 15 }, // الاختبار النهائي
+                { width: 10 }, // المجموع
+                { width: 10 }, // التقدير
+                { width: 20 }  // تاريخ الإضافة
+            ];
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'بيانات الطلاب');
+            
+            // Save file
+            XLSX.writeFile(wb, 'students_template_sample.xlsx');
+            
+            alert('تم إنشاء وتحميل قالب Excel بنجاح!\n\nيمكنك الآن استيراد هذا الملف في المنظومة.');
+        }
+
+        function createEmptyTemplate() {
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Create empty template data
+            const emptyTemplateData = [
+                ['الرقم الدراسي', 'اسم الطالب', 'القسم', 'المادة', 'الوحدات', 'أعمال الفصل', 'الاختبار النهائي', 'المجموع', 'التقدير', 'تاريخ الإضافة'],
+                ['SE242001', 'أحمد محمد علي', 'المساحة', 'رياضيات هندسية', 3, '20', '30', '75', 'جيد', '29/01/2026 17:30'],
+                ['SE242001', 'أحمد محمد علي', 'المساحة', 'فيزياء هندسية', 3, '18', '32', '85', 'جيد جدا', '29/01/2026 17:30'],
+                ['CO242002', 'محمد خالد أحمد', 'الحاسوب', 'برمجة 1', 4, '22', '38', '65', 'مقبول', '29/01/2026 17:30']
+            ];
+
+            // Create worksheet
+            const ws = XLSX.utils.aoa_to_sheet(emptyTemplateData);
+            
+            // Set column widths
+            ws['!cols'] = [
+                { width: 15 }, // الرقم الدراسي
+                { width: 20 }, // اسم الطالب
+                { width: 15 }, // القسم
+                { width: 20 }, // المادة
+                { width: 10 }, // الوحدات
+                { width: 12 }, // أعمال الفصل
+                { width: 15 }, // الاختبار النهائي
+                { width: 10 }, // المجموع
+                { width: 10 }, // التقدير
+                { width: 20 }  // تاريخ الإضافة
+            ];
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'بيانات الطلاب');
+            
+            // Save file
+            XLSX.writeFile(wb, 'students_template_empty.xlsx');
+            
+            alert('تم إنشاء وتحميل قالب Excel فارغ بنجاح!\n\nيمكنك تعبئة البيانات ثم استيرادها في المنظومة.');
+        }
+
+        // Auto-create template on page load
+        window.onload = function() {
+            console.log('صفحة إنشاء قالب Excel جاهزة');
+        };
+    </script>
+</body>
+</html>

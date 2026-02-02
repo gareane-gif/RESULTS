@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بحث عن نتيجة الطالب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            text-align: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            margin: 0 auto;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .search-form {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .search-btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            text-align: right;
+        }
+        
+        .student-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .student-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 20px;
+        }
+        
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .student-info p {
+            margin: 5px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .student-info strong {
+            color: #2c3e50;
+        }
+        
+        .result-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .result-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .no-results {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            color: #856404;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            border-radius: 10px;
+            padding: 20px;
+            color: #721c24;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .result-display {
+            background: #e8f4fd;
+            border: 3px solid #007bff;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px auto;
+            display: none;
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .result-header h2 {
+            color: #007bff;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .result-info {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .result-info p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        
+        .result-info strong {
+            color: #2c3e50;
+        }
+        
+        .subjects-table {
+            width: 100%;
+            max-width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            font-size: 14px;
+            direction: rtl;
+            table-layout: fixed;
+            box-sizing: border-box;
+        }
+        
+        .subjects-table th,
+        .subjects-table td {
+            border: 1px solid #e0e0e0;
+            padding: 12px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .subjects-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .subjects-table th:nth-child(1) { width: 5%; }
+        .subjects-table th:nth-child(2) { width: 25%; }
+        .subjects-table th:nth-child(3) { width: 8%; }
+        .subjects-table th:nth-child(4) { width: 12%; }
+        .subjects-table th:nth-child(5) { width: 12%; }
+        .subjects-table th:nth-child(6) { width: 10%; }
+        .subjects-table th:nth-child(7) { width: 12%; }
+        .subjects-table th:nth-child(8) { width: 16%; }
+        
+        .subjects-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .subjects-table tr:hover {
+            background: #e3f2fd;
+            transition: background-color 0.3s ease;
+        }
+        
+        .failed-subject {
+            background: #ffebee !important;
+        }
+        
+        .failed-subject:hover {
+            background: #ffcdd2 !important;
+        }
+        
+        .subjects-table td:first-child {
+            font-weight: bold;
+            color: #2c3e50;
+            background: #f5f5f5;
+        }
+        
+        .subjects-table td:nth-child(2) {
+            text-align: right;
+            font-weight: 500;
+            color: #34495e;
+            padding-right: 12px;
+        }
+        
+        .subjects-table td:nth-child(3),
+        .subjects-table td:nth-child(4),
+        .subjects-table td:nth-child(5),
+        .subjects-table td:nth-child(6) {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .subjects-table td:nth-child(7) {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .subjects-table td:nth-child(8) {
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        .grade-excellent {
+            color: #27ae60 !important;
+            background: #d5f4e6;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .grade-very-good {
+            color: #2980b9 !important;
+            background: #d6eaf8;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .grade-good {
+            color: #f39c12 !important;
+            background: #fef5e7;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .grade-acceptable {
+            color: #e67e22 !important;
+            background: #fdebd0;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .grade-weak {
+            color: #e74c3c !important;
+            background: #fadbd8;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .grade-fail {
+            color: #c0392b !important;
+            background: #f5b7b1;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .status-pass {
+            color: #27ae60 !important;
+            background: #d5f4e6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status-fail {
+            color: #e74c3c !important;
+            background: #fadbd8;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .total-row {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%) !important;
+            color: white !important;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        
+        .total-row td {
+            color: white !important;
+            background: transparent !important;
+        }
+        
+        .total-row td:first-child {
+            background: rgba(255,255,255,0.1) !important;
+        }
+        
+        @media (max-width: 600px) {
+            .subjects-table {
+                font-size: 11px;
+            }
+            
+            .subjects-table th,
+            .subjects-table td {
+                padding: 8px 4px;
+            }
+            
+            .subjects-table th {
+                font-size: 11px;
+            }
+        }
+        
+        .close-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px auto 0;
+            display: block;
+        }
+        
+        .close-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .subjects-table {
+                font-size: 12px;
+            }
+            
+            .subjects-table th,
+            .subjects-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 بحث عن نتيجة الطالب</h1>
+            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
+        </div>
+        
+        <div class="search-form">
+            <div class="form-group">
+                <label for="searchId">الرقم الدراسي:</label>
+                <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" maxlength="20">
+            </div>
+            <button class="search-btn" onclick="searchStudent()">🔍 بحث</button>
+        </div>
+        
+        <div id="searchResults" class="result-container"></div>
+        
+        <div id="studentResultDisplay" class="result-display"></div>
+        
+        <div class="footer">
+            <p>&copy; 2026 المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
+        </div>
+    </div>
+    
+    <script>
+        let students = [];
+        
+        // Load students from localStorage
+        function loadStudents() {
+            const storedStudents = localStorage.getItem('students');
+            if (storedStudents) {
+                students = JSON.parse(storedStudents);
+            }
+        }
+        
+        // Search student function
+        function searchStudent() {
+            const searchId = document.getElementById('searchId').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            const resultDisplayDiv = document.getElementById('studentResultDisplay');
+            
+            if (!searchId) {
+                resultsDiv.innerHTML = '<div class="no-results">الرجاء إدخال الرقم الدراسي</div>';
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            const student = students.find(s => s.id === searchId);
+            
+            if (!student) {
+                resultsDiv.innerHTML = '<div class="no-results">الطالب غير موجود</div>';
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            // Check if student is blocked
+            const blockedStudents = JSON.parse(localStorage.getItem('blockedStudents') || '[]');
+            const blocked = blockedStudents.find(b => b.studentId === searchId);
+            
+            if (blocked) {
+                resultsDiv.innerHTML = `
+                    <div class="student-card">
+                        <h3>🚫 نتيجة الطالب محجوبة</h3>
+                        <div class="student-info">
+                            <p><strong>الرقم الدراسي:</strong> ${student.id}</p>
+                            <p><strong>اسم الطالب:</strong> ${student.name}</p>
+                            <p><strong>القسم:</strong> ${student.department}</p>
+                            <p><strong>الفصل:</strong> ${student.semester}</p>
+                            <p><strong>سبب الحجب:</strong> ${blocked.reason}</p>
+                            <p><strong>تاريخ الحجب:</strong> ${new Date(blocked.date).toLocaleDateString('ar-SA')}</p>
+                        </div>
+                        <div class="error">
+                            <strong>لا يمكن عرض النتيجة بسبب الحجب</strong>
+                        </div>
+                    </div>
+                `;
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            // Display search result
+            resultsDiv.innerHTML = `
+                <div class="student-card">
+                    <h3>${student.name}</h3>
+                    <div class="student-info">
+                        <p><strong>الرقم الدراسي:</strong> ${student.id}</p>
+                        <p><strong>القسم:</strong> ${student.department}</p>
+                        <p><strong>الفصل:</strong> ${student.semester}</p>
+                        <p><strong>عدد المواد:</strong> ${student.subjects.length}</p>
+                    </div>
+                    <button class="result-btn" onclick="displayStudentResult('${student.id}')">عرض النتيجة</button>
+                </div>
+            `;
+            
+            resultDisplayDiv.style.display = 'none';
+        }
+        
+        // Display student result function
+        function displayStudentResult(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const resultDisplayDiv = document.getElementById('studentResultDisplay');
+            
+            // Calculate totals and semester GPA
+            let totalUnits = 0;
+            let totalClassWork = 0;
+            let totalFinal = 0;
+            let totalGrade = 0;
+            let totalWeightedGrade = 0;
+            let passedSubjects = 0;
+            let failedSubjects = 0;
+            
+            student.subjects.forEach(subject => {
+                totalUnits += subject.units;
+                totalClassWork += subject.classWork;
+                totalFinal += subject.finalExam;
+                totalGrade += subject.total;
+                totalWeightedGrade += (subject.total * subject.units);
+                
+                // Check pass/fail status
+                if (subject.total >= 50 && subject.finalExam >= 30) {
+                    passedSubjects++;
+                } else {
+                    failedSubjects++;
+                }
+            });
+            
+            const semesterGPA = totalUnits > 0 ? (totalWeightedGrade / totalUnits).toFixed(2) : 0;
+            const overallEvaluation = getEvaluation(parseFloat(semesterGPA));
+            const gradeClass = getGradeClass(parseFloat(semesterGPA));
+            const isSemesterPassed = failedSubjects === 0 && semesterGPA >= 50;
+            
+            resultDisplayDiv.innerHTML = `
+                <div class="result-header">
+                    <h2>🎓 نتيجة الطالب</h2>
+                </div>
+                
+                <div class="result-info">
+                    <p><strong>الاسم:</strong> <span style="color: #007bff; font-size: 18px;">${student.name}</span></p>
+                    <p><strong>الرقم:</strong> ${student.id}</p>
+                    <p><strong>القسم:</strong> ${student.department}</p>
+                    <p><strong>الفصل:</strong> ${student.semester}</p>
+                    <p><strong>المعدل:</strong> <span class="${gradeClass}">${semesterGPA}</span></p>
+                    <p><strong>التقدير:</strong> <span class="${gradeClass}">${overallEvaluation}</span></p>
+                    <p><strong>المواد الناجحة:</strong> <span style="color: #28a745;">${passedSubjects}</span></p>
+                    <p><strong>المواد الراسبة:</strong> <span style="color: #dc3545;">${failedSubjects}</span></p>
+                </div>
+                
+                <table class="subjects-table">
+                    <thead>
+                        <tr>
+                            <th>م</th>
+                            <th>اسم المادة</th>
+                            <th>وحدات</th>
+                            <th>أعمال الفصل</th>
+                            <th>الاختبار النهائي</th>
+                            <th>المجموع</th>
+                            <th>التقدير</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${student.subjects.map((subject, index) => {
+                            const isFailed = subject.name.includes('(مطالب)') || subject.total < 50 || subject.finalExam < 30;
+                            const subjectGradeClass = getGradeClass(subject.total);
+                            const statusClass = isFailed ? 'status-fail' : 'status-pass';
+                            const statusText = isFailed ? 'راسب' : 'ناجح';
+                            const statusIcon = isFailed ? '❌' : '✅';
+                            
+                            return `
+                                <tr class="${isFailed ? 'failed-subject' : ''}">
+                                    <td>${index + 1}</td>
+                                    <td>${subject.name}</td>
+                                    <td>${subject.units}</td>
+                                    <td>${subject.classWork}</td>
+                                    <td>${subject.finalExam}</td>
+                                    <td><span class="${subjectGradeClass}">${subject.total}</span></td>
+                                    <td><span class="${subjectGradeClass}">${subject.evaluation}</span></td>
+                                    <td><span class="${statusClass}">${statusIcon} ${statusText}</span></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                        <tr class="total-row">
+                            <td>المجموع</td>
+                            <td>-</td>
+                            <td>${totalUnits}</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <button class="close-btn" onclick="document.getElementById('studentResultDisplay').style.display='none'">إغلاق</button>
+            `;
+            
+            resultDisplayDiv.style.display = 'block';
+            resultDisplayDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Helper functions
+        function getEvaluation(gpa) {
+            if (gpa >= 90) return 'ممتاز';
+            if (gpa >= 80) return 'جيد جدا';
+            if (gpa >= 70) return 'جيد';
+            if (gpa >= 60) return 'مقبول';
+            if (gpa >= 50) return 'ضعيف';
+            return 'راسب';
+        }
+        
+        function getGradeClass(grade) {
+            if (grade >= 90) return 'grade-excellent';
+            if (grade >= 80) return 'grade-very-good';
+            if (grade >= 70) return 'grade-good';
+            if (grade >= 60) return 'grade-acceptable';
+            if (grade >= 50) return 'grade-weak';
+            return 'grade-fail';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudents();
+            
+            // Auto-focus on search input
+            document.getElementById('searchId').focus();
+            
+            // Allow Enter key to search
+            document.getElementById('searchId').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchStudent();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
