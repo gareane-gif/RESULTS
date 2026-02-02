@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بحث عن نتيجة الطالب - متكيف</title>
+    <title>بحث عن نتيجة الطالب - متكامل</title>
     <style>
         * {
             margin: 0;
@@ -27,7 +27,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             padding: 50px;
-            max-width: 1200px;
+            max-width: 1000px;
             width: 100%;
             text-align: center;
             margin: 0 auto;
@@ -49,50 +49,42 @@
             font-size: 18px;
         }
         
-        .adaptive-status {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        .integration-status {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
             text-align: right;
-            border: 2px solid #2196f3;
+            border: 2px solid #4caf50;
         }
         
-        .adaptive-status h3 {
-            color: #1565c0;
+        .integration-status h3 {
+            color: #2e7d32;
             margin-bottom: 15px;
             font-size: 18px;
         }
         
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
         .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
             background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-right: 4px solid #2196f3;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .status-item strong {
-            color: #1565c0;
-            display: block;
-            margin-bottom: 5px;
+        .status-item.success {
+            border-right: 4px solid #4caf50;
         }
         
-        .field-mapping {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: left;
-            font-family: monospace;
-            font-size: 12px;
+        .status-item.warning {
+            border-right: 4px solid #ff9800;
+        }
+        
+        .status-item.error {
+            border-right: 4px solid #f44336;
         }
         
         .search-section {
@@ -123,6 +115,7 @@
             font-size: 18px;
             text-align: center;
             background: white;
+            transition: all 0.3s ease;
         }
         
         .form-group input:focus {
@@ -227,6 +220,11 @@
             background: #f8f9fa;
         }
         
+        .subjects-table tr:hover {
+            background: #e3f2fd;
+            transition: background 0.3s ease;
+        }
+        
         .no-results {
             background: #fff5f5;
             border: 2px solid #fed7d7;
@@ -252,56 +250,58 @@
             100% { transform: rotate(360deg); }
         }
         
-        .debug-section {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 400px;
-            overflow-y: auto;
+        .sync-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        
+        .sync-indicator.success {
+            background: #4caf50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+        }
+        
+        .sync-indicator.warning {
+            background: #ff9800;
+            box-shadow: 0 0 8px rgba(255, 152, 0, 0.5);
+        }
+        
+        .sync-indicator.error {
+            background: #f44336;
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 بحث عن نتيجة الطالب - متكيف</h1>
-            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة - يكتشف الحقول تلقائياً</p>
+            <h1>🎓 بحث عن نتيجة الطالب</h1>
+            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة - متكامل مع المنظومة</p>
         </div>
         
-        <div class="adaptive-status">
-            <h3>🧠 حالة التكيف الذكي</h3>
-            <div class="status-grid">
-                <div class="status-item">
-                    <strong>عدد الطلاب:</strong>
-                    <span id="studentsCount">0</span>
-                </div>
-                <div class="status-item">
-                    <strong>حالة التكيف:</strong>
-                    <span id="adaptiveStatus">لم يتم التكيف</span>
-                </div>
-                <div class="status-item">
-                    <strong>الحقول المكتشفة:</strong>
-                    <span id="fieldsDiscovered">0</span>
-                </div>
-                <div class="status-item">
-                    <strong>مصدر البيانات:</strong>
-                    <span id="dataSource">غير محدد</span>
-                </div>
+        <div class="integration-status">
+            <h3>🔄 حالة التكامل مع المنظومة</h3>
+            <div class="status-item success">
+                <span>التكامل:</span>
+                <strong>نشط <span class="sync-indicator success"></span></strong>
+            </div>
+            <div class="status-item">
+                <span>عدد الطلاب:</span>
+                <strong id="studentsCount">جاري التحميل...</strong>
+            </div>
+            <div class="status-item">
+                <span>آخر تحديث:</span>
+                <strong id="lastUpdate">لم يتم التحديث</strong>
+            </div>
+            <div class="status-item">
+                <span>مصدر البيانات:</span>
+                <strong id="dataSource">المنظومة الرئيسية</strong>
             </div>
             
-            <div class="field-mapping" id="fieldMapping" style="display: none;">
-                <strong>🔍 خرائط الحقول المكتشفة:</strong>
-                <div id="fieldMappingContent"></div>
-            </div>
-            
-            <button class="search-btn success" onclick="adaptiveLoad()">🧠 تحميل متكيف</button>
-            <button class="search-btn warning" onclick="showFieldAnalysis()">🔍 تحليل الحقول</button>
-            <button class="search-btn success" onclick="showDebugInfo()">📊 معلومات التشخيص</button>
+            <button class="search-btn success" onclick="syncWithMainSystem()">🔄 مزامنة مع المنظومة الرئيسية</button>
+            <button class="search-btn warning" onclick="forceRefresh()">🔄 تحديث قسري</button>
         </div>
         
         <div class="search-section">
@@ -312,190 +312,112 @@
             <button class="search-btn" onclick="searchStudent()">🔍 بحث</button>
         </div>
         
-        <div id="debugInfo" class="debug-section" style="display: none;"></div>
         <div id="searchResults"></div>
         <div id="studentResultDisplay"></div>
     </div>
     
     <script>
         let students = [];
-        let fieldMapping = {
-            units: null,
-            classwork: null,
-            final: null,
-            total: null
-        };
+        let lastSyncTime = null;
         
-        // Adaptive load - discovers field names automatically
-        function adaptiveLoad() {
+        // Sync with main system
+        function syncWithMainSystem() {
             const studentsCount = document.getElementById('studentsCount');
-            const adaptiveStatus = document.getElementById('adaptiveStatus');
-            const fieldsDiscovered = document.getElementById('fieldsDiscovered');
+            const lastUpdate = document.getElementById('lastUpdate');
             const dataSource = document.getElementById('dataSource');
             
-            adaptiveStatus.innerHTML = 'جاري التكيف... <span class="loading"></span>';
+            studentsCount.innerHTML = 'جاري المزامنة... <span class="loading"></span>';
             
             try {
-                // Load students data
-                const storedStudents = localStorage.getItem('students');
-                if (storedStudents) {
-                    students = JSON.parse(storedStudents);
-                    console.log('📊 Loaded students:', students.length);
-                    
-                    if (students.length > 0) {
-                        // Analyze first student to discover field names
-                        analyzeStudentStructure(students[0]);
-                        
-                        studentsCount.textContent = students.length;
-                        adaptiveStatus.textContent = 'تم التكيف';
-                        fieldsDiscovered.textContent = Object.values(fieldMapping).filter(f => f !== null).length;
-                        dataSource.textContent = 'localStorage';
-                        
-                        console.log('✅ Adaptive load successful:', fieldMapping);
-                    } else {
-                        adaptiveStatus.textContent = 'لا توجد بيانات';
-                    }
-                } else {
-                    adaptiveStatus.textContent = 'لا توجد بيانات في localStorage';
+                // Method 1: Try to access main system's students directly
+                if (typeof window.parent !== 'undefined' && window.parent.students) {
+                    students = window.parent.students;
+                    updateSyncStatus('success', 'النافذة الرئيسية');
+                    return;
                 }
+                
+                // Method 2: Try localStorage from main system
+                const mainStudents = localStorage.getItem('students');
+                if (mainStudents) {
+                    students = JSON.parse(mainStudents);
+                    updateSyncStatus('success', 'localStorage');
+                    return;
+                }
+                
+                // Method 3: Try to load from main system via iframe
+                loadFromMainSystem();
+                
             } catch (error) {
-                console.error('❌ Error in adaptive load:', error);
-                adaptiveStatus.textContent = 'خطأ في التكيف';
+                console.error('Error syncing with main system:', error);
+                updateSyncStatus('error', 'خطأ في المزامنة');
             }
         }
         
-        // Analyze student structure to discover field names
-        function analyzeStudentStructure(student) {
-            console.log('🔍 Analyzing student structure:', student);
+        // Load from main system via iframe
+        function loadFromMainSystem() {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'index.html';
             
-            if (!student.subjects || student.subjects.length === 0) {
-                console.log('❌ No subjects found');
-                return;
-            }
-            
-            const firstSubject = student.subjects[0];
-            console.log('📖 First subject:', firstSubject);
-            
-            // Discover field names
-            const subjectFields = Object.keys(firstSubject);
-            console.log('🔑 Subject fields found:', subjectFields);
-            
-            // Map fields to expected types
-            fieldMapping = {
-                units: discoverField(subjectFields, ['units', 'credit', 'credits', 'وحدات', 'unit']),
-                classwork: discoverField(subjectFields, ['classwork', 'midterm', 'activities', 'أعمال فصل', 'أعمال', 'activity', 'mid']),
-                final: discoverField(subjectFields, ['final', 'exam', 'finalExam', 'نهائي', 'اختبار', 'test']),
-                total: discoverField(subjectFields, ['total', 'grade', 'score', 'مجموع', 'درجة', 'mark'])
+            iframe.onload = function() {
+                try {
+                    const iframeWindow = iframe.contentWindow;
+                    if (iframeWindow.students && iframeWindow.students.length > 0) {
+                        students = iframeWindow.students;
+                        updateSyncStatus('success', 'iframe');
+                        
+                        // Also save to localStorage for caching
+                        localStorage.setItem('cachedStudents', JSON.stringify(students));
+                    } else {
+                        updateSyncStatus('warning', 'لا توجد بيانات');
+                    }
+                } catch (e) {
+                    console.error('Error accessing iframe:', e);
+                    updateSyncStatus('error', 'خطأ في الوصول');
+                }
+                
+                document.body.removeChild(iframe);
             };
             
-            console.log('🗺️ Field mapping discovered:', fieldMapping);
+            iframe.onerror = function() {
+                updateSyncStatus('error', 'خطأ في التحميل');
+                document.body.removeChild(iframe);
+            };
             
-            // Show field mapping
-            updateFieldMappingDisplay();
+            document.body.appendChild(iframe);
         }
         
-        // Discover the best field name for a type
-        function discoverField(availableFields, possibleNames) {
-            for (const name of possibleNames) {
-                // Try exact match
-                if (availableFields.includes(name)) {
-                    console.log(`✅ Found exact match for ${possibleNames}: ${name}`);
-                    return name;
-                }
-                
-                // Try case-insensitive match
-                const lowerName = name.toLowerCase();
-                for (const field of availableFields) {
-                    if (field.toLowerCase() === lowerName) {
-                        console.log(`✅ Found case-insensitive match for ${possibleNames}: ${field}`);
-                        return field;
-                    }
-                }
-                
-                // Try partial match
-                for (const field of availableFields) {
-                    if (field.toLowerCase().includes(lowerName) || lowerName.includes(field.toLowerCase())) {
-                        console.log(`✅ Found partial match for ${possibleNames}: ${field}`);
-                        return field;
-                    }
-                }
-            }
+        // Update sync status
+        function updateSyncStatus(status, source) {
+            const studentsCount = document.getElementById('studentsCount');
+            const lastUpdate = document.getElementById('lastUpdate');
+            const dataSource = document.getElementById('dataSource');
             
-            console.log(`❌ No match found for ${possibleNames}`);
-            return null;
-        }
-        
-        // Update field mapping display
-        function updateFieldMappingDisplay() {
-            const fieldMappingDiv = document.getElementById('fieldMapping');
-            const fieldMappingContent = document.getElementById('fieldMappingContent');
-            
-            if (Object.values(fieldMapping).some(f => f !== null)) {
-                fieldMappingDiv.style.display = 'block';
+            if (status === 'success') {
+                studentsCount.textContent = students.length;
+                lastSyncTime = new Date();
+                lastUpdate.textContent = lastSyncTime.toLocaleString('ar-SA');
+                dataSource.textContent = source;
                 
-                let mappingHTML = '';
-                for (const [type, field] of Object.entries(fieldMapping)) {
-                    if (field) {
-                        mappingHTML += `<div style="margin: 5px 0; padding: 5px; background: #e8f5e8; border-radius: 4px;">
-                            ${type} → ${field}
-                        </div>`;
-                    }
-                }
-                
-                fieldMappingContent.innerHTML = mappingHTML;
-            }
-        }
-        
-        // Show field analysis
-        function showFieldAnalysis() {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.style.display = 'block';
-            
-            let analysisHTML = '<strong>🔍 تحليل الحقول:</strong><br><br>';
-            
-            if (students.length > 0 && students[0].subjects) {
-                const firstSubject = students[0].subjects[0];
-                analysisHTML += '<strong>حقول المادة الأولى:</strong><br>';
-                
-                for (const [key, value] of Object.entries(firstSubject)) {
-                    const type = typeof value;
-                    const displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
-                    analysisHTML += `<div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 4px;">
-                        ${key} (${type}): ${displayValue}
-                    </div>`;
-                }
-                
-                analysisHTML += '<br><strong>خرائط الحقول المكتشفة:</strong><br>';
-                for (const [type, field] of Object.entries(fieldMapping)) {
-                    analysisHTML += `<div style="margin: 5px 0; padding: 5px; background: ${field ? '#e8f5e8' : '#ffebee'}; border-radius: 4px;">
-                        ${type}: ${field || 'غير مكتشف'}
-                    </div>`;
-                }
+                console.log('✅ Sync successful:', students.length, 'students from', source);
+            } else if (status === 'warning') {
+                studentsCount.textContent = '0';
+                lastUpdate.textContent = 'لا توجد بيانات';
+                dataSource.textContent = source;
             } else {
-                analysisHTML += 'لا توجد بيانات للتحليل';
+                studentsCount.textContent = 'خطأ';
+                lastUpdate.textContent = 'فشل المزامنة';
+                dataSource.textContent = source;
             }
-            
-            debugDiv.innerHTML = analysisHTML;
         }
         
-        // Show debug info
-        function showDebugInfo() {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
+        // Force refresh
+        function forceRefresh() {
+            // Clear cached data
+            localStorage.removeItem('cachedStudents');
             
-            if (debugDiv.style.display === 'block') {
-                let debugHTML = '<strong>📊 معلومات التشخيص:</strong><br><br>';
-                
-                debugHTML += `<strong>عدد الطلاب:</strong> ${students.length}<br>`;
-                debugHTML += `<strong>خرائط الحقول:</strong> ${JSON.stringify(fieldMapping, null, 2)}<br><br>`;
-                
-                if (students.length > 0) {
-                    debugHTML += '<strong>أول طالب:</strong><br>';
-                    debugHTML += JSON.stringify(students[0], null, 2);
-                }
-                
-                debugDiv.innerHTML = debugHTML;
-            }
+            // Force sync
+            syncWithMainSystem();
         }
         
         // Search student function
@@ -511,7 +433,7 @@
             }
             
             if (students.length === 0) {
-                resultsDiv.innerHTML = '<div class="no-results"><h3>لا توجد بيانات طلاب</h3><p>الرجاء التحميل المتكيف أولاً</p></div>';
+                resultsDiv.innerHTML = '<div class="no-results"><h3>لا توجد بيانات طلاب</h3><p>الرجاء مزامنة البيانات مع المنظومة</p></div>';
                 resultDisplayDiv.innerHTML = '';
                 return;
             }
@@ -525,6 +447,12 @@
                         <h3>الطالب غير موجود</h3>
                         <p>الرقم الدراسي: ${searchId}</p>
                         <p>عدد الطلاب المتاح: ${students.length}</p>
+                        <details style="margin-top: 15px;">
+                            <summary style="cursor: pointer; color: #667eea;">عرض أرقام الطلاب المتاحة</summary>
+                            <div style="text-align: right; margin-top: 10px; max-height: 200px; overflow-y: auto;">
+                                ${students.map(s => `<div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 4px;">${s.id} - ${s.name}</div>`).join('')}
+                            </div>
+                        </details>
                     </div>
                 `;
                 resultDisplayDiv.innerHTML = '';
@@ -535,11 +463,11 @@
             displayStudentResult(student);
         }
         
-        // Display student result with adaptive field mapping
+        // Display student result
         function displayStudentResult(student) {
             const resultDisplayDiv = document.getElementById('studentResultDisplay');
             
-            // Calculate totals using discovered field mapping
+            // Calculate totals
             let totalUnits = 0;
             let totalClassWork = 0;
             let totalFinal = 0;
@@ -552,14 +480,13 @@
                 student.subjects.forEach((subject, index) => {
                     console.log(`Subject ${index + 1}:`, subject);
                     
-                    // Use discovered field mapping
-                    const units = fieldMapping.units ? parseInt(subject[fieldMapping.units]) || 0 : 0;
-                    const classwork = fieldMapping.classwork ? parseInt(subject[fieldMapping.classwork]) || 0 : 0;
-                    const final = fieldMapping.final ? parseInt(subject[fieldMapping.final]) || 0 : 0;
-                    const total = fieldMapping.total ? parseInt(subject[fieldMapping.total]) || 0 : (classwork + final);
+                    // Try different field names
+                    const units = parseInt(subject.units) || parseInt(subject.credit) || 0;
+                    const classwork = parseInt(subject.classwork) || parseInt(subject.midterm) || parseInt(subject.activities) || 0;
+                    const final = parseInt(subject.final) || parseInt(subject.exam) || 0;
+                    const total = parseInt(subject.total) || parseInt(subject.grade) || (classwork + final);
                     
-                    console.log(`Adaptive values: units=${units}, classwork=${classwork}, final=${final}, total=${total}`);
-                    console.log(`Using fields: units=${fieldMapping.units}, classwork=${fieldMapping.classwork}, final=${fieldMapping.final}, total=${fieldMapping.total}`);
+                    console.log(`Processed values: units=${units}, classwork=${classwork}, final=${final}, total=${total}`);
                     
                     totalUnits += units;
                     totalClassWork += classwork;
@@ -600,10 +527,10 @@
                 `;
                 
                 student.subjects.forEach((subject, index) => {
-                    const units = fieldMapping.units ? parseInt(subject[fieldMapping.units]) || 0 : 0;
-                    const classwork = fieldMapping.classwork ? parseInt(subject[fieldMapping.classwork]) || 0 : 0;
-                    const final = fieldMapping.final ? parseInt(subject[fieldMapping.final]) || 0 : 0;
-                    const total = fieldMapping.total ? parseInt(subject[fieldMapping.total]) || 0 : (classwork + final);
+                    const units = parseInt(subject.units) || parseInt(subject.credit) || 0;
+                    const classwork = parseInt(subject.classwork) || parseInt(subject.midterm) || parseInt(subject.activities) || 0;
+                    const final = parseInt(subject.final) || parseInt(subject.exam) || 0;
+                    const total = parseInt(subject.total) || parseInt(subject.grade) || (classwork + final);
                     const grade = getGrade(total);
                     
                     subjectsTableHTML += `
@@ -686,10 +613,26 @@
         
         // Initialize
         window.onload = function() {
-            console.log('🧠 Adaptive Student Search Page Loaded');
-            // Auto-adaptive load
-            adaptiveLoad();
+            console.log('🚀 Integrated Student Search Page Loaded');
+            
+            // Try to load cached data first
+            const cachedStudents = localStorage.getItem('cachedStudents');
+            if (cachedStudents) {
+                try {
+                    students = JSON.parse(cachedStudents);
+                    updateSyncStatus('success', 'بيانات مخزنة');
+                    console.log('✅ Loaded cached students:', students.length);
+                } catch (e) {
+                    console.log('Invalid cached data, syncing fresh...');
+                }
+            }
+            
+            // Always try to sync with main system
+            syncWithMainSystem();
         };
+        
+        // Auto-sync every 5 minutes
+        setInterval(syncWithMainSystem, 5 * 60 * 1000);
     </script>
 </body>
 </html>

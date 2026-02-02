@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بحث عن نتيجة الطالب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            padding: 50px;
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 18px;
+            font-weight: 400;
+        }
+        
+        .search-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: right;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 18px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .search-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .search-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .search-btn.secondary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .search-btn.secondary:hover {
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+        
+        .status-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #90caf9;
+            text-align: right;
+        }
+        
+        .status-section h3 {
+            color: #1565c0;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .status-item strong {
+            color: #1565c0;
+        }
+        
+        .result-container {
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+        
+        .no-results {
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border: 2px solid #fc8181;
+            border-radius: 15px;
+            padding: 30px;
+            color: #c53030;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(252, 129, 129, 0.2);
+        }
+        
+        .no-results h3 {
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .no-results p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        
+        .student-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: right;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .student-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.1;
+            border-radius: 0 0 0 100%;
+        }
+        
+        .student-card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-right: 4px solid #667eea;
+        }
+        
+        .info-item p {
+            margin: 5px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .info-item strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .result-display {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            text-align: right;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .subjects-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .subjects-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .subjects-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 15px;
+        }
+        
+        .subjects-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .subjects-table tr:hover {
+            background: #e3f2fd;
+            transition: background 0.3s ease;
+        }
+        
+        .subjects-table td:last-child {
+            font-weight: 600;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-badge {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .warning-badge {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .error-badge {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 بحث عن نتيجة الطالب</h1>
+            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
+        </div>
+        
+        <div class="status-section">
+            <h3>📊 حالة البيانات</h3>
+            <div class="status-item">
+                <span>عدد الطلاب في النظام:</span>
+                <strong id="studentsCount">جاري التحميل...</strong>
+            </div>
+            <div class="status-item">
+                <span>حالة التحميل:</span>
+                <strong id="loadStatus">جاري التحميل...</strong>
+            </div>
+            <div class="status-item">
+                <span>مصدر البيانات:</span>
+                <strong id="dataSource">غير محدد</strong>
+            </div>
+        </div>
+        
+        <div class="search-section">
+            <div class="form-group">
+                <label for="searchId">الرقم الدراسي:</label>
+                <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" maxlength="20">
+            </div>
+            <button class="search-btn" onclick="searchStudent()">🔍 بحث</button>
+            <button class="search-btn secondary" onclick="loadStudentsFromMain()">🔄 تحديث البيانات</button>
+        </div>
+        
+        <div id="searchResults" class="result-container"></div>
+        
+        <div id="studentResultDisplay" class="result-display"></div>
+        
+        <div class="footer">
+            <p>&copy; 2026 المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
+        </div>
+    </div>
+    
+    <script>
+        let students = [];
+        
+        // Load students from main system
+        function loadStudentsFromMain() {
+            const studentsCount = document.getElementById('studentsCount');
+            const loadStatus = document.getElementById('loadStatus');
+            const dataSource = document.getElementById('dataSource');
+            
+            loadStatus.innerHTML = 'جاري التحميل... <span class="loading"></span>';
+            
+            try {
+                // Method 1: Try localStorage
+                let storedStudents = localStorage.getItem('students');
+                let source = 'localStorage';
+                
+                if (storedStudents) {
+                    students = JSON.parse(storedStudents);
+                    console.log('✅ Loaded from localStorage:', students.length);
+                } else {
+                    // Method 2: Try sessionStorage
+                    storedStudents = sessionStorage.getItem('students');
+                    if (storedStudents) {
+                        students = JSON.parse(storedStudents);
+                        source = 'sessionStorage';
+                        console.log('✅ Loaded from sessionStorage:', students.length);
+                    } else {
+                        // Method 3: Try parent window
+                        try {
+                            if (window.parent && window.parent.localStorage) {
+                                storedStudents = window.parent.localStorage.getItem('students');
+                                if (storedStudents) {
+                                    students = JSON.parse(storedStudents);
+                                    source = 'النافذة الرئيسية';
+                                    console.log('✅ Loaded from parent window:', students.length);
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Cannot access parent window:', e.message);
+                        }
+                    }
+                }
+                
+                if (!students || students.length === 0) {
+                    students = [];
+                    loadStatus.innerHTML = '<span class="error-badge">لا توجد بيانات</span>';
+                    dataSource.textContent = 'غير متوفر';
+                } else {
+                    loadStatus.innerHTML = '<span class="success-badge">تم التحميل</span>';
+                    dataSource.textContent = source;
+                }
+                
+                studentsCount.textContent = students.length;
+                
+                // Log detailed info
+                if (students.length > 0) {
+                    console.log('📊 First student:', students[0]);
+                    console.log('📚 First student subjects:', students[0].subjects);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading students:', error);
+                loadStatus.innerHTML = '<span class="error-badge">خطأ</span>';
+                dataSource.textContent = 'غير متوفر';
+                students = [];
+                studentsCount.textContent = '0';
+            }
+        }
+        
+        // Search student function
+        function searchStudent() {
+            const searchId = document.getElementById('searchId').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            const resultDisplayDiv = document.getElementById('studentResultDisplay');
+            
+            console.log('🔍 Searching for student ID:', searchId);
+            console.log('📊 Available students:', students.length);
+            
+            if (!searchId) {
+                resultsDiv.innerHTML = '<div class="no-results"><h3>⚠️ الرجاء إدخال الرقم الدراسي</h3></div>';
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            if (students.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results"><h3>📭 لا توجد بيانات طلاب</h3><p>الرجاء تحديث البيانات أولاً</p></div>';
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            // Try exact match first
+            let student = students.find(s => s.id === searchId);
+            
+            // If not found, try partial match
+            if (!student) {
+                student = students.find(s => s.id.includes(searchId));
+            }
+            
+            console.log('👤 Found student:', student);
+            
+            if (!student) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <h3>❌ الطالب غير موجود</h3>
+                        <p><strong>الرقم الدراسي:</strong> ${searchId}</p>
+                        <p><strong>عدد الطلاب في النظام:</strong> ${students.length}</p>
+                        <details style="margin-top: 15px;">
+                            <summary style="cursor: pointer; color: #667eea; font-weight: 600;">عرض أرقام الطلاب المتاحة</summary>
+                            <div style="text-align: right; margin-top: 10px; font-family: monospace; background: white; padding: 15px; border-radius: 8px;">
+                                ${students.slice(0, 10).map(s => `<div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 4px;">${s.id} - ${s.name}</div>`).join('')}
+                                ${students.length > 10 ? `<div style="margin-top: 10px; color: #666;">... و ${students.length - 10} آخرون</div>` : ''}
+                            </div>
+                        </details>
+                    </div>
+                `;
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            // Display student result
+            displayStudentResult(student);
+        }
+        
+        // Display student result function
+        function displayStudentResult(student) {
+            console.log('🎯 Displaying student result for:', student);
+            
+            const resultDisplayDiv = document.getElementById('studentResultDisplay');
+            
+            // Calculate totals and semester GPA
+            let totalUnits = 0;
+            let totalClassWork = 0;
+            let totalFinal = 0;
+            let totalGrade = 0;
+            let totalWeightedGrade = 0;
+            let passedSubjects = 0;
+            let failedSubjects = 0;
+            
+            console.log('📚 Student subjects:', student.subjects);
+            
+            if (student.subjects && student.subjects.length > 0) {
+                student.subjects.forEach((subject, index) => {
+                    console.log(`📖 Subject ${index + 1}:`, subject);
+                    
+                    // Handle different field names and types
+                    const units = parseInt(subject.units) || parseInt(subject.credit) || 0;
+                    const classwork = parseInt(subject.classwork) || parseInt(subject.midterm) || parseInt(subject.activities) || 0;
+                    const final = parseInt(subject.final) || parseInt(subject.exam) || 0;
+                    const total = parseInt(subject.total) || parseInt(subject.grade) || (classwork + final);
+                    
+                    console.log(`📊 Subject ${index + 1} processed values:`, {
+                        units: units,
+                        classwork: classwork,
+                        final: final,
+                        total: total
+                    });
+                    
+                    totalUnits += units;
+                    totalClassWork += classwork;
+                    totalFinal += final;
+                    totalGrade += total;
+                    
+                    if (units && total) {
+                        totalWeightedGrade += (total * units);
+                    }
+                    
+                    if (total >= 50) {
+                        passedSubjects++;
+                    } else {
+                        failedSubjects++;
+                    }
+                });
+            }
+            
+            const semesterGPA = totalUnits > 0 ? (totalWeightedGrade / totalUnits).toFixed(2) : 0;
+            const evaluation = getEvaluation(parseFloat(semesterGPA));
+            
+            console.log('📈 Final calculated values:', {
+                totalUnits: totalUnits,
+                totalClassWork: totalClassWork,
+                totalFinal: totalFinal,
+                totalGrade: totalGrade,
+                totalWeightedGrade: totalWeightedGrade,
+                semesterGPA: semesterGPA,
+                passedSubjects: passedSubjects,
+                failedSubjects: failedSubjects
+            });
+            
+            // Generate subjects table HTML
+            let subjectsTableHTML = '';
+            if (student.subjects && student.subjects.length > 0) {
+                subjectsTableHTML = `
+                    <table class="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>الوحدات</th>
+                                <th>أعمال الفصل</th>
+                                <th>الاختبار النهائي</th>
+                                <th>المجموع</th>
+                                <th>التقدير</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                student.subjects.forEach((subject, index) => {
+                    const units = parseInt(subject.units) || parseInt(subject.credit) || 0;
+                    const classwork = parseInt(subject.classwork) || parseInt(subject.midterm) || parseInt(subject.activities) || 0;
+                    const final = parseInt(subject.final) || parseInt(subject.exam) || 0;
+                    const total = parseInt(subject.total) || parseInt(subject.grade) || (classwork + final);
+                    const grade = getGrade(total);
+                    
+                    subjectsTableHTML += `
+                        <tr>
+                            <td>${subject.name || 'غير محدد'}</td>
+                            <td>${units}</td>
+                            <td>${classwork}</td>
+                            <td>${final}</td>
+                            <td><strong>${total}</strong></td>
+                            <td>${grade}</td>
+                        </tr>
+                    `;
+                });
+                
+                subjectsTableHTML += `
+                        </tbody>
+                    </table>
+                `;
+            }
+            
+            resultDisplayDiv.innerHTML = `
+                <div class="student-card">
+                    <h3>📊 نتيجة الطالب</h3>
+                    <div class="student-info">
+                        <div class="info-item">
+                            <strong>الرقم الدراسي:</strong>
+                            <p>${student.id || 'غير محدد'}</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>اسم الطالب:</strong>
+                            <p>${student.name || 'غير محدد'}</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>القسم:</strong>
+                            <p>${student.department || 'غير محدد'}</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>الفصل:</strong>
+                            <p>${student.semester || 'غير محدد'}</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>المعدل التراكمي:</strong>
+                            <p style="color: #007bff; font-weight: bold; font-size: 18px;">${semesterGPA}</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>التقدير:</strong>
+                            <p style="color: #28a745; font-weight: bold; font-size: 18px;">${evaluation}</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>المواد الناجحة:</strong>
+                            <p style="color: #28a745; font-weight: bold;">${passedSubjects}</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>المواد الراسبة:</strong>
+                            <p style="color: #dc3545; font-weight: bold;">${failedSubjects}</p>
+                        </div>
+                    </div>
+                    ${subjectsTableHTML}
+                </div>
+            `;
+            
+            resultDisplayDiv.style.display = 'block';
+        }
+        
+        // Get grade based on score
+        function getGrade(score) {
+            const numScore = parseFloat(score) || 0;
+            if (numScore >= 90) return 'ممتاز';
+            if (numScore >= 80) return 'جيد جداً';
+            if (numScore >= 70) return 'جيد';
+            if (numScore >= 60) return 'مقبول';
+            if (numScore >= 50) return 'مقبول';
+            return 'ضعيف';
+        }
+        
+        // Get evaluation based on GPA
+        function getEvaluation(gpa) {
+            const numGpa = parseFloat(gpa) || 0;
+            if (numGpa >= 85) return 'ممتاز';
+            if (numGpa >= 75) return 'جيد جداً';
+            if (numGpa >= 65) return 'جيد';
+            if (numGpa >= 50) return 'مقبول';
+            return 'ضعيف';
+        }
+        
+        // Initialize on page load
+        window.onload = function() {
+            console.log('🚀 Student Search Page - Final Version Loaded');
+            loadStudentsFromMain();
+        };
+    </script>
+</body>
+</html>
