@@ -517,18 +517,19 @@
             let passedSubjects = 0;
             let failedSubjects = 0;
             
+            // Calculate student status using same logic as main system
+            let studentStatus = 'منقول';
+            let failedRequiredSubjects = 0;
+            let hasFailedRequired = false;
+            
             if (student.subjects && student.subjects.length > 0) {
                 student.subjects.forEach((subject, index) => {
-                    console.log(`Subject ${index + 1}:`, subject);
-                    
-                    // Use discovered field mapping
                     const units = fieldMapping.units ? parseInt(subject[fieldMapping.units]) || 0 : 0;
                     const classwork = fieldMapping.classwork ? parseInt(subject[fieldMapping.classwork]) || 0 : 0;
                     const final = fieldMapping.final ? parseInt(subject[fieldMapping.final]) || 0 : 0;
                     const total = fieldMapping.total ? parseInt(subject[fieldMapping.total]) || 0 : (classwork + final);
                     
-                    console.log(`Adaptive values: units=${units}, classwork=${classwork}, final=${final}, total=${total}`);
-                    console.log(`Using fields: units=${fieldMapping.units}, classwork=${fieldMapping.classwork}, final=${fieldMapping.final}, total=${fieldMapping.total}`);
+                    console.log(`Subject ${index + 1}: ${subject.name}, Total: ${total}, Units: ${units}`);
                     
                     totalUnits += units;
                     totalClassWork += classwork;
@@ -539,15 +540,40 @@
                         totalWeightedGrade += (total * units);
                     }
                     
-                    if (total >= 50) {
-                        passedSubjects++;
-                    } else {
+                    // Check if failed
+                    if (total < 50) {
                         failedSubjects++;
+                        
+                        // Check if this is a required subject (contains "مطالب" in name)
+                        if (subject.name && subject.name.includes('(مطالب)')) {
+                            failedRequiredSubjects++;
+                            hasFailedRequired = true;
+                            console.log(`Failed required subject: ${subject.name}`);
+                        } else {
+                            console.log(`Failed non-required subject: ${subject.name}`);
+                        }
+                    } else {
+                        passedSubjects++;
                     }
                 });
             }
             
+            // Apply same logic as main system
             const semesterGPA = totalUnits > 0 ? (totalWeightedGrade / totalUnits).toFixed(2) : 0;
+            
+            // Rule 1: If failed any "مطالب" subject, student fails
+            if (hasFailedRequired) {
+                studentStatus = 'راسب';
+                console.log('Student failed due to required subject');
+            } else {
+                // Rule 2: Pass if failed subjects <= 2 AND GPA >= 50
+                const passed = failedSubjects <= 2 && parseFloat(semesterGPA) >= 50;
+                studentStatus = passed ? 'منقول' : 'راسب';
+                console.log(`Student status: ${studentStatus} (Failed: ${failedSubjects}, GPA: ${semesterGPA})`);
+            }
+            
+            console.log(`Final student status: ${studentStatus} (Failed required: ${failedRequiredSubjects}, Failed total: ${failedSubjects})`);
+            
             const evaluation = getEvaluation(parseFloat(semesterGPA));
             
             // Generate subjects table
@@ -616,7 +642,7 @@
                         </div>
                         <div class="info-item">
                             <strong>الحالة:</strong>
-                            <p style="color: ${failedSubjects > 0 ? '#dc3545' : '#28a745'}; font-weight: bold; font-size: 18px;">${failedSubjects > 0 ? 'راسب' : 'منقول'}</p>
+                            <p style="color: ${studentStatus === 'راسب' ? '#dc3545' : '#28a745'}; font-weight: bold; font-size: 18px;">${studentStatus}</p>
                         </div>
                         <div class="info-item">
                             <strong>المواد الناجحة:</strong>
@@ -656,9 +682,28 @@
         // Initialize
         window.onload = function() {
             console.log('🎓 Student Search Page Loaded');
-            // Auto-load students
-            adaptiveLoad();
+            // Auto-load students from localStorage
+            loadStudentsFromStorage();
         };
+        
+        // Load students from localStorage
+        function loadStudentsFromStorage() {
+            try {
+                const storedStudents = localStorage.getItem('students');
+                if (storedStudents) {
+                    students = JSON.parse(storedStudents);
+                    console.log('✅ Loaded students:', students.length);
+                    
+                    if (students.length > 0 && students[0].subjects) {
+                        analyzeStudentStructure(students[0]);
+                    }
+                } else {
+                    console.log('❌ No students found in localStorage');
+                }
+            } catch (error) {
+                console.error('❌ Error loading students:', error);
+            }
+        }
     </script>
 </body>
 </html>
