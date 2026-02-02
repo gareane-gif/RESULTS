@@ -473,15 +473,17 @@
             const resultsDiv = document.getElementById('searchResults');
             const resultDisplayDiv = document.getElementById('studentResultDisplay');
             
+            // Clear previous results
+            resultsDiv.innerHTML = '';
+            resultDisplayDiv.innerHTML = '';
+            
             if (!searchId) {
                 resultsDiv.innerHTML = '<div class="no-results"><h3>الرجاء إدخال الرقم الدراسي</h3></div>';
-                resultDisplayDiv.innerHTML = '';
                 return;
             }
             
             if (students.length === 0) {
                 resultsDiv.innerHTML = '<div class="no-results"><h3>لا توجد بيانات طلاب</h3><p>الرجاء التحميل المتكيف أولاً</p></div>';
-                resultDisplayDiv.innerHTML = '';
                 return;
             }
             
@@ -502,7 +504,6 @@
                         </details>
                     </div>
                 `;
-                resultDisplayDiv.innerHTML = '';
                 return;
             }
             
@@ -523,7 +524,6 @@
                         <p style="color: #666; font-size: 14px; margin-top: 10px;">يرجى التواصل مع لجنة الامتحانات</p>
                     </div>
                 `;
-                resultDisplayDiv.innerHTML = '';
                 return;
             }
             
