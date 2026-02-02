@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بحث عن نتيجة الطالب - نسخة عاملة</title>
+    <title>بحث عن نتيجة الطالب - النسخة النهائية</title>
     <style>
         * {
             margin: 0;
@@ -176,6 +176,15 @@
             background: #f8f9fa;
         }
         
+        .blocked-message {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            color: #856404;
+            text-align: center;
+        }
+        
         .footer {
             margin-top: 30px;
             padding-top: 20px;
@@ -193,56 +202,40 @@
             text-align: right;
         }
         
-        .test-students {
-            background: #fff3cd;
-            border: 2px solid #ffeaa7;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: right;
-        }
-        
-        .test-students ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .test-students li {
-            margin: 5px 0;
-            padding: 5px;
-            background: #fff;
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
             border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 بحث عن نتيجة الطالب - نسخة عاملة</h1>
+            <h1>🎓 بحث عن نتيجة الطالب - النسخة النهائية</h1>
             <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
         </div>
         
         <div class="data-status">
             <h3>📊 حالة البيانات</h3>
             <p>عدد الطلاب في النظام: <strong id="studentsCount">0</strong></p>
-            <p>هذه النسخة تحتوي على بيانات تجريبية للاختبار</p>
-        </div>
-        
-        <div class="test-students">
-            <h3>🧪 بيانات الاختبار المتاحة</h3>
-            <p>يمكنك البحث عن الطلاب التاليين:</p>
-            <ul>
-                <li><strong>CO242001</strong> - محمد علي أحمد (التمويل والمصارف) ← الطالب المطلوب</li>
-                <li><strong>2023001</strong> - أحمد محمد علي (التمويل والمصارف)</li>
-                <li><strong>2023002</strong> - فاطمة أحمد حسن (المساحة)</li>
-                <li><strong>2023003</strong> - محمد عبدالله (التمويل والمصارف)</li>
-            </ul>
+            <p>حالة التحميل: <strong id="loadStatus">جاري التحميل...</strong></p>
+            <button class="search-btn success" onclick="loadStudentsFromMain()">🔄 تحميل البيانات من المنظومة الرئيسية</button>
+            <button class="search-btn warning" onclick="showDebugInfo()">🔍 عرض معلومات التشخيص</button>
+            <div id="debugInfo" class="debug-info" style="display: none;"></div>
         </div>
         
         <div class="search-form">
             <div class="form-group">
                 <label for="searchId">الرقم الدراسي:</label>
-                <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي (مثال: CO242001)" maxlength="20">
+                <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" maxlength="20">
             </div>
             <button class="search-btn" onclick="searchStudent()">🔍 بحث</button>
         </div>
@@ -257,68 +250,118 @@
     </div>
     
     <script>
-        // Test data with correct structure
-        let students = [
-            {
-                id: 'CO242001',
-                name: 'محمد علي أحمد',
-                department: 'التمويل والمصارف',
-                semester: 1,
-                subjects: [
-                    { name: 'مبادئ المحاسبة', units: 3, classwork: 28, final: 52, total: 80 },
-                    { name: 'إدارة مالية', units: 3, classwork: 30, final: 55, total: 85 },
-                    { name: 'محاسبة متوسطة', units: 3, classwork: 25, final: 45, total: 70 },
-                    { name: 'اقتصاد جزئي', units: 3, classwork: 22, final: 40, total: 62 },
-                    { name: 'رياضيات مالية', units: 3, classwork: 26, final: 48, total: 74 }
-                ]
-            },
-            {
-                id: '2023001',
-                name: 'أحمد محمد علي',
-                department: 'التمويل والمصارف',
-                semester: 1,
-                subjects: [
-                    { name: 'مبادئ المحاسبة', units: 3, classwork: 25, final: 45, total: 70 },
-                    { name: 'إدارة مالية', units: 3, classwork: 28, final: 50, total: 78 },
-                    { name: 'محاسبة متوسطة', units: 3, classwork: 30, final: 55, total: 85 },
-                    { name: 'اقتصاد جزئي', units: 3, classwork: 22, final: 40, total: 62 },
-                    { name: 'رياضيات مالية', units: 3, classwork: 26, final: 48, total: 74 }
-                ]
-            },
-            {
-                id: '2023002',
-                name: 'فاطمة أحمد حسن',
-                department: 'المساحة',
-                semester: 2,
-                subjects: [
-                    { name: 'مساحة تفصيلية', units: 3, classwork: 30, final: 55, total: 85 },
-                    { name: 'تصوير جوي', units: 3, classwork: 25, final: 45, total: 70 },
-                    { name: 'جيوديسيا', units: 3, classwork: 28, final: 50, total: 78 },
-                    { name: 'برمجة حاسوب', units: 3, classwork: 32, final: 58, total: 90 },
-                    { name: 'مساحة طرق', units: 2, classwork: 20, final: 35, total: 55 }
-                ]
-            },
-            {
-                id: '2023003',
-                name: 'محمد عبدالله',
-                department: 'التمويل والمصارف',
-                semester: 1,
-                subjects: [
-                    { name: 'مبادئ المحاسبة', units: 3, classwork: 15, final: 25, total: 40 },
-                    { name: 'إدارة مالية', units: 3, classwork: 20, final: 30, total: 50 },
-                    { name: 'محاسبة متوسطة', units: 3, classwork: 18, final: 28, total: 46 },
-                    { name: 'اقتصاد جزئي', units: 3, classwork: 25, final: 45, total: 70 },
-                    { name: 'رياضيات مالية', units: 3, classwork: 22, final: 38, total: 60 }
-                ]
-            }
-        ];
+        let students = [];
         
-        // Initialize page
-        function initializePage() {
+        // Load students from main system
+        function loadStudentsFromMain() {
+            const loadStatus = document.getElementById('loadStatus');
             const studentsCount = document.getElementById('studentsCount');
-            studentsCount.textContent = students.length;
-            console.log('🚀 Student Search Page - Working Version');
-            console.log('📊 Loaded students:', students.length);
+            
+            loadStatus.textContent = 'جاري التحميل...';
+            
+            try {
+                // Method 1: Try to get from localStorage
+                let storedStudents = localStorage.getItem('students');
+                
+                if (storedStudents) {
+                    students = JSON.parse(storedStudents);
+                    loadStatus.textContent = 'تم التحميل من localStorage';
+                    console.log('✅ Loaded from localStorage:', students.length);
+                } else {
+                    // Method 2: Try to get from sessionStorage
+                    storedStudents = sessionStorage.getItem('students');
+                    if (storedStudents) {
+                        students = JSON.parse(storedStudents);
+                        loadStatus.textContent = 'تم التحميل من sessionStorage';
+                        console.log('✅ Loaded from sessionStorage:', students.length);
+                    } else {
+                        // Method 3: Try to access parent window
+                        try {
+                            if (window.parent && window.parent.localStorage) {
+                                storedStudents = window.parent.localStorage.getItem('students');
+                                if (storedStudents) {
+                                    students = JSON.parse(storedStudents);
+                                    loadStatus.textContent = 'تم التحميل من النافذة الرئيسية';
+                                    console.log('✅ Loaded from parent window:', students.length);
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Cannot access parent window:', e.message);
+                        }
+                    }
+                }
+                
+                // Method 4: Create sample data if no data found
+                if (!students || students.length === 0) {
+                    students = createSampleData();
+                    loadStatus.textContent = 'تم إنشاء بيانات تجريبية';
+                    console.log('✅ Created sample data:', students.length);
+                }
+                
+                studentsCount.textContent = students.length;
+                
+                // Log detailed info
+                if (students.length > 0) {
+                    console.log('📊 First student:', students[0]);
+                    console.log('📚 First student subjects:', students[0].subjects);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading students:', error);
+                loadStatus.textContent = 'حدث خطأ في التحميل';
+                students = [];
+                studentsCount.textContent = '0';
+            }
+        }
+        
+        // Create sample data for testing
+        function createSampleData() {
+            return [
+                {
+                    id: '2023001',
+                    name: 'أحمد محمد علي',
+                    department: 'التمويل والمصارف',
+                    semester: 1,
+                    subjects: [
+                        { name: 'مبادئ المحاسبة', units: 3, classwork: 25, final: 45, total: 70 },
+                        { name: 'إدارة مالية', units: 3, classwork: 28, final: 50, total: 78 },
+                        { name: 'محاسبة متوسطة', units: 3, classwork: 30, final: 55, total: 85 },
+                        { name: 'اقتصاد جزئي', units: 3, classwork: 22, final: 40, total: 62 },
+                        { name: 'رياضيات مالية', units: 3, classwork: 26, final: 48, total: 74 }
+                    ]
+                },
+                {
+                    id: '2023002',
+                    name: 'فاطمة أحمد حسن',
+                    department: 'المساحة',
+                    semester: 2,
+                    subjects: [
+                        { name: 'مساحة تفصيلية', units: 3, classwork: 30, final: 55, total: 85 },
+                        { name: 'تصوير جوي', units: 3, classwork: 25, final: 45, total: 70 },
+                        { name: 'جيوديسيا', units: 3, classwork: 28, final: 50, total: 78 },
+                        { name: 'برمجة حاسوب', units: 3, classwork: 32, final: 58, total: 90 },
+                        { name: 'مساحة طرق', units: 2, classwork: 20, final: 35, total: 55 }
+                    ]
+                }
+            ];
+        }
+        
+        // Show debug information
+        function showDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+            
+            if (debugInfo.style.display === 'block') {
+                debugInfo.innerHTML = `
+                    <strong>🔍 معلومات التشخيص:</strong><br>
+                    عدد الطلاب: ${students.length}<br>
+                    localStorage students: ${localStorage.getItem('students') ? 'موجود' : 'غير موجود'}<br>
+                    sessionStorage students: ${sessionStorage.getItem('students') ? 'موجود' : 'غير موجود'}<br>
+                    <br>
+                    <strong>أول طالب:</strong><br>
+                    ${JSON.stringify(students[0] || 'لا يوجد', null, 2)}
+                `;
+            }
         }
         
         // Search student function
@@ -332,6 +375,12 @@
             
             if (!searchId) {
                 resultsDiv.innerHTML = '<div class="no-results">الرجاء إدخال الرقم الدراسي</div>';
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            if (students.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">لا توجد بيانات طلاب. الرجاء تحميل البيانات أولاً.</div>';
                 resultDisplayDiv.style.display = 'none';
                 return;
             }
@@ -355,7 +404,8 @@
                         <details>
                             <summary>عرض أرقام الطلاب المتاحة</summary>
                             <div style="text-align: right; margin-top: 10px; font-family: monospace;">
-                                ${students.map(s => `<div>${s.id} - ${s.name}</div>`).join('')}
+                                ${students.slice(0, 10).map(s => `<div>${s.id} - ${s.name}</div>`).join('')}
+                                ${students.length > 10 ? `<div>... و ${students.length - 10} آخرون</div>` : ''}
                             </div>
                         </details>
                     </div>
@@ -389,14 +439,13 @@
                 student.subjects.forEach((subject, index) => {
                     console.log(`📖 Subject ${index + 1}:`, subject);
                     
-                    // Extract values with proper parsing
-                    const units = parseInt(subject.units) || 0;
-                    const classwork = parseInt(subject.classwork) || 0;
-                    const final = parseInt(subject.final) || 0;
-                    const total = parseInt(subject.total) || 0;
+                    // Handle different field names and types
+                    const units = parseInt(subject.units) || parseInt(subject.credit) || 0;
+                    const classwork = parseInt(subject.classwork) || parseInt(subject.midterm) || parseInt(subject.activities) || 0;
+                    const final = parseInt(subject.final) || parseInt(subject.exam) || 0;
+                    const total = parseInt(subject.total) || parseInt(subject.grade) || (classwork + final);
                     
-                    console.log(`📊 Subject ${index + 1} values:`, {
-                        name: subject.name,
+                    console.log(`📊 Subject ${index + 1} processed values:`, {
                         units: units,
                         classwork: classwork,
                         final: final,
@@ -453,10 +502,10 @@
                 `;
                 
                 student.subjects.forEach((subject, index) => {
-                    const units = parseInt(subject.units) || 0;
-                    const classwork = parseInt(subject.classwork) || 0;
-                    const final = parseInt(subject.final) || 0;
-                    const total = parseInt(subject.total) || 0;
+                    const units = parseInt(subject.units) || parseInt(subject.credit) || 0;
+                    const classwork = parseInt(subject.classwork) || parseInt(subject.midterm) || parseInt(subject.activities) || 0;
+                    const final = parseInt(subject.final) || parseInt(subject.exam) || 0;
+                    const total = parseInt(subject.total) || parseInt(subject.grade) || (classwork + final);
                     const grade = getGrade(total);
                     
                     subjectsTableHTML += `
@@ -520,7 +569,8 @@
         
         // Initialize on page load
         window.onload = function() {
-            initializePage();
+            console.log('🚀 Student Search Page - Final Version Loaded');
+            loadStudentsFromMain();
         };
     </script>
 </body>
