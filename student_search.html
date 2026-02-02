@@ -507,8 +507,12 @@
             }
             
             // Check if student result is blocked
+            console.log('🔍 Checking if student is blocked:', student.id);
             const blockedInfo = isStudentBlocked(student.id);
+            console.log('🚫 Blocked info found:', blockedInfo);
+            
             if (blockedInfo) {
+                console.log('❌ Student result is blocked, showing blocked message');
                 resultsDiv.innerHTML = `
                     <div class="no-results">
                         <h3>🚫 نتيجة الطالب محجوبة</h3>
@@ -516,12 +520,14 @@
                         <p><strong>اسم الطالب:</strong> ${student.name}</p>
                         <p><strong>السبب:</strong> ${blockedInfo.reason || 'غير محدد'}</p>
                         <p><strong>تاريخ الحجب:</strong> ${blockedInfo.date ? new Date(blockedInfo.date).toLocaleDateString('ar-SA') : 'غير محدد'}</p>
-                        <p style="color: #666; font-size: 14px; margin-top: 10px;">للتواصل مع الإدارة بخصوص حجب النتيجة</p>
+                        <p style="color: #666; font-size: 14px; margin-top: 10px;">يرجى التواصل مع لجنة الامتحانات</p>
                     </div>
                 `;
                 resultDisplayDiv.innerHTML = '';
                 return;
             }
+            
+            console.log('✅ Student result is not blocked, displaying result');
             
             // Display student result
             displayStudentResult(student);
@@ -531,9 +537,18 @@
         function isStudentBlocked(studentId) {
             try {
                 const blockedStudents = JSON.parse(localStorage.getItem('blockedStudents') || '[]');
-                return blockedStudents.find(blocked => blocked.studentId === studentId);
+                console.log('🔍 All blocked students:', blockedStudents);
+                console.log('🔍 Looking for student ID:', studentId);
+                
+                const blockedInfo = blockedStudents.find(blocked => {
+                    console.log('🔍 Comparing:', blocked.studentId, 'with', studentId);
+                    return blocked.studentId === studentId;
+                });
+                
+                console.log('🚫 Found blocked info:', blockedInfo);
+                return blockedInfo;
             } catch (error) {
-                console.error('Error checking blocked status:', error);
+                console.error('❌ Error checking blocked status:', error);
                 return null;
             }
         }
