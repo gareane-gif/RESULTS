@@ -3907,6 +3907,11 @@
             const currentUrl = window.location.origin + window.location.pathname;
             const urlPath = currentUrl.substring(0, currentUrl.lastIndexOf('/')) + '/student_search.html';
             
+            // Get students data
+            const studentsData = JSON.stringify(students);
+            const encodedData = encodeURIComponent(studentsData);
+            const linkWithData = `${urlPath}?students=${encodedData}`;
+            
             // Create modal to show the link
             const modal = document.createElement('div');
             modal.style.cssText = `
@@ -3923,38 +3928,41 @@
             `;
             
             modal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
                     <h2 style="color: #3b82f6; margin-bottom: 20px;">🔗 رابط البحث عن النتيجة للطلاب</h2>
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; border: 2px solid #e5e7eb;">
-                        <p style="margin: 0 0 15px 0; color: #374151; font-weight: bold;">يمكن للطلاب استخدام هذا الرابط للبحث عن نتائجهم</p>
+                        <p style="margin: 0 0 15px 0; color: #374151; font-weight: bold;">رابط مباشر مع البيانات (موصى به للهواتف)</p>
                         <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #d1d5db;">
-                            <input type="text" value="${urlPath}" readonly style="width: 100%; border: none; outline: none; font-family: monospace; font-size: 12px; direction: ltr;" id="linkInput">
+                            <input type="text" value="${linkWithData}" readonly style="width: 100%; border: none; outline: none; font-family: monospace; font-size: 10px; direction: ltr;" id="linkInput">
                         </div>
                     </div>
                     <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #bbdefb;">
                         <h3 style="margin: 0 0 10px 0; color: #1976d2;">📋 خطوات الاستخدام للطالب:</h3>
                         <ol style="margin: 0; padding-right: 20px; text-align: right; color: #424242; font-size: 14px;">
-                            <li>يفتح الطالب الرابط</li>
+                            <li>يفتح الطالب الرابط أعلاه</li>
+                            <li>تظهر البيانات تلقائياً (لا حاجة لتحميل)</li>
                             <li>يدخل رقمه الدراسي في حقل البحث</li>
                             <li>يضغط على زر "بحث"</li>
                             <li>تظهر نتيجته مباشرة</li>
                         </ol>
                     </div>
                     <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #c3e6cb;">
-                        <h3 style="margin: 0 0 10px 0; color: #155724;">✨ مميزات صفحة الطالب:</h3>
+                        <h3 style="margin: 0 0 10px 0; color: #155724;">✨ مميزات الرابط مع البيانات:</h3>
                         <ul style="margin: 0; padding-right: 20px; text-align: right; color: #155724; font-size: 14px;">
+                            <li>يعمل على جميع الأجهزة (هواتف، كمبيوتر، أجهزة لوحية)</li>
+                            <li>لا يحتاج لفتح المنظومة الرئيسية أولاً</li>
+                            <li>يحمل البيانات تلقائياً</li>
                             <li>صفحة نظيفة وخاصة للطلاب</li>
-                            <li>لا توجد نافذة دخول أو أزرار تحكم</li>
                             <li>واجهة بسيطة وسهلة الاستخدام</li>
                             <li>عرض كامل للنتيجة مع جدول المواد</li>
                         </ul>
                     </div>
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                        <button onclick="copyLink('${urlPath}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">📋 نسخ الرابط</button>
-                        <button onclick="testLink('${urlPath}')" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">🧪 اختبار الرابط</button>
+                        <button onclick="copyLink('${linkWithData}')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">📋 نسخ الرابط</button>
+                        <button onclick="testLink('${linkWithData}')" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">🧪 اختبار الرابط</button>
                         <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">إغلاق</button>
                     </div>
-                    <p style="margin-top: 15px; font-size: 12px; color: #6b7280;">يمكن مشاركة هذا الرابط مع جميع الطلاب</p>
+                    <p style="margin-top: 15px; font-size: 12px; color: #6b7280;">يمكن مشاركة هذا الرابط مع جميع الطلاب - يعمل على جميع الأجهزة</p>
                 </div>
             `;
             

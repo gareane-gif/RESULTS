@@ -932,9 +932,9 @@
                             <div style="margin: 15px 0;">
                                 <h5 style="color: #856404; margin-bottom: 8px;">📱 الحل 1: رابط مباشر (موصى به للهواتف)</h5>
                                 <ol style="text-align: right; margin: 10px 20px; color: #856404; font-size: 13px;">
-                                    <li>في المنظومة الرئيسية، اضغط زر "فتح صفحة البحث بالبيانات"</li>
-                                    <li>سيتم فتح صفحة البحث مع البيانات تلقائياً</li>
-                                    <li>إذا لم يوجد الزر، انسخ الرابط من الأسفل</li>
+                                    <li>في المنظومة الرئيسية، افتح Console (F12)</li>
+                                    <li>اكتب: <code>copy(window.location.href + '?students=' + encodeURIComponent(JSON.stringify(students)))</code></li>
+                                    <li>الصق الرابط في متصفح جديد</li>
                                 </ol>
                                 <button onclick="generateDirectLink()" style="background: #17a2b8; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">إنشاء رابط مباشر</button>
                                 <div id="directLinkContainer" style="margin-top: 10px;"></div>
@@ -1025,6 +1025,8 @@
         function openDirectLink(link) {
             window.open(link, '_blank');
         }
+        
+        // Load manual data from textarea
         function loadManualData() {
             const manualDataInput = document.getElementById('manualDataInput');
             const dataText = manualDataInput.value.trim();
