@@ -5886,6 +5886,11 @@
                 };
                 users.push(defaultAdmin);
                 localStorage.setItem('users', JSON.stringify(users));
+                
+                // Show confirmation that default user was created
+                console.log('✅ تم إنشاء المستخدم الافتراضي بنجاح');
+                console.log('👤 اسم المستخدم: المدير');
+                console.log('🔑 كلمة المرور: admin123');
             }
             
             // Load initial data
