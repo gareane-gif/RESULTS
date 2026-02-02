@@ -2464,46 +2464,6 @@
 
         // Confirm failed subjects selection
         function confirmFailedSubjects(button) {
-            const modal = button.closest('.modal-overlay');
-            const checkboxes = modal.querySelectorAll('input[type="checkbox"]:checked');
-            
-            if (checkboxes.length === 0) {
-                alert('اختر مادة واحدة على الأقل');
-                return;
-            }
-            
-            const container = document.getElementById('subjectsContainer');
-            
-            checkboxes.forEach(checkbox => {
-                const index = parseInt(checkbox.value);
-                const department = document.getElementById('department').value;
-                const previousSemester = currentSemester - 1;
-                const subject = departmentSubjects[department]?.[previousSemester]?.[index];
-                
-                if (subject) {
-                    const subjectDiv = document.createElement('div');
-                    subjectDiv.className = 'subject-input';
-                    subjectDiv.innerHTML = `
-                        <input type="text" placeholder="اسم المادة" class="subject-name" value="${subject.name} (مطالب)" readonly style="background: #ffebee;">
-                        <input type="number" placeholder="الوحدات" class="subject-units" min="1" max="6" value="${subject.units}" readonly style="background: #ffebee;">
-                        <input type="number" placeholder="أعمال الفصل" class="subject-classwork" min="0" max="50" onchange="autoCalculate(this)">
-                        <input type="number" placeholder="الاختبار النهائي" class="subject-final" min="0" max="50" onchange="autoCalculate(this)">
-                        <input type="number" placeholder="المجموع" class="subject-total" min="0" max="100" readonly style="background: #f8f9fa;">
-                        <select class="subject-evaluation" readonly style="background: #f8f9fa;">
-                            <option value="">يتم حساب تلقائياً</option>
-                            <option value="ممتاز">ممتاز</option>
-                            <option value="جيد جدا">جيد جدا</option>
-                            <option value="جيد">جيد</option>
-                            <option value="مقبول">مقبول</option>
-                            <option value="ضعيف">ضعيف</option>
-                            <option value="راسب">راسب</option>
-                        </select>
-                        <button type="button" class="remove-subject" onclick="removeSubject(this)">حذف</button>
-                    `;
-                    container.appendChild(subjectDiv);
-                }
-            });
-            
             closeFailedSubjectsModal(button);
             showStatus(`تم إضافة ${checkboxes.length} مواد مطالبة بنجاح`, 'success');
         }
@@ -2620,7 +2580,7 @@
             localStorage.setItem('departmentSubjects', JSON.stringify(departmentSubjects));
             
             // Reload subjects display
-            loadDepartmentSubjectsForGrid();
+            loadDepartmentSubjects();
             
             // Close editor
             toggleSubjectEditor();
@@ -2669,7 +2629,7 @@
                     localStorage.removeItem('adminSettings');
                     localStorage.removeItem('departments');
                     localStorage.removeItem('blockedStudents');
-                    localStorage.removeItem('customSubjects');
+                    localStorage.removeItem('departmentSubjects');
                     
                     // Reset global variables
                     students = [];
@@ -2706,7 +2666,7 @@
                 blockedStudents: JSON.parse(localStorage.getItem('blockedStudents')) || [],
                 
                 // Custom subjects (if exists)
-                customSubjects: JSON.parse(localStorage.getItem('customSubjects')) || {},
+                customSubjects: JSON.parse(localStorage.getItem('departmentSubjects')) || {},
                 
                 // Statistics
                 statistics: {
@@ -2771,7 +2731,7 @@
                     localStorage.setItem('adminSettings', JSON.stringify(importData.settings || { failRuleEnabled: true }));
                     localStorage.setItem('departments', JSON.stringify(importData.departments || []));
                     localStorage.setItem('blockedStudents', JSON.stringify(importData.blockedStudents || []));
-                    localStorage.setItem('customSubjects', JSON.stringify(importData.customSubjects || {}));
+                    localStorage.setItem('departmentSubjects', JSON.stringify(importData.customSubjects || {}));
                     
                     // Update global variables
                     students = importData.students || [];
@@ -2984,7 +2944,7 @@
             const subjectsContainer = document.getElementById('subjectsContainer');
             
             // Get custom subjects for this department
-            const customSubjects = JSON.parse(localStorage.getItem('customSubjects')) || {};
+            const customSubjects = JSON.parse(localStorage.getItem('departmentSubjects')) || {};
             const deptSubjects = customSubjects[deptCode] || [];
             
             if (deptSubjects.length === 0) {
@@ -5891,13 +5851,19 @@
                 console.log('✅ تم إنشاء المستخدم الافتراضي بنجاح');
                 console.log('👤 اسم المستخدم: المدير');
                 console.log('🔑 كلمة المرور: admin123');
+                console.log('📧 أو الإيميل: admin@institute.edu');
+                console.log('🔑 كلمة المرور: admin123');
             }
+            
+            // Load custom subjects first
+            loadCustomSubjects();
             
             // Load initial data
             loadAllStudents();
             updateStatistics();
             displayDepartments();
             loadRequiredSubjectRule();
+            loadSettings();
             
             // Check if user is already logged in - but don't auto-login
             const savedUser = localStorage.getItem('currentUser');
