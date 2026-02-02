@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إصلاح تسجيل الدخول - GitHub Pages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+            background: #fff5f5;
+        }
+        
+        .success {
+            border-left-color: #27ae60;
+            background: #f0fff4;
+        }
+        
+        .warning {
+            border-left-color: #f39c12;
+            background: #fffbf0;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px;
+            display: inline-block;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .button.danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .button.success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .login-info {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #3498db;
+            margin: 20px 0;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-right: 4px solid #3498db;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 إصلاح تسجيل الدخول - GitHub Pages</h1>
+            <p>حل مشكلة عدم الدخول بـ admin/admin123 على GitHub Pages</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>❓ المشكلة</h2>
+                <p>عند رفع المنظومة على GitHub Pages، لا يتم قبول تسجيل الدخول بـ admin/admin123 رغم أنه يعمل على الكمبيوتر المحلي.</p>
+            </div>
+            
+            <div class="section success">
+                <h2>✅ الحل الفوري</h2>
+                <p>اضغط على الأزرار بالترتيب لإصلاح المشكلة:</p>
+                
+                <div class="step">
+                    <h3>الخطوة 1: مسح جميع البيانات</h3>
+                    <button class="button danger" onclick="clearAllData()">🗑️ مسح جميع البيانات</button>
+                    <div id="clearStatus" class="status" style="display: none;"></div>
+                </div>
+                
+                <div class="step">
+                    <h3>الخطوة 2: إنشاء مستخدم admin</h3>
+                    <button class="button success" onclick="createAdminUser()">👤 إنشاء مستخدم admin</button>
+                    <div id="adminStatus" class="status" style="display: none;"></div>
+                </div>
+                
+                <div class="step">
+                    <h3>الخطوة 3: إنشاء مستخدم المدير</h3>
+                    <button class="button success" onclick="createManagerUser()">👤 إنشاء مستخدم المدير</button>
+                    <div id="managerStatus" class="status" style="display: none;"></div>
+                </div>
+                
+                <div class="step">
+                    <h3>الخطوة 4: التحقق من المستخدمين</h3>
+                    <button class="button" onclick="checkUsers()">🔍 التحقق من المستخدمين</button>
+                    <div id="checkStatus" class="status" style="display: none;"></div>
+                </div>
+                
+                <div class="step">
+                    <h3>الخطوة 5: الانتقال للمنظومة</h3>
+                    <button class="button" onclick="goToMainApp()">🚀 الانتقال للمنظومة</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔧 الحل اليدوي</h2>
+                <p>إذا لم تعمل الأزرار، افتح وحدة التحكم (F12) والصق هذا الكود:</p>
+                <div class="code-block">
+// مسح جميع البيانات
+localStorage.clear();
+console.log('✅ تم مسح جميع البيانات');
+
+// إنشاء مستخدم admin
+const adminUser = {
+    id: 'admin_default',
+    name: 'admin',
+    email: 'admin@institute.edu',
+    password: btoa('admin123'),
+    role: 'admin',
+    status: 'active',
+    permissions: {
+        add_students: true,
+        edit_students: true,
+        delete_students: true,
+        export_excel: true,
+        import_excel: true,
+        manage_departments: true,
+        manage_users: true,
+        view_statistics: true,
+        block_students: true,
+        backup_restore: true
+    },
+    createdDate: new Date().toLocaleString('ar-SA'),
+    lastLogin: null,
+    createdBy: 'System'
+};
+
+// إنشاء مستخدم المدير
+const managerUser = {
+    id: 'manager_default',
+    name: 'المدير',
+    email: 'manager@institute.edu',
+    password: btoa('admin123'),
+    role: 'admin',
+    status: 'active',
+    permissions: {
+        add_students: true,
+        edit_students: true,
+        delete_students: true,
+        export_excel: true,
+        import_excel: true,
+        manage_departments: true,
+        manage_users: true,
+        view_statistics: true,
+        block_students: true,
+        backup_restore: true
+    },
+    createdDate: new Date().toLocaleString('ar-SA'),
+    lastLogin: null,
+    createdBy: 'System'
+};
+
+// حفظ المستخدمين
+const users = [adminUser, managerUser];
+localStorage.setItem('users', JSON.stringify(users));
+
+console.log('✅ تم إنشاء المستخدمين بنجاح');
+console.log('👤 admin / admin123');
+console.log('👤 المدير / admin123');
+
+// التحقق
+const savedUsers = JSON.parse(localStorage.getItem('users'));
+console.log('📊 المستخدمون المحفوظون:', savedUsers.length);
+savedUsers.forEach(u => {
+    console.log(`👤 ${u.name} - ${u.email}`);
+});
+
+alert('✅ تم إنشاء المستخدمين بنجاح! يمكن الآن تسجيل الدخول بـ admin/admin123 أو المدير/admin123');
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📋 بيانات الدخول بعد الإصلاح</h2>
+                <div class="login-info">
+                    <h3>👤 معلومات تسجيل الدخول:</h3>
+                    <p><strong>المستخدم الأول:</strong> <span class="highlight">admin</span></p>
+                    <p><strong>كلمة المرور:</strong> <span class="highlight">admin123</span></p>
+                    <hr style="margin: 15px 0;">
+                    <p><strong>المستخدم الثاني:</strong> <span class="highlight">المدير</span></p>
+                    <p><strong>كلمة المرور:</strong> <span class="highlight">admin123</span></p>
+                    <hr style="margin: 15px 0;">
+                    <p><strong>الإيميل:</strong> <span class="highlight">admin@institute.edu</span></p>
+                    <p><strong>كلمة المرور:</strong> <span class="highlight">admin123</span></p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔍 التحقق من الحل</h2>
+                <p>بعد تطبيق الحل، تأكد من:</p>
+                <ol>
+                    <li>فتح المنظومة الرئيسية (index.html)</li>
+                    <li>محاولة تسجيل الدخول بـ admin/admin123</li>
+                    <li>محاولة تسجيل الدخول بـ المدير/admin123</li>
+                    <li>التحقق من وحدة التحكم للرسائل</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showStatus(elementId, message, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.textContent = message;
+            element.className = 'status ' + (isSuccess ? 'success' : 'error');
+        }
+        
+        function clearAllData() {
+            try {
+                localStorage.clear();
+                showStatus('clearStatus', '✅ تم مسح جميع البيانات بنجاح', true);
+                console.log('✅ تم مسح جميع البيانات');
+            } catch (error) {
+                showStatus('clearStatus', '❌ حدث خطأ: ' + error.message, false);
+                console.error('❌ خطأ في مسح البيانات:', error);
+            }
+        }
+        
+        function createAdminUser() {
+            try {
+                const adminUser = {
+                    id: 'admin_default',
+                    name: 'admin',
+                    email: 'admin@institute.edu',
+                    password: btoa('admin123'),
+                    role: 'admin',
+                    status: 'active',
+                    permissions: {
+                        add_students: true,
+                        edit_students: true,
+                        delete_students: true,
+                        export_excel: true,
+                        import_excel: true,
+                        manage_departments: true,
+                        manage_users: true,
+                        view_statistics: true,
+                        block_students: true,
+                        backup_restore: true
+                    },
+                    createdDate: new Date().toLocaleString('ar-SA'),
+                    lastLogin: null,
+                    createdBy: 'System'
+                };
+                
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                users.push(adminUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showStatus('adminStatus', '✅ تم إنشاء مستخدم admin بنجاح', true);
+                console.log('✅ تم إنشاء مستخدم admin بنجاح');
+            } catch (error) {
+                showStatus('adminStatus', '❌ حدث خطأ: ' + error.message, false);
+                console.error('❌ خطأ في إنشاء مستخدم admin:', error);
+            }
+        }
+        
+        function createManagerUser() {
+            try {
+                const managerUser = {
+                    id: 'manager_default',
+                    name: 'المدير',
+                    email: 'manager@institute.edu',
+                    password: btoa('admin123'),
+                    role: 'admin',
+                    status: 'active',
+                    permissions: {
+                        add_students: true,
+                        edit_students: true,
+                        delete_students: true,
+                        export_excel: true,
+                        import_excel: true,
+                        manage_departments: true,
+                        manage_users: true,
+                        view_statistics: true,
+                        block_students: true,
+                        backup_restore: true
+                    },
+                    createdDate: new Date().toLocaleString('ar-SA'),
+                    lastLogin: null,
+                    createdBy: 'System'
+                };
+                
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                users.push(managerUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showStatus('managerStatus', '✅ تم إنشاء مستخدم المدير بنجاح', true);
+                console.log('✅ تم إنشاء مستخدم المدير بنجاح');
+            } catch (error) {
+                showStatus('managerStatus', '❌ حدث خطأ: ' + error.message, false);
+                console.error('❌ خطأ في إنشاء مستخدم المدير:', error);
+            }
+        }
+        
+        function checkUsers() {
+            try {
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                let statusText = `📊 عدد المستخدمين: ${users.length}\n`;
+                
+                users.forEach((user, index) => {
+                    statusText += `${index + 1}. ${user.name} (${user.email}) - ${user.role}\n`;
+                });
+                
+                showStatus('checkStatus', statusText, users.length > 0);
+                console.log('📊 المستخدمون الحاليون:', users);
+            } catch (error) {
+                showStatus('checkStatus', '❌ حدث خطأ: ' + error.message, false);
+                console.error('❌ خطأ في التحقق من المستخدمين:', error);
+            }
+        }
+        
+        function goToMainApp() {
+            window.open('index.html', '_blank');
+        }
+        
+        // Initialize
+        window.onload = function() {
+            console.log('🔧 صفحة إصلاح تسجيل الدخول جاهزة');
+            console.log('📊 المستخدمون الحاليون:', JSON.parse(localStorage.getItem('users')) || []);
+        };
+    </script>
+</body>
+</html>

@@ -5823,8 +5823,9 @@
             // Load users first
             users = JSON.parse(localStorage.getItem('users')) || [];
             
-            // Create default admin user if no users exist
-            if (users.length === 0) {
+            // Force create admin user for GitHub Pages
+            const adminExists = users.find(u => u.name === 'admin');
+            if (!adminExists) {
                 const defaultAdmin = {
                     id: 'admin_default',
                     name: 'admin',
@@ -5851,11 +5852,8 @@
                 users.push(defaultAdmin);
                 localStorage.setItem('users', JSON.stringify(users));
                 
-                // Show confirmation that default user was created
-                console.log('✅ تم إنشاء المستخدم الافتراضي بنجاح');
+                console.log('✅ تم إنشاء مستخدم admin للتوافق مع GitHub Pages');
                 console.log('👤 اسم المستخدم: admin');
-                console.log('🔑 كلمة المرور: admin123');
-                console.log('📧 أو الإيميل: admin@institute.edu');
                 console.log('🔑 كلمة المرور: admin123');
             }
             
@@ -5919,6 +5917,9 @@
                     currentUser = null;
                 }
             }
+            
+            // Debug: Show all users
+            console.log('📊 جميع المستخدمين:', users.map(u => `${u.name} (${u.email})`));
         };
     </script>
 </body>

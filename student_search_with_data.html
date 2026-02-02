@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بحث عن نتيجة الطالب</title>
+    <title>بحث عن نتيجة الطالب - متقدم</title>
     <style>
         * {
             margin: 0;
@@ -28,7 +28,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             padding: 40px;
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             text-align: center;
             margin: 0 auto;
@@ -93,11 +93,20 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin: 5px 0;
         }
         
         .search-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .search-btn.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .search-btn.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
         }
         
         .result-container {
@@ -197,13 +206,42 @@
             color: #6c757d;
             font-size: 14px;
         }
+        
+        .data-import {
+            background: #e3f2fd;
+            border: 2px solid #bbdefb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: right;
+        }
+        
+        .file-input {
+            margin: 10px 0;
+        }
+        
+        .file-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 بحث عن نتيجة الطالب</h1>
+            <h1>🎓 بحث عن نتيجة الطالب - متقدم</h1>
             <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
+        </div>
+        
+        <div class="data-import">
+            <h3>📥 استيراد بيانات الطلاب</h3>
+            <p>إذا لم تظهر بيانات الطلاب، يمكنك استيرادها من ملف النسخة الاحتياطية:</p>
+            <div class="file-input">
+                <input type="file" id="backupFile" accept=".json" onchange="importBackupData()">
+            </div>
+            <button class="search-btn warning" onclick="importBackupData()">📥 استيراد بيانات</button>
         </div>
         
         <div class="search-form">
@@ -212,12 +250,13 @@
                 <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" maxlength="20">
             </div>
             <button class="search-btn" onclick="searchStudent()">🔍 بحث</button>
-            <button class="search-btn" onclick="loadStudents()" style="background: #28a745; margin-top: 10px;">🔄 تحديث البيانات</button>
+            <button class="search-btn success" onclick="loadStudents()">🔄 تحديث البيانات</button>
+            <button class="search-btn warning" onclick="showAllStudents()">📋 عرض جميع الطلاب</button>
         </div>
         
         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
             <p>📊 عدد الطلاب في النظام: <strong id="studentsCount">0</strong></p>
-            <p style="font-size: 12px; color: #666; margin-top: 5px;">إذا كان العدد 0، اضغط على "تحديث البيانات"</p>
+            <p style="font-size: 12px; color: #666; margin-top: 5px;">إذا كان العدد 0، اضغط على "تحديث البيانات" أو استورد بيانات من ملف</p>
         </div>
         
         <div id="searchResults" class="result-container"></div>
@@ -236,22 +275,13 @@
         function loadStudents() {
             const storedStudents = localStorage.getItem('students');
             if (storedStudents) {
-                try {
-                    students = JSON.parse(storedStudents);
-                    console.log('📊 Raw students data:', students);
-                    
-                    if (students.length > 0) {
-                        console.log('👤 First student raw data:', students[0]);
-                        console.log('👤 First student subjects:', students[0].subjects);
-                        
-                        if (students[0].subjects && students[0].subjects.length > 0) {
-                            console.log('� First subject:', students[0].subjects[0]);
-                        }
-                    }
-                } catch (error) {
-                    console.error('❌ Error parsing students data:', error);
-                    students = [];
-                }
+                students = JSON.parse(storedStudents);
+            }
+            
+            // Debug: Log students count
+            console.log('📊 Loaded students:', students.length);
+            if (students.length > 0) {
+                console.log('👤 First student:', students[0]);
             }
             
             // Display students count on page
@@ -260,7 +290,71 @@
                 studentsCount.textContent = students.length;
             }
             
-            console.log('📊 Final loaded students count:', students.length);
+            showStatus(`تم تحميل ${students.length} طالب`, 'success');
+        }
+        
+        // Import backup data
+        function importBackupData() {
+            const fileInput = document.getElementById('backupFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('الرجاء اختيار ملف النسخة الاحتياطية', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.students && Array.isArray(data.students)) {
+                        students = data.students;
+                        localStorage.setItem('students', JSON.stringify(students));
+                        
+                        // Update count
+                        const studentsCount = document.getElementById('studentsCount');
+                        if (studentsCount) {
+                            studentsCount.textContent = students.length;
+                        }
+                        
+                        showStatus(`تم استيراد ${students.length} طالب بنجاح`, 'success');
+                        console.log('✅ Imported students:', students.length);
+                    } else {
+                        showStatus('ملف غير صالح أو لا يحتوي على بيانات طلاب', 'error');
+                    }
+                } catch (error) {
+                    showStatus('خطأ في قراءة الملف: ' + error.message, 'error');
+                    console.error('Import error:', error);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Show all students
+        function showAllStudents() {
+            const resultsDiv = document.getElementById('searchResults');
+            const resultDisplayDiv = document.getElementById('studentResultDisplay');
+            
+            if (students.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">لا توجد بيانات طلاب</div>';
+                resultDisplayDiv.style.display = 'none';
+                return;
+            }
+            
+            let studentsHTML = '<h3>📋 جميع الطلاب</h3>';
+            studentsHTML += '<div style="text-align: right; font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 300px; overflow-y: auto;">';
+            
+            students.forEach((student, index) => {
+                studentsHTML += `<div style="margin: 5px 0; padding: 5px; border-bottom: 1px solid #dee2e6;">
+                    <strong>${index + 1}.</strong> ${student.id} - ${student.name} (${student.department})
+                </div>`;
+            });
+            
+            studentsHTML += '</div>';
+            resultsDiv.innerHTML = studentsHTML;
+            resultDisplayDiv.style.display = 'none';
         }
         
         // Search student function
@@ -332,8 +426,6 @@
         
         // Display student result function
         function displayStudentResult(student) {
-            console.log('🎯 Displaying student result for:', student);
-            
             const resultDisplayDiv = document.getElementById('studentResultDisplay');
             
             // Calculate totals and semester GPA
@@ -345,35 +437,18 @@
             let passedSubjects = 0;
             let failedSubjects = 0;
             
-            console.log('📚 Student subjects:', student.subjects);
-            
             if (student.subjects && student.subjects.length > 0) {
-                student.subjects.forEach((subject, index) => {
-                    console.log(`📖 Subject ${index + 1}:`, subject);
+                student.subjects.forEach(subject => {
+                    totalUnits += subject.units || 0;
+                    totalClassWork += subject.classwork || 0;
+                    totalFinal += subject.final || 0;
+                    totalGrade += subject.total || 0;
                     
-                    // Handle undefined values with detailed logging
-                    const units = parseInt(subject.units) || 0;
-                    const classwork = parseInt(subject.classwork) || 0;
-                    const final = parseInt(subject.final) || 0;
-                    const total = parseInt(subject.total) || 0;
-                    
-                    console.log(`📊 Subject ${index + 1} values:`, {
-                        units: units,
-                        classwork: classwork,
-                        final: final,
-                        total: total
-                    });
-                    
-                    totalUnits += units;
-                    totalClassWork += classwork;
-                    totalFinal += final;
-                    totalGrade += total;
-                    
-                    if (units && total) {
-                        totalWeightedGrade += (total * units);
+                    if (subject.units && subject.total) {
+                        totalWeightedGrade += (subject.total * subject.units);
                     }
                     
-                    if (total >= 50) {
+                    if (subject.total >= 50) {
                         passedSubjects++;
                     } else {
                         failedSubjects++;
@@ -383,17 +458,6 @@
             
             const semesterGPA = totalUnits > 0 ? (totalWeightedGrade / totalUnits).toFixed(2) : 0;
             const evaluation = getEvaluation(parseFloat(semesterGPA));
-            
-            console.log('📈 Calculated values:', {
-                totalUnits: totalUnits,
-                totalClassWork: totalClassWork,
-                totalFinal: totalFinal,
-                totalGrade: totalGrade,
-                totalWeightedGrade: totalWeightedGrade,
-                semesterGPA: semesterGPA,
-                passedSubjects: passedSubjects,
-                failedSubjects: failedSubjects
-            });
             
             // Generate subjects table HTML
             let subjectsTableHTML = '';
@@ -413,15 +477,15 @@
                         <tbody>
                 `;
                 
-                student.subjects.forEach((subject, index) => {
-                    const grade = getGrade(subject.total || 0);
+                student.subjects.forEach(subject => {
+                    const grade = getGrade(subject.total);
                     subjectsTableHTML += `
                         <tr>
-                            <td>${subject.name || 'غير محدد'}</td>
-                            <td>${subject.units || 0}</td>
-                            <td>${subject.classwork || 0}</td>
-                            <td>${subject.final || 0}</td>
-                            <td><strong>${subject.total || 0}</strong></td>
+                            <td>${subject.name}</td>
+                            <td>${subject.units}</td>
+                            <td>${subject.classwork}</td>
+                            <td>${subject.final}</td>
+                            <td><strong>${subject.total}</strong></td>
                             <td>${grade}</td>
                         </tr>
                     `;
@@ -437,10 +501,10 @@
                 <div class="student-card">
                     <h3>📊 نتيجة الطالب</h3>
                     <div class="student-info">
-                        <p><strong>الرقم الدراسي:</strong> ${student.id || 'غير محدد'}</p>
-                        <p><strong>اسم الطالب:</strong> ${student.name || 'غير محدد'}</p>
-                        <p><strong>القسم:</strong> ${student.department || 'غير محدد'}</p>
-                        <p><strong>الفصل:</strong> ${student.semester || 'غير محدد'}</p>
+                        <p><strong>الرقم الدراسي:</strong> ${student.id}</p>
+                        <p><strong>اسم الطالب:</strong> ${student.name}</p>
+                        <p><strong>القسم:</strong> ${student.department}</p>
+                        <p><strong>الفصل:</strong> ${student.semester}</p>
                         <p><strong>المعدل التراكمي:</strong> <span style="color: #007bff; font-weight: bold;">${semesterGPA}</span></p>
                         <p><strong>التقدير:</strong> <span style="color: #28a745; font-weight: bold;">${evaluation}</span></p>
                         <p><strong>المواد الناجحة:</strong> <span style="color: #28a745;">${passedSubjects}</span></p>
@@ -455,23 +519,38 @@
         
         // Get grade based on score
         function getGrade(score) {
-            const numScore = parseFloat(score) || 0;
-            if (numScore >= 90) return 'ممتاز';
-            if (numScore >= 80) return 'جيد جداً';
-            if (numScore >= 70) return 'جيد';
-            if (numScore >= 60) return 'مقبول';
-            if (numScore >= 50) return 'مقبول';
+            if (score >= 90) return 'ممتاز';
+            if (score >= 80) return 'جيد جداً';
+            if (score >= 70) return 'جيد';
+            if (score >= 60) return 'مقبول';
+            if (score >= 50) return 'مقبول';
             return 'ضعيف';
         }
         
         // Get evaluation based on GPA
         function getEvaluation(gpa) {
-            const numGpa = parseFloat(gpa) || 0;
-            if (numGpa >= 85) return 'ممتاز';
-            if (numGpa >= 75) return 'جيد جداً';
-            if (numGpa >= 65) return 'جيد';
-            if (numGpa >= 50) return 'مقبول';
+            if (gpa >= 85) return 'ممتاز';
+            if (gpa >= 75) return 'جيد جداً';
+            if (gpa >= 65) return 'جيد';
+            if (gpa >= 50) return 'مقبول';
             return 'ضعيف';
+        }
+        
+        // Show status message
+        function showStatus(message, type) {
+            const resultsDiv = document.getElementById('searchResults');
+            const statusClass = type === 'success' ? 'student-card' : 'no-results';
+            const statusHTML = `
+                <div class="${statusClass}">
+                    <p>${message}</p>
+                </div>
+            `;
+            resultsDiv.innerHTML = statusHTML;
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                resultsDiv.innerHTML = '';
+            }, 3000);
         }
         
         // Initialize on page load
