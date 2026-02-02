@@ -494,6 +494,29 @@
                         <h3>الطالب غير موجود</h3>
                         <p>الرقم الدراسي: ${searchId}</p>
                         <p>عدد الطلاب المتاح: ${students.length}</p>
+                        <details style="margin-top: 15px;">
+                            <summary style="cursor: pointer; color: #667eea;">عرض أرقام الطلاب المتاحة</summary>
+                            <div style="text-align: right; margin-top: 10px; max-height: 200px; overflow-y: auto;">
+                                ${students.map(s => `<div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 4px;">${s.id} - ${s.name}</div>`).join('')}
+                            </div>
+                        </details>
+                    </div>
+                `;
+                resultDisplayDiv.innerHTML = '';
+                return;
+            }
+            
+            // Check if student result is blocked
+            const blockedInfo = isStudentBlocked(student.id);
+            if (blockedInfo) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <h3>🚫 نتيجة الطالب محجوبة</h3>
+                        <p><strong>الرقم الدراسي:</strong> ${student.id}</p>
+                        <p><strong>اسم الطالب:</strong> ${student.name}</p>
+                        <p><strong>السبب:</strong> ${blockedInfo.reason || 'غير محدد'}</p>
+                        <p><strong>تاريخ الحجب:</strong> ${blockedInfo.date ? new Date(blockedInfo.date).toLocaleDateString('ar-SA') : 'غير محدد'}</p>
+                        <p style="color: #666; font-size: 14px; margin-top: 10px;">للتواصل مع الإدارة بخصوص حجب النتيجة</p>
                     </div>
                 `;
                 resultDisplayDiv.innerHTML = '';
@@ -504,7 +527,18 @@
             displayStudentResult(student);
         }
         
-        // Display student result with adaptive field mapping
+        // Check if student result is blocked
+        function isStudentBlocked(studentId) {
+            try {
+                const blockedStudents = JSON.parse(localStorage.getItem('blockedStudents') || '[]');
+                return blockedStudents.find(blocked => blocked.studentId === studentId);
+            } catch (error) {
+                console.error('Error checking blocked status:', error);
+                return null;
+            }
+        }
+        
+        // Display student result
         function displayStudentResult(student) {
             const resultDisplayDiv = document.getElementById('studentResultDisplay');
             
