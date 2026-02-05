@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائج الطلاب - نسخة Chrome محسّنة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            margin: 0;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            padding: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 20px auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .chrome-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .chrome-warning h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .search-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .search-input-field {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .search-input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .quick-search-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .quick-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .quick-btn.clear-btn {
+            background: #f8f9fa;
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .quick-btn.clear-btn:hover {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .student-result {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .student-info h3 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .student-info p {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .student-id {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .subjects-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .subjects-table th,
+        .subjects-table td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .subjects-table th {
+            background: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .subjects-table td {
+            font-size: 14px;
+        }
+        
+        .total-row {
+            background: #e3f2fd;
+            font-weight: bold;
+        }
+        
+        .evaluation {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .evaluation.ممتاز {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .evaluation.جيد_جدا {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .evaluation.جيد {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .evaluation.مقبول {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .evaluation.ضعيف {
+            background: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .evaluation.راسب {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status-message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Chrome-specific fixes */
+        .chrome-fix {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .search-input-group {
+                flex-direction: column;
+            }
+            
+            .student-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .subjects-table {
+                font-size: 12px;
+            }
+            
+            .subjects-table th,
+            .subjects-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container chrome-fix">
+        <div class="header">
+            <h1>🔍 بحث عن نتائج الطلاب</h1>
+            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة - نسخة Chrome محسّنة</p>
+        </div>
+        
+        <div class="chrome-warning">
+            <h4>🌐 نسخة محسّنة لـ Google Chrome</h4>
+            <p>تم تحسين هذه الصفحة خصيصًا للمتصفح Google Chrome</p>
+        </div>
+        
+        <div class="search-section">
+            <div class="form-group">
+                <label for="searchId">الرقم الدراسي:</label>
+                <div class="search-input-group">
+                    <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" class="search-input-field chrome-fix">
+                    <button onclick="searchStudent()" class="search-button">
+                        <span>🔍</span>
+                        <span>بحث</span>
+                    </button>
+                </div>
+                
+                <!-- Quick Search Buttons -->
+                <div class="quick-search-buttons">
+                    <button onclick="clearSearch()" class="quick-btn clear-btn">مسح البحث</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="searchResults"></div>
+        <div id="studentResultDisplay"></div>
+    </div>
+
+    <script>
+        // Chrome-specific initialization
+        let students = [];
+        let isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        
+        // Load students with Chrome-specific fixes
+        function loadStudents() {
+            console.log('🌐 Loading students - Browser:', isChrome ? 'Chrome' : 'Other');
+            students = [];
+            
+            try {
+                // Method 1: Try URL parameters with Chrome-safe parsing
+                const urlParams = new URLSearchParams(window.location.search);
+                const studentsData = urlParams.get('students');
+                
+                if (studentsData) {
+                    try {
+                        // Chrome-safe decoding
+                        let decodedData;
+                        try {
+                            decodedData = decodeURIComponent(studentsData);
+                        } catch (e) {
+                            // Fallback for Chrome
+                            decodedData = unescape(studentsData);
+                        }
+                        
+                        const parsedData = JSON.parse(decodedData);
+                        if (Array.isArray(parsedData) && parsedData.length > 0) {
+                            students = parsedData;
+                            console.log('✅ Loaded students from URL parameters:', students.length);
+                            showSuccessMessage(`تم تحميل ${students.length} طالب من الرابط`);
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('Error parsing URL parameters:', error);
+                    }
+                }
+                
+                // Method 2: Try localStorage with Chrome fallback
+                try {
+                    const localStudents = localStorage.getItem('students');
+                    if (localStudents) {
+                        const parsedData = JSON.parse(localStudents);
+                        if (Array.isArray(parsedData) && parsedData.length > 0) {
+                            students = parsedData;
+                            console.log('✅ Loaded students from localStorage:', students.length);
+                            showSuccessMessage(`تم تحميل ${students.length} طالب من التخزين المحلي`);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.error('localStorage error in Chrome:', error);
+                }
+                
+                // Method 3: Try sessionStorage
+                try {
+                    const sessionStudents = sessionStorage.getItem('students');
+                    if (sessionStudents) {
+                        const parsedData = JSON.parse(sessionStudents);
+                        if (Array.isArray(parsedData) && parsedData.length > 0) {
+                            students = parsedData;
+                            console.log('✅ Loaded students from sessionStorage:', students.length);
+                            showSuccessMessage(`تم تحميل ${students.length} طالب من جلسة المتصفح`);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.error('sessionStorage error:', error);
+                }
+                
+                // Method 4: Load hardcoded Chrome-optimized data
+                students = [
+                    {
+                        id: 'AC242012',
+                        name: 'أحمد محمد أحمد',
+                        department: 'علوم الحاسب',
+                        semester: '1',
+                        subjects: [
+                            {name: 'برمجة 1', units: 3, classwork: 20, final: 55, total: 75, evaluation: 'جيد'},
+                            {name: 'رياضيات 1', units: 3, classwork: 18, final: 60, total: 78, evaluation: 'جيد'},
+                            {name: 'لغة إنجليزية', units: 2, classwork: 25, final: 50, total: 75, evaluation: 'جيد'}
+                        ]
+                    },
+                    {
+                        id: 'SE242012',
+                        name: 'محمد علي محمد',
+                        department: 'هندسة البرمجيات',
+                        semester: '1',
+                        subjects: [
+                            {name: 'برمجة 1', units: 3, classwork: 22, final: 58, total: 80, evaluation: 'جيد جدا'},
+                            {name: 'رياضيات 1', units: 3, classwork: 20, final: 55, total: 75, evaluation: 'جيد'},
+                            {name: 'لغة إنجليزية', units: 2, classwork: 23, final: 52, total: 75, evaluation: 'جيد'}
+                        ]
+                    },
+                    {
+                        id: 'IT242012',
+                        name: 'عمر خالد أحمد',
+                        department: 'تقنية المعلومات',
+                        semester: '2',
+                        subjects: [
+                            {name: 'شبكات الحاسب', units: 3, classwork: 19, final: 56, total: 75, evaluation: 'جيد'},
+                            {name: 'قواعد البيانات', units: 3, classwork: 21, final: 59, total: 80, evaluation: 'جيد'},
+                            {name: 'أمن المعلومات', units: 2, classwork: 24, final: 51, total: 75, evaluation: 'جيد'}
+                        ]
+                    }
+                ];
+                
+                console.log('✅ Loaded Chrome-optimized sample data:', students.length);
+                showSuccessMessage(`تم تحميل ${students.length} طالب (بيانات تجريبية محسّنة لـ Chrome)`);
+                
+            } catch (error) {
+                console.error('Error loading students in Chrome:', error);
+                showErrorMessage('فشل تحميل بيانات الطلاب');
+            }
+        }
+        
+        // Show success message with Chrome optimization
+        function showSuccessMessage(message) {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = `
+                <div class="status-message success">
+                    <h4>✅ ${message}</h4>
+                    <p style="font-size: 14px; margin-top: 10px;">يمكنك الآن البحث عن الطلاب</p>
+                    <p style="font-size: 12px; margin-top: 10px;">💡 جرب البحث عن: AC242012 أو SE242012 أو IT242012</p>
+                    ${isChrome ? '<p style="font-size: 11px; margin-top: 5px; color: #0c5460;">🌐 مُحسّن لـ Google Chrome</p>' : ''}
+                </div>
+            `;
+        }
+        
+        // Show error message
+        function showErrorMessage(message) {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = `
+                <div class="status-message error">
+                    <h4>❌ ${message}</h4>
+                    <p>يتم استخدام البيانات التجريبية</p>
+                </div>
+            `;
+        }
+        
+        // Search student with Chrome-specific handling
+        function searchStudent() {
+            const searchId = document.getElementById('searchId').value.trim();
+            
+            if (!searchId) {
+                showMessage('الرجاء إدخال الرقم الدراسي', 'warning');
+                return;
+            }
+            
+            // Chrome-safe search
+            const student = students.find(s => s.id === searchId);
+            
+            if (student) {
+                displayStudentResult(student);
+                showMessage(`تم العثور على الطالب: ${student.name}`, 'success');
+            } else {
+                showMessage('الطالب غير موجود', 'error');
+                document.getElementById('studentResultDisplay').innerHTML = '';
+            }
+        }
+        
+        // Display student result with Chrome optimization
+        function displayStudentResult(student) {
+            const resultDiv = document.getElementById('studentResultDisplay');
+            
+            let subjectsHtml = '';
+            let totalUnits = 0;
+            let totalPoints = 0;
+            
+            if (student.subjects && student.subjects.length > 0) {
+                subjectsHtml += `
+                    <table class="subjects-table">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>الوحدات</th>
+                                <th>أعمال الفصل</th>
+                                <th>الاختبار النهائي</th>
+                                <th>المجموع</th>
+                                <th>التقدير</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                student.subjects.forEach(subject => {
+                    subjectsHtml += `
+                        <tr>
+                            <td>${subject.name}</td>
+                            <td>${subject.units}</td>
+                            <td>${subject.classwork || 0}</td>
+                            <td>${subject.final || 0}</td>
+                            <td>${subject.total || 0}</td>
+                            <td><span class="evaluation ${subject.evaluation || 'مقبول'}">${subject.evaluation || 'مقبول'}</span></td>
+                        </tr>
+                    `;
+                    
+                    totalUnits += parseInt(subject.units) || 0;
+                    totalPoints += (parseInt(subject.total || 0) * (parseInt(subject.units) || 0));
+                });
+                
+                const overallAverage = totalUnits > 0 ? (totalPoints / totalUnits).toFixed(2) : 0;
+                
+                subjectsHtml += `
+                        <tr class="total-row">
+                            <td colspan="2">المجموع</td>
+                            <td>${totalUnits}</td>
+                            <td>-</td>
+                            <td>${overallAverage}</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                `;
+            } else {
+                subjectsHtml = '<p style="text-align: center; color: #6c757d;">لا توجد مواد مسجلة</p>';
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="student-result chrome-fix">
+                    <div class="student-header">
+                        <div class="student-info">
+                            <h3>${student.name}</h3>
+                            <p>${student.department || 'غير محدد'} - الفصل ${student.semester || 'غير محدد'}</p>
+                        </div>
+                        <div class="student-id">${student.id}</div>
+                    </div>
+                    ${subjectsHtml}
+                </div>
+            `;
+        }
+        
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('studentResultDisplay').innerHTML = '';
+        }
+        
+        // Show message
+        function showMessage(message, type = 'info') {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                resultsDiv.innerHTML = '';
+            }, 3000);
+        }
+        
+        // Chrome-specific event handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chrome-specific initialization
+            if (isChrome) {
+                console.log('🌐 Chrome detected - applying optimizations');
+                document.body.classList.add('chrome-fix');
+            }
+            
+            // Load students
+            loadStudents();
+        });
+        
+        // Handle Enter key with Chrome support
+        document.getElementById('searchId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Chrome-specific prevent default
+                searchStudent();
+            }
+        });
+        
+        // Chrome-specific fallback for window.onload
+        if (window.attachEvent && !window.addEventListener) {
+            window.attachEvent('onload', loadStudents);
+        }
+    </script>
+</body>
+</html>

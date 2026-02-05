@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فحص Firebase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+        }
+        
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #45a049;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+        }
+        
+        .btn-danger:hover {
+            background: #da190b;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196F3;
+            color: #2196F3;
+        }
+        
+        .log {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 فحص Firebase</h1>
+    
+    <div class="section">
+        <h2>⚙️ إعدادات Firebase</h2>
+        <div id="firebaseStatus"></div>
+        
+        <div style="margin: 15px 0;">
+            <label>API Key:</label>
+            <input type="text" id="apiKey" placeholder="AIzaSyYOUR_API_KEY" value="AIzaSyYOUR_API_KEY">
+            
+            <label>Project ID:</label>
+            <input type="text" id="projectId" placeholder="your-project" value="your-project">
+            
+            <button class="btn" onclick="initializeFirebase()">🔗 ربط Firebase</button>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>📊 اختبار الاتصال</h2>
+        <button class="btn" onclick="testConnection()">🔍 اختبار الاتصال</button>
+        <button class="btn" onclick="testWrite()">✍️ اختبار الكتابة</button>
+        <button class="btn" onclick="testRead()">📖 اختبار القراءة</button>
+        <div id="testStatus"></div>
+    </div>
+    
+    <div class="section">
+        <h2>📤 اختبار المزامنة</h2>
+        <button class="btn" onclick="testSync()">🔄 اختبار المزامنة</button>
+        <button class="btn btn-danger" onclick="clearFirebase()">🗑️ مسح البيانات</button>
+        <div id="syncStatus"></div>
+    </div>
+    
+    <div class="section">
+        <h2>📝 السجلات</h2>
+        <button class="btn" onclick="clearLogs()">🗑️ مسح السجلات</button>
+        <div id="logs" class="log"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        let db;
+        let logs = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push(logEntry);
+            
+            const logsDiv = document.getElementById('logs');
+            logsDiv.innerHTML = logs.join('\n');
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            
+            console.log(logEntry);
+        }
+        
+        function clearLogs() {
+            logs = [];
+            document.getElementById('logs').innerHTML = '';
+        }
+        
+        function initializeFirebase() {
+            const apiKey = document.getElementById('apiKey').value;
+            const projectId = document.getElementById('projectId').value;
+            const statusDiv = document.getElementById('firebaseStatus');
+            
+            if (!apiKey || !projectId) {
+                statusDiv.innerHTML = '<div class="status error">❌ الرجاء إدخال API Key و Project ID</div>';
+                return;
+            }
+            
+            const firebaseConfig = {
+                apiKey: apiKey,
+                authDomain: `${projectId}.firebaseapp.com`,
+                projectId: projectId,
+                storageBucket: `${projectId}.appspot.com`,
+                messagingSenderId: "123456789",
+                appId: "1:123456789:web:abcdef"
+            };
+
+            try {
+                // Initialize Firebase
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                db = firebase.firestore();
+                statusDiv.innerHTML = '<div class="status success">✅ تم ربط Firebase بنجاح</div>';
+                log('Firebase initialized successfully');
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ خطأ في ربط Firebase: ${error.message}</div>`;
+                log(`Firebase initialization error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testConnection() {
+            if (!db) {
+                document.getElementById('testStatus').innerHTML = '<div class="status error">❌ Firebase غير مهيأ</div>';
+                return;
+            }
+            
+            try {
+                log('Testing connection...');
+                const testDoc = await db.collection('test').doc('connection').get();
+                document.getElementById('testStatus').innerHTML = '<div class="status success">✅ الاتصال ناجح</div>';
+                log('Connection test successful');
+            } catch (error) {
+                document.getElementById('testStatus').innerHTML = `<div class="status error">❌ خطأ في الاتصال: ${error.message}</div>`;
+                log(`Connection test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testWrite() {
+            if (!db) {
+                document.getElementById('testStatus').innerHTML = '<div class="status error">❌ Firebase غير مهيأ</div>';
+                return;
+            }
+            
+            try {
+                log('Testing write operation...');
+                await db.collection('test').doc('writeTest').set({
+                    message: 'Test write',
+                    timestamp: Date.now()
+                });
+                document.getElementById('testStatus').innerHTML = '<div class="status success">✅ الكتابة ناجحة</div>';
+                log('Write test successful');
+            } catch (error) {
+                document.getElementById('testStatus').innerHTML = `<div class="status error">❌ خطأ في الكتابة: ${error.message}</div>`;
+                log(`Write test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testRead() {
+            if (!db) {
+                document.getElementById('testStatus').innerHTML = '<div class="status error">❌ Firebase غير مهيأ</div>';
+                return;
+            }
+            
+            try {
+                log('Testing read operation...');
+                const testDoc = await db.collection('test').doc('writeTest').get();
+                if (testDoc.exists) {
+                    const data = testDoc.data();
+                    document.getElementById('testStatus').innerHTML = '<div class="status success">✅ القراءة ناجحة</div>';
+                    log(`Read test successful: ${JSON.stringify(data)}`);
+                } else {
+                    document.getElementById('testStatus').innerHTML = '<div class="status info">ℹ️ لا توجد بيانات للاختبار</div>';
+                    log('Read test: no data found');
+                }
+            } catch (error) {
+                document.getElementById('testStatus').innerHTML = `<div class="status error">❌ خطأ في القراءة: ${error.message}</div>`;
+                log(`Read test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testSync() {
+            if (!db) {
+                document.getElementById('syncStatus').innerHTML = '<div class="status error">❌ Firebase غير مهيأ</div>';
+                return;
+            }
+            
+            try {
+                log('Testing sync operation...');
+                
+                // Test data
+                const testStudents = [
+                    {
+                        id: 'TEST001',
+                        name: 'طالب اختبار',
+                        department: 'قسم اختبار',
+                        semester: 'اختبار',
+                        timestamp: Date.now()
+                    }
+                ];
+                
+                // Clear existing test data
+                const snapshot = await db.collection('students').get();
+                const batch = db.batch();
+                snapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                log('Cleared existing test data');
+                
+                // Add test data
+                for (const student of testStudents) {
+                    await db.collection('students').doc(student.id).set(student);
+                }
+                log('Added test data');
+                
+                // Read back
+                const readSnapshot = await db.collection('students').get();
+                const readStudents = [];
+                readSnapshot.forEach(doc => {
+                    readStudents.push(doc.data());
+                });
+                
+                document.getElementById('syncStatus').innerHTML = `<div class="status success">✅ المزامنة ناجحة - ${readStudents.length} طالب</div>`;
+                log(`Sync test successful: ${readStudents.length} students synced`);
+                
+            } catch (error) {
+                document.getElementById('syncStatus').innerHTML = `<div class="status error">❌ خطأ في المزامنة: ${error.message}</div>`;
+                log(`Sync test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function clearFirebase() {
+            if (!db) {
+                document.getElementById('syncStatus').innerHTML = '<div class="status error">❌ Firebase غير مهيأ</div>';
+                return;
+            }
+            
+            if (!confirm('هل أنت متأكد من مسح جميع البيانات؟')) {
+                return;
+            }
+            
+            try {
+                log('Clearing Firebase data...');
+                const snapshot = await db.collection('students').get();
+                const batch = db.batch();
+                snapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                
+                document.getElementById('syncStatus').innerHTML = '<div class="status success">✅ تم مسح البيانات بنجاح</div>';
+                log('Firebase data cleared successfully');
+                
+            } catch (error) {
+                document.getElementById('syncStatus').innerHTML = `<div class="status error">❌ خطأ في المسح: ${error.message}</div>`;
+                log(`Clear operation failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Initialize on load
+        window.onload = function() {
+            log('Firebase debug tool loaded');
+            document.getElementById('firebaseStatus').innerHTML = '<div class="status info">ℹ️ الرجاء ربط Firebase لبدء الاختبار</div>';
+        };
+    </script>
+</body>
+</html>

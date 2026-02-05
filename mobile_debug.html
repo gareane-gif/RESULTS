@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فحص الهاتف - نظام الطلاب</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary-color: #6366f1;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .debug-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .debug-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .debug-info {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .students-grid {
+            display: grid;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .student-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #4f46e5;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .status.info {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .debug-section {
+                padding: 15px;
+            }
+
+            .students-grid {
+                gap: 15px;
+                margin: 15px 0;
+            }
+
+            .student-card {
+                padding: 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 فحص نظام الطلاب للهاتف</h1>
+            <p>هذه الصفحة مخصصة لفحص مشاكل عرض الطلاب على الهاتف</p>
+        </div>
+
+        <div class="debug-section">
+            <h3>📱 معلومات الجهاز</h3>
+            <div class="debug-info" id="deviceInfo"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>💾 فحص التخزين المحلي</h3>
+            <button class="btn" onclick="checkLocalStorage()">فحص localStorage</button>
+            <div id="localStorageInfo"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>👥 عرض الطلاب</h3>
+            <button class="btn" onclick="loadStudents()">تحميل الطلاب</button>
+            <button class="btn" onclick="addSampleStudents()">إضافة بيانات تجريبية</button>
+            <div id="studentsList"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>🎨 فحص CSS</h3>
+            <button class="btn" onclick="testCSS()">اختبار التصميم</button>
+            <div id="cssTest"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>🔧 فحص JavaScript</h3>
+            <button class="btn" onclick="testJavaScript()">اختبار JavaScript</button>
+            <div id="jsTest"></div>
+        </div>
+    </div>
+
+    <script>
+        // فحص معلومات الجهاز
+        function checkDeviceInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Screen Width': screen.width,
+                'Screen Height': screen.height,
+                'Window Width': window.innerWidth,
+                'Window Height': window.innerHeight,
+                'Pixel Ratio': window.devicePixelRatio,
+                'Touch Support': 'ontouchstart' in window,
+                'Language': navigator.language,
+                'Platform': navigator.platform
+            };
+
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<div><strong>${key}:</strong> ${value}</div>`;
+            }
+
+            document.getElementById('deviceInfo').innerHTML = html;
+        }
+
+        // فحص localStorage
+        function checkLocalStorage() {
+            const info = {
+                'localStorage Available': typeof(Storage) !== "undefined",
+                'Students Data': localStorage.getItem('students') ? 'Exists' : 'Not Found',
+                'Students Count': localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')).length : 0,
+                'Blocked Students': localStorage.getItem('blockedStudents') ? 'Exists' : 'Not Found',
+                'Settings': localStorage.getItem('instituteSettings') ? 'Exists' : 'Not Found',
+                'Total Storage Used': JSON.stringify(localStorage).length + ' bytes'
+            };
+
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<div><strong>${key}:</strong> ${value}</div>`;
+            }
+
+            document.getElementById('localStorageInfo').innerHTML = html;
+        }
+
+        // تحميل الطلاب
+        function loadStudents() {
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+
+            if (students.length === 0) {
+                document.getElementById('studentsList').innerHTML = '<div class="status error">لا توجد بيانات طلاب في التخزين المحلي</div>';
+                return;
+            }
+
+            let html = '<div class="students-grid">';
+            
+            students.forEach((student, index) => {
+                html += `
+                    <div class="student-card">
+                        <h4>${student.name}</h4>
+                        <p><strong>الرقم:</strong> ${student.id}</p>
+                        <p><strong>القسم:</strong> ${student.department}</p>
+                        <p><strong>الفصل:</strong> ${student.semester}</p>
+                        <p><strong>المواد:</strong> ${student.subjects ? student.subjects.length : 0}</p>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            document.getElementById('studentsList').innerHTML = html;
+        }
+
+        // إضافة بيانات تجريبية
+        function addSampleStudents() {
+            const sampleStudents = [
+                {
+                    id: 'AC242037',
+                    name: 'أحمد محمد علي',
+                    department: 'علوم الحاسب',
+                    semester: 'السادس',
+                    subjects: [
+                        { name: 'برمجة متقدمة', degree: 85, status: 'نجح' },
+                        { name: 'شبكات', degree: 90, status: 'نجح' },
+                        { name: 'قواعد بيانات', degree: 78, status: 'نجح' }
+                    ]
+                },
+                {
+                    id: 'AC242038',
+                    name: 'فاطمة حسن إبراهيم',
+                    department: 'نظم معلومات',
+                    semester: 'الرابع',
+                    subjects: [
+                        { name: 'تحليل نظم', degree: 92, status: 'نجح' },
+                        { name: 'إدارة مشاريع', degree: 88, status: 'نجح' }
+                    ]
+                },
+                {
+                    id: 'AC242039',
+                    name: 'محمد عبدالله سالم',
+                    department: 'هندسة برمجيات',
+                    semester: 'الثامن',
+                    subjects: [
+                        { name: 'ذكاء اصطناعي', degree: 95, status: 'ممتاز' },
+                        { name: 'أمن معلومات', degree: 87, status: 'نجح' }
+                    ]
+                }
+            ];
+
+            localStorage.setItem('students', JSON.stringify(sampleStudents));
+            document.getElementById('studentsList').innerHTML = '<div class="status success">تم إضافة 3 طلاب تجريبيين بنجاح</div>';
+            
+            setTimeout(() => {
+                loadStudents();
+            }, 1000);
+        }
+
+        // اختبار CSS
+        function testCSS() {
+            const testElement = document.createElement('div');
+            testElement.className = 'student-card';
+            testElement.style.cssText = 'position: absolute; top: -9999px; left: -9999px;';
+            document.body.appendChild(testElement);
+
+            const styles = window.getComputedStyle(testElement);
+            const cssInfo = {
+                'Display': styles.display,
+                'Background': styles.background,
+                'Border': styles.border,
+                'Border Radius': styles.borderRadius,
+                'Padding': styles.padding,
+                'Margin': styles.margin,
+                'Backdrop Filter': styles.backdropFilter,
+                'Transform': styles.transform
+            };
+
+            document.body.removeChild(testElement);
+
+            let html = '';
+            for (const [key, value] of Object.entries(cssInfo)) {
+                html += `<div><strong>${key}:</strong> ${value}</div>`;
+            }
+
+            document.getElementById('cssTest').innerHTML = html;
+        }
+
+        // اختبار JavaScript
+        function testJavaScript() {
+            const tests = {
+                'JSON Support': typeof JSON !== 'undefined',
+                'localStorage Support': typeof(Storage) !== "undefined",
+                'Grid Support': CSS.supports('display', 'grid'),
+                'Flexbox Support': CSS.supports('display', 'flex'),
+                'Backdrop Filter Support': CSS.supports('backdrop-filter', 'blur(10px)'),
+                'Transform Support': CSS.supports('transform', 'translateY(-5px)'),
+                'QuerySelector Support': typeof document.querySelector !== 'undefined'
+            };
+
+            let html = '';
+            for (const [key, value] of Object.entries(tests)) {
+                const status = value ? 'success' : 'error';
+                const text = value ? '✅ مدعوم' : '❌ غير مدعوم';
+                html += `<div class="status ${status}"><strong>${key}:</strong> ${text}</div>`;
+            }
+
+            document.getElementById('jsTest').innerHTML = html;
+        }
+
+        // تشغيل الفحوصات تلقائياً
+        window.onload = function() {
+            checkDeviceInfo();
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

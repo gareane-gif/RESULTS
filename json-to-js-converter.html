@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحويل JSON إلى students-data.js</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-right: 4px solid #667eea;
+        }
+
+        .step h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        button.primary {
+            background: #007bff;
+        }
+
+        button.primary:hover {
+            background: #0056b3;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .instructions strong {
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔄 محول JSON لـ GitHub Pages</h1>
+
+        <div class="instructions">
+            <strong>📝 التعليمات:</strong>
+            <ol style="margin-top: 10px; padding-right: 20px;">
+                <li>افتح <code>index.html</code> في المتصفح</li>
+                <li>اضغط زر <strong>📥 تصدير البيانات (JSON)</strong></li>
+                <li>افتح الملف المُنزل في Notepad</li>
+                <li>انسخ محتواه كاملاً</li>
+                <li>الصقه في المربع أدناه</li>
+                <li>اضغط "تحويل"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>الخطوة 1: الصق بيانات JSON</h3>
+            <textarea id="jsonInput" placeholder='الصق هنا محتوى ملف JSON...'></textarea>
+        </div>
+
+        <button onclick="convertJSON()" class="primary">🔄 تحويل إلى students-data.js</button>
+
+        <div class="step" id="outputSection" style="display: none;">
+            <h3>الخطوة 2: انسخ النتيجة</h3>
+            <textarea id="jsOutput" readonly></textarea>
+            <button onclick="copyToClipboard()">📋 نسخ للحافظة</button>
+            <button onclick="downloadFile()">💾 تنزيل كملف</button>
+        </div>
+
+        <div class="success" id="successMsg">
+            ✅ تم التحويل بنجاح! الآن:
+            <ol style="margin-top: 10px; padding-right: 20px;">
+                <li>انسخ المحتوى أعلاه</li>
+                <li>اذهب إلى GitHub Repository</li>
+                <li>افتح ملف <code>students-data.js</code></li>
+                <li>اضغط أيقونة القلم (Edit)</li>
+                <li>الصق المحتوى الجديد</li>
+                <li>Commit changes</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function convertJSON() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+
+            if (!jsonInput) {
+                alert('الرجاء لصق بيانات JSON أولاً!');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(jsonInput);
+
+                // استخراج بيانات الطلاب
+                const students = data.data && data.data.students ? data.data.students : data;
+
+                if (!Array.isArray(students)) {
+                    throw new Error('البيانات ليست بصيغة صحيحة');
+                }
+
+                // إنشاء ملف JavaScript
+                const currentDate = new Date().toLocaleDateString('ar-EG');
+                const jsContent = `// Student Data File - Auto-generated
+// Last updated: ${currentDate}
+// Total students: ${students.length}
+
+const studentsData = ${JSON.stringify(students, null, 2)};
+
+// Export for compatibility
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = studentsData;
+}
+`;
+
+                // عرض النتيجة
+                document.getElementById('jsOutput').value = jsContent;
+                document.getElementById('outputSection').style.display = 'block';
+                document.getElementById('successMsg').style.display = 'block';
+
+                // Scroll to output
+                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                alert('خطأ في تحويل البيانات: ' + error.message + '\n\nتأكد من أن البيانات بصيغة JSON صحيحة');
+                console.error(error);
+            }
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('jsOutput');
+            output.select();
+            document.execCommand('copy');
+            alert('✅ تم النسخ! الآن الصقه في ملف students-data.js على GitHub');
+        }
+
+        function downloadFile() {
+            const content = document.getElementById('jsOutput').value;
+            const blob = new Blob([content], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'students-data.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('✅ تم التنزيل! الآن ارفعه إلى GitHub');
+        }
+    </script>
+</body>
+
+</html>

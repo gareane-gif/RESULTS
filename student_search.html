@@ -1,428 +1,505 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نتائج الطلاب - المعهد العالي للعلوم والتقنية</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Temporarily disabled to ensure compatibility -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="db-helper.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="db-helper.js"></script>
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #7c3aed;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --background: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Outfit', 'Segoe UI', Tahoma, sans-serif;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--background);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
             min-height: 100vh;
-            padding: 10px;
-            margin: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        
+
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            padding: 30px;
-            max-width: 1200px;
-            width: 100%;
-            margin: 20px auto;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
         }
-        
+
+        /* Glassmorphism Header */
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #667eea;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 0.8s ease-out;
         }
-        
+
         .header h1 {
-            color: #2c3e50;
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 2.5rem;
             font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
         }
-        
+
         .header p {
-            color: #7f8c8d;
-            font-size: 16px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
         }
-        
+
+        /* Search Section */
         .search-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
-        
-        .form-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-        
+
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
+            margin-bottom: 1rem;
             font-weight: 600;
-            font-size: 16px;
+            color: var(--text-main);
+            font-size: 1.1rem;
         }
-        
+
         .search-input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
+            gap: 1rem;
+            position: relative;
         }
-        
+
         .search-input-field {
             flex: 1;
-            min-width: 200px;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
-            background: white;
-            transition: border-color 0.3s;
         }
-        
+
         .search-input-field:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+            transform: translateY(-2px);
         }
-        
+
         .search-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-        
-        .search-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .quick-search-buttons {
+            transition: all 0.3s ease;
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 10px;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
         }
-        
-        .quick-btn {
-            padding: 10px 15px;
-            background: #f8f9fa;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
+
+        .search-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
+            filter: brightness(1.1);
         }
-        
-        .quick-btn:hover {
-            background: #e9ecef;
-            border-color: #667eea;
-            transform: translateY(-1px);
+
+        .search-button:active {
+            transform: translateY(0);
         }
-        
-        .clear-btn {
-            background: #fff3cd;
-            border-color: #ffc107;
-            color: #856404;
-        }
-        
-        .clear-btn:hover {
-            background: #ffeaa7;
-            border-color: #ffb300;
-        }
-        
+
+        /* Result Cards */
         .student-card {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            text-align: right;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-top: 2rem;
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        
+
         .student-card h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 22px;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
             text-align: center;
+            color: var(--primary-light);
         }
-        
+
         .student-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
-        
+
         .info-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            border-right: 4px solid #667eea;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.2rem;
+            border-radius: 16px;
+            border-right: 4px solid var(--primary);
+            transition: transform 0.3s ease;
         }
-        
-        .info-item p {
-            margin: 5px 0;
-            color: #495057;
+
+        .info-item:hover {
+            transform: translateX(-5px);
+            background: rgba(255, 255, 255, 0.06);
         }
-        
+
         .info-item strong {
-            color: #2c3e50;
             display: block;
-            margin-bottom: 5px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
         }
-        
+
+        .info-item p {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Subjects Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
         .subjects-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: rgba(15, 23, 42, 0.4);
         }
-        
+
         .subjects-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px;
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-light);
+            padding: 1.2rem;
             text-align: center;
             font-weight: 600;
-            font-size: 14px;
+            border-bottom: 2px solid var(--glass-border);
         }
-        
+
         .subjects-table td {
-            padding: 10px;
+            padding: 1.2rem;
             text-align: center;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 14px;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-main);
         }
-        
-        .subjects-table tr:nth-child(even) {
-            background: #f8f9fa;
+
+        .subjects-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
         }
-        
+
+        .subjects-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Badges */
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .status-passed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Helpers */
         .no-results {
-            background: #fff5f5;
-            border: 2px solid #fed7d7;
-            border-radius: 15px;
-            padding: 30px;
-            color: #c53030;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
             text-align: center;
+            color: #f87171;
+            animation: shake 0.5s ease-in-out;
         }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        /* Mobile Responsive Design */
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* Responsive Improvements */
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-                border-radius: 15px;
+            .header {
+                padding: 2rem 1rem;
             }
-            
+
             .header h1 {
-                font-size: 24px;
+                font-size: 1.8rem;
             }
-            
-            .header p {
-                font-size: 14px;
-            }
-            
-            .search-section {
-                padding: 20px;
-            }
-            
+
             .search-input-group {
                 flex-direction: column;
-                gap: 10px;
             }
-            
-            .search-input-field {
-                min-width: 100%;
-                font-size: 16px; /* Prevent zoom on iOS */
-            }
-            
+
             .search-button {
-                width: 100%;
+                padding: 1.2rem;
                 justify-content: center;
-                padding: 15px;
             }
-            
-            .quick-search-buttons {
-                justify-content: stretch;
-            }
-            
-            .quick-btn {
-                flex: 1;
-                min-width: 80px;
-                padding: 12px 8px;
-                font-size: 12px;
-            }
-            
+
             .student-card {
-                padding: 20px;
+                padding: 1.5rem;
             }
-            
-            .student-card h3 {
-                font-size: 20px;
-            }
-            
-            .student-info {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .info-item {
-                padding: 12px;
-            }
-            
+
             .subjects-table {
-                font-size: 12px;
+                font-size: 0.9rem;
             }
-            
+
             .subjects-table th,
             .subjects-table td {
-                padding: 8px 4px;
-                font-size: 12px;
+                padding: 0.8rem 0.4rem;
             }
         }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 15px;
-                margin: 5px;
-                border-radius: 10px;
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
             }
-            
-            .header h1 {
-                font-size: 20px;
+
+            50% {
+                transform: scale(1.02);
+                opacity: 0.9;
             }
-            
-            .search-section {
-                padding: 15px;
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
             }
-            
-            .search-input-field {
-                padding: 12px;
-                font-size: 16px;
-            }
-            
-            .search-button {
-                padding: 12px;
-                font-size: 14px;
-            }
-            
-            .quick-btn {
-                padding: 10px 6px;
-                font-size: 11px;
-            }
-            
-            .quick-search-buttons {
-                gap: 8px;
-            }
-            
-            .student-card {
-                padding: 15px;
-            }
-            
-            .student-card h3 {
-                font-size: 18px;
-            }
-            
-            .info-item {
-                padding: 10px;
-            }
-            
-            .subjects-table th,
-            .subjects-table td {
-                padding: 6px 2px;
-                font-size: 11px;
-            }
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .status-passed {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-failed {
-            background: #f8d7da;
-            color: #721c24;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎓 نتائج الطلاب</h1>
+        <header class="header">
+            <h1>🎓 بوابة نتائج الطلاب</h1>
             <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
-        </div>
-        
-        <div class="search-section">
+        </header>
+
+        <main class="search-section">
             <div class="form-group">
-                <label for="searchId">الرقم الدراسي:</label>
+                <label for="searchId">أدخل الرقم الدراسي للاستعلام:</label>
                 <div class="search-input-group">
-                    <input type="text" id="searchId" placeholder="أدخل الرقم الدراسي" class="search-input-field">
+                    <input type="text" id="searchId" placeholder="مثال: AC241002" class="search-input-field">
                     <button onclick="searchStudent()" class="search-button">
                         <span>🔍</span>
-                        <span>بحث</span>
+                        <span>بحث عن النتيجة</span>
                     </button>
                 </div>
-                
-                <!-- Quick Search Buttons -->
-                <div class="quick-search-buttons">
-                    <button onclick="clearSearch()" class="quick-btn clear-btn">مسح البحث</button>
-                </div>
             </div>
-        </div>
-        
+        </main>
+
         <div id="searchResults"></div>
         <div id="studentResultDisplay"></div>
+        <div id="syncStatus"
+            style="position: fixed; bottom: 10px; left: 10px; padding: 5px 10px; border-radius: 20px; font-size: 11px; backdrop-filter: blur(5px); z-index: 1000;">
+        </div>
     </div>
-    
+
     <script>
+        // Firebase Configuration - Placeholder
+        // NOTE: User should replace these with their actual Firebase project keys
+        const firebaseConfig = {
+            apiKey: "API_KEY_HERE",
+            authDomain: "hist-js.firebaseapp.com",
+            projectId: "hist-js",
+            storageBucket: "hist-js.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+
+        // Initialize Firebase if config is valid
+        let db = null;
+        const statusEl = document.getElementById('syncStatus');
+
+        // Ensure db-helper is used if available
+        const useIndexedDB = typeof initDB === 'function';
+
+        if (firebaseConfig.apiKey !== "API_KEY_HERE") {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log("🔥 Firebase Initialized");
+                if (statusEl) {
+                    statusEl.innerHTML = '🟢 سحابي';
+                    statusEl.style.background = 'rgba(16, 185, 129, 0.1)';
+                    statusEl.style.color = '#34d399';
+                }
+                // Auto-fetch blocked students from Cloud
+                fetchBlockedStudentsFromCloud();
+            } catch (err) {
+                console.error("❌ Firebase Init Error:", err);
+                if (statusEl) statusEl.innerHTML = '🔴 خطأ في الربط';
+            }
+        } else {
+            console.warn("⚠️ Firebase credentials not set. Using local/URL data only.");
+            if (statusEl) {
+                statusEl.innerHTML = '🟡 محلي فقط';
+                statusEl.style.background = 'rgba(245, 158, 11, 0.1)';
+                statusEl.style.color = '#fbbf24';
+            }
+        }
+
+        let blockedStudents = [];
+
+        // Fetch blocked students from Firestore
+        async function fetchBlockedStudentsFromCloud() {
+            if (!db) return;
+            try {
+                console.log('🔍 Fetching blocked students from Cloud...');
+                const snapshot = await db.collection('blockedStudents').get();
+                blockedStudents = snapshot.docs.map(doc => doc.data());
+                console.log(`✅ Loaded ${blockedStudents.length} blocked students from Cloud`);
+
+                // Also update localStorage for fallback
+                localStorage.setItem('blockedStudents', JSON.stringify(blockedStudents));
+            } catch (error) {
+                console.error('❌ Failed to fetch blocked students:', error);
+            }
+        }
+
+        // Fetch ALL students from Firestore (to sync devices)
+        async function fetchAllStudentsFromCloud() {
+            if (!db) return;
+            try {
+                console.log('🔍 Fetching students from Cloud...');
+                const snapshot = await db.collection('students').get();
+                const cloudStudents = snapshot.docs.map(doc => doc.data());
+
+                if (cloudStudents.length > 0) {
+                    students = cloudStudents;
+                    console.log(`📡 Synced ${students.length} students from Cloud`);
+
+                    // Update localStorage for offline use
+                    localStorage.setItem('students', JSON.stringify(students));
+
+                    // Re-analyze structure if we have data
+                    if (students.length > 0 && students[0].subjects) {
+                        analyzeStudentStructure(students[0]);
+                    }
+
+                    // Clear any "No Data" message if it was shown
+                    const resultsDiv = document.getElementById('searchResults');
+                    if (resultsDiv && resultsDiv.innerHTML.includes('البيانات غير متوفرة')) {
+                        resultsDiv.innerHTML = '';
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Failed to fetch students from Cloud:', error);
+            }
+        }
+
         let students = [];
         let fieldMapping = {
             units: null,
@@ -430,69 +507,94 @@
             final: null,
             total: null
         };
-        
-        // Quick search function
-        function quickSearch(studentId) {
-            document.getElementById('searchId').value = studentId;
-            searchStudent();
-        }
-        
+
         // Clear search function
         function clearSearch() {
             document.getElementById('searchId').value = '';
-            document.getElementById('searchResults').innerHTML = '';
-            document.getElementById('studentResultDisplay').innerHTML = '';
+            const resultsDiv = document.getElementById('searchResults');
+            const resultDisplayDiv = document.getElementById('studentResultDisplay');
+            if (resultsDiv) resultsDiv.innerHTML = '';
+            if (resultDisplayDiv) resultDisplayDiv.innerHTML = '';
         }
-        
-        // Load students from localStorage
+
+        // Load students from storage (students-data.js, localStorage, or sessionStorage)
         function loadStudentsFromStorage() {
             try {
-                // Try localStorage first
+                // Try students-data.js first (for GitHub Pages deployment)
+                if (typeof studentsData !== 'undefined' && Array.isArray(studentsData) && studentsData.length > 0) {
+                    students = studentsData;
+                    console.log('✅ Loaded students from students-data.js:', students.length);
+
+                    if (students[0].subjects) {
+                        analyzeStudentStructure(students[0]);
+                    }
+                    return;
+                }
+
+                // Try localStorage for local deployment
                 let storedStudents = localStorage.getItem('students');
                 if (storedStudents) {
                     students = JSON.parse(storedStudents);
                     console.log('✅ Loaded students from localStorage:', students.length);
-                    
+
                     if (students.length > 0 && students[0].subjects) {
                         analyzeStudentStructure(students[0]);
                     }
                     return;
                 }
-                
+
                 // Try sessionStorage
                 let sessionStudents = sessionStorage.getItem('students');
                 if (sessionStudents) {
                     students = JSON.parse(sessionStudents);
                     console.log('✅ Loaded students from sessionStorage:', students.length);
-                    
+
                     if (students.length > 0 && students[0].subjects) {
                         analyzeStudentStructure(students[0]);
                     }
                     return;
                 }
-                
-                console.log('❌ No students found in storage');
+
+                console.log('❌ No students found in any storage');
+                showNoDataMessage();
             } catch (error) {
                 console.error('❌ Error loading students:', error);
+                showNoDataMessage();
             }
         }
-        
+
+        // Show message when no data is available
+        function showNoDataMessage() {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = `
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px; padding: 2rem; text-align: center; margin-top: 2rem;">
+                    <h3 style="color: #f87171; margin-bottom: 1rem;">📦 البيانات غير متوفرة</h3>
+                    <p style="color: var(--text-main); margin-bottom: 1rem;">
+                        لعرض نتائج الطلاب، يجب أولاً إضافة طلاب من خلال صفحة الإدارة.
+                    </p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">
+                        افتح <strong>index.html</strong> وأضف بعض الطلاب أولاً
+                    </p>
+                </div>
+            `;
+        }
+
         // Analyze student structure to discover field names
         function analyzeStudentStructure(student) {
             console.log('🔍 Analyzing student structure:', student);
-            
+
             if (!student.subjects || student.subjects.length === 0) {
                 console.log('❌ No subjects found');
                 return;
             }
-            
+
             const firstSubject = student.subjects[0];
             console.log('📖 First subject:', firstSubject);
-            
+
             // Discover field names
             const subjectFields = Object.keys(firstSubject);
             console.log('🔑 Subject fields found:', subjectFields);
-            
+
             // Map fields to expected types
             fieldMapping = {
                 units: discoverField(subjectFields, ['units', 'credit', 'credits', 'وحدات', 'unit']),
@@ -500,10 +602,10 @@
                 final: discoverField(subjectFields, ['final', 'exam', 'finalExam', 'نهائي', 'اختبار', 'test']),
                 total: discoverField(subjectFields, ['total', 'grade', 'score', 'مجموع', 'درجة', 'mark'])
             };
-            
+
             console.log('🗺️ Field mapping discovered:', fieldMapping);
         }
-        
+
         // Discover the best field name for a type
         function discoverField(availableFields, possibleNames) {
             for (const name of possibleNames) {
@@ -512,7 +614,7 @@
                     console.log(`✅ Found exact match for ${possibleNames}: ${name}`);
                     return name;
                 }
-                
+
                 // Try case-insensitive match
                 const lowerName = name.toLowerCase();
                 for (const field of availableFields) {
@@ -521,7 +623,7 @@
                         return field;
                     }
                 }
-                
+
                 // Try partial match
                 for (const field of availableFields) {
                     if (field.toLowerCase().includes(lowerName) || lowerName.includes(field.toLowerCase())) {
@@ -530,117 +632,216 @@
                     }
                 }
             }
-            
+
             console.log(`❌ No match found for ${possibleNames}`);
             return null;
         }
-        
+
         // Search student function
-        function searchStudent() {
-            const searchId = document.getElementById('searchId').value.trim();
+        async function searchStudent() {
+            const searchId = (document.getElementById('searchId').value || "").trim();
             const resultsDiv = document.getElementById('searchResults');
             const resultDisplayDiv = document.getElementById('studentResultDisplay');
-            
+
+            // Robust ID normalization
+            const normalize = (id) => {
+                if (!id) return "";
+                return id.toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            };
+
+            const nSearchId = normalize(searchId);
+
             // Clear previous results
             resultsDiv.innerHTML = '';
             resultDisplayDiv.innerHTML = '';
-            
-            if (!searchId) {
+
+            if (!nSearchId) {
                 resultsDiv.innerHTML = '<div class="no-results"><h3>الرجاء إدخال الرقم الدراسي</h3></div>';
                 return;
             }
-            
+
+            // 1. Try Firestore if available
+            if (db) {
+                try {
+                    // Try looking up by normalized ID first
+                    console.log('🔍 Searching Firestore for:', nSearchId);
+                    const doc = await db.collection('students').doc(nSearchId).get();
+                    let studentData = doc.exists ? doc.data() : null;
+
+                    // Fallback to original searchId if not found as normalized
+                    if (!studentData && searchId !== nSearchId) {
+                        const docAlt = await db.collection('students').doc(searchId).get();
+                        if (docAlt.exists) studentData = docAlt.data();
+                    }
+
+                    if (studentData) {
+                        // Check if blocked
+                        const blockedInfo = isStudentBlocked(studentData.id);
+                        if (blockedInfo) {
+                            showBlockedMessage(studentData, blockedInfo);
+                            return;
+                        }
+
+                        displayStudentResult(studentData);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('❌ Firestore search error:', error);
+                }
+            }
+
+            // 2. Fallback to Local Data
             if (students.length === 0) {
-                resultsDiv.innerHTML = '<div class="no-results"><h3>لا توجد بيانات طلاب</h3></div>';
+                resultsDiv.innerHTML = '<div class="no-results"><h3>بيانات الطلاب غير محملة</h3><p>يرجى التأكد من توفر اتصال بالإنترنت أو تهيئة البيانات</p></div>';
                 return;
             }
-            
-            // Search for student
-            const student = students.find(s => s.id === searchId || s.id.includes(searchId));
-            
+
+            const student = students.find(s => {
+                const sId = normalize(s.id);
+                return sId === nSearchId || (sId && sId.includes(nSearchId));
+            });
+
             if (!student) {
                 resultsDiv.innerHTML = `
                     <div class="no-results">
                         <h3>الطالب غير موجود</h3>
                         <p>الرقم الدراسي: ${searchId}</p>
-                        <p>عدد الطلاب المتاح: ${students.length}</p>
                     </div>
                 `;
                 return;
             }
-            
+
             // Check if student result is blocked
             const blockedInfo = isStudentBlocked(student.id);
-            
+
             if (blockedInfo) {
-                resultsDiv.innerHTML = `
-                    <div class="no-results">
-                        <h3>🚫 نتيجة الطالب محجوبة</h3>
-                        <p><strong>الرقم الدراسي:</strong> ${student.id}</p>
-                        <p><strong>اسم الطالب:</strong> ${student.name}</p>
-                        <p><strong>السبب:</strong> ${blockedInfo.reason || 'غير محدد'}</p>
-                        <p style="color: #666; font-size: 14px; margin-top: 10px;">يرجى التواصل مع لجنة الامتحانات</p>
-                    </div>
-                `;
+                console.warn('🚫 Student is blocked. Results will not be displayed.');
+                showBlockedMessage(student, blockedInfo);
                 return;
             }
-            
+
             // Display student result
             displayStudentResult(student);
         }
-        
+
+        // Helper to show blocked message
+        function showBlockedMessage(student, blockedInfo) {
+            const resultsDiv = document.getElementById('searchResults');
+            const resultDisplayDiv = document.getElementById('studentResultDisplay');
+            resultsDiv.innerHTML = `
+                <div class="no-results" style="background: rgba(239, 68, 68, 0.15); border-color: var(--danger);">
+                    <h3 style="color: #ef4444;">🚫 نتيجة الطالب محجوبة</h3>
+                    <p><strong>الرقم الدراسي:</strong> ${student.id}</p>
+                    <p><strong>اسم الطالب:</strong> ${student.name}</p>
+                    <p style="margin-top: 10px; font-weight: bold;">السبب: ${blockedInfo.reason || 'غير محدد'}</p>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-top: 15px;">يرجى مراجعة إدارة التسجيل بالمعهد</p>
+                </div>
+            `;
+            resultDisplayDiv.innerHTML = '';
+        }
+
         // Check if student result is blocked
         function isStudentBlocked(studentId) {
             try {
-                const blockedStudents = JSON.parse(localStorage.getItem('blockedStudents') || '[]');
-                return blockedStudents.find(blocked => blocked.studentId === studentId);
+                if (studentId === undefined || studentId === null) return null;
+
+                // Super aggressive normalization
+                const normalize = (id) => {
+                    if (!id) return "";
+                    return id.toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                };
+
+                const nid = normalize(studentId);
+                if (!nid) return null;
+
+                // Consolidate all potential sources of blocked students
+                let allBlocked = [];
+
+                // 1. From global array (synced from Cloud)
+                if (typeof blockedStudents !== 'undefined' && Array.isArray(blockedStudents)) {
+                    allBlocked = [...blockedStudents];
+                }
+
+                // 2. From localStorage
+                try {
+                    const storedStr = localStorage.getItem('blockedStudents');
+                    if (storedStr) {
+                        const storedBlocked = JSON.parse(storedStr);
+                        if (Array.isArray(storedBlocked)) {
+                            storedBlocked.forEach(b => {
+                                if (b && b.studentId && !allBlocked.find(existing => existing.studentId === b.studentId)) {
+                                    allBlocked.push(b);
+                                }
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error('Local storage block read error:', e);
+                }
+
+                if (allBlocked.length === 0) return null;
+
+                // Robust fuzzy matching
+                return allBlocked.find(blocked => {
+                    const bid = normalize(blocked.studentId);
+                    if (!bid) return false;
+
+                    // Match if one contains the other (at least 5 chars for safety)
+                    if (bid === nid) return true;
+                    if (bid.length >= 5 && nid.includes(bid)) return true;
+                    if (nid.length >= 5 && bid.includes(nid)) return true;
+
+                    return false;
+                });
             } catch (error) {
-                console.error('❌ Error checking blocked status:', error);
+                console.error('❌ Critical error in isStudentBlocked:', error);
                 return null;
             }
         }
-        
+
         // Display student result
         function displayStudentResult(student) {
+            // Absolute final safeguard - ensure result is blocked if student is in blocked list
+            const blockedInfo = isStudentBlocked(student.id);
+            if (blockedInfo) {
+                console.warn('⛔ displayStudentResult: Blocking confirmed for', student.id);
+                showBlockedMessage(student, blockedInfo);
+                return;
+            }
+
             const resultDisplayDiv = document.getElementById('studentResultDisplay');
-            
+            const resultsDiv = document.getElementById('searchResults');
+
+            // Clear previous messages
+            resultsDiv.innerHTML = '';
+
+            // Discover fields on the fly if needed
+            if (!fieldMapping.total) {
+                analyzeStudentStructure(student);
+            }
+
             // Calculate totals using discovered field mapping
             let totalUnits = 0;
-            let totalClassWork = 0;
-            let totalFinal = 0;
-            let totalGrade = 0;
             let totalWeightedGrade = 0;
             let passedSubjects = 0;
             let failedSubjects = 0;
-            
-            // Calculate student status using same logic as main system
-            let studentStatus = 'منقول';
-            let failedRequiredSubjects = 0;
             let hasFailedRequired = false;
-            
+
             if (student.subjects && student.subjects.length > 0) {
-                student.subjects.forEach((subject, index) => {
-                    const units = fieldMapping.units ? parseInt(subject[fieldMapping.units]) || 0 : 0;
-                    const classwork = fieldMapping.classwork ? parseInt(subject[fieldMapping.classwork]) || 0 : 0;
-                    const final = fieldMapping.final ? parseInt(subject[fieldMapping.final]) || 0 : 0;
-                    const total = fieldMapping.total ? parseInt(subject[fieldMapping.total]) || 0 : (classwork + final);
-                    
+                student.subjects.forEach((subject) => {
+                    const units = fieldMapping.units ? parseFloat(subject[fieldMapping.units]) || 0 : 0;
+                    const total = fieldMapping.total ? parseFloat(subject[fieldMapping.total]) || 0 : 0;
+
                     totalUnits += units;
-                    totalClassWork += classwork;
-                    totalFinal += final;
-                    totalGrade += total;
-                    
                     if (units && total) {
                         totalWeightedGrade += (total * units);
                     }
-                    
+
                     // Check if failed
                     if (total < 50) {
                         failedSubjects++;
-                        
-                        // Check if this is a required subject (contains "مطالب" in name)
-                        if (subject.name && subject.name.includes('(مطالب)')) {
-                            failedRequiredSubjects++;
+                        // Check if this is a required subject (contains "مطالب" or "(مطالب)" in name)
+                        if (subject.name && (subject.name.includes('مطالب') || subject.name.includes('(مطالب)'))) {
                             hasFailedRequired = true;
                         }
                     } else {
@@ -648,103 +849,100 @@
                     }
                 });
             }
-            
-            // Apply same logic as main system
+
+            // Logic matching main system
             const semesterGPA = totalUnits > 0 ? (totalWeightedGrade / totalUnits).toFixed(2) : 0;
-            
-            // Rule 1: If failed any "مطالب" subject, student fails
+            let studentStatus = 'منقول';
+
             if (hasFailedRequired) {
                 studentStatus = 'راسب';
             } else {
-                // Rule 2: Pass if failed subjects <= 2 AND GPA >= 50
                 const passed = failedSubjects <= 2 && parseFloat(semesterGPA) >= 50;
                 studentStatus = passed ? 'منقول' : 'راسب';
             }
-            
-            const evaluation = getEvaluation(parseFloat(semesterGPA));
-            
+
             // Generate subjects table
             let subjectsTableHTML = '';
             if (student.subjects && student.subjects.length > 0) {
                 subjectsTableHTML = `
-                    <table class="subjects-table">
-                        <thead>
-                            <tr>
-                                <th>المادة</th>
-                                <th>الوحدات</th>
-                                <th>أعمال الفصل</th>
-                                <th>النهائي</th>
-                                <th>المجموع</th>
-                                <th>التقدير</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <div class="table-container">
+                        <table class="subjects-table">
+                            <thead>
+                                <tr>
+                                    <th>المادة</th>
+                                    <th>الوحدات</th>
+                                    <th>أعمال الفصل</th>
+                                    <th>النهائي</th>
+                                    <th>المجموع</th>
+                                    <th>التقدير</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                 `;
-                
-                student.subjects.forEach((subject, index) => {
-                    const units = fieldMapping.units ? parseInt(subject[fieldMapping.units]) || 0 : 0;
-                    const classwork = fieldMapping.classwork ? parseInt(subject[fieldMapping.classwork]) || 0 : 0;
-                    const final = fieldMapping.final ? parseInt(subject[fieldMapping.final]) || 0 : 0;
-                    const total = fieldMapping.total ? parseInt(subject[fieldMapping.total]) || 0 : (classwork + final);
+
+                student.subjects.forEach((subject) => {
+                    const units = fieldMapping.units ? subject[fieldMapping.units] || 0 : 0;
+                    const classwork = fieldMapping.classwork ? subject[fieldMapping.classwork] || 0 : 0;
+                    const final = fieldMapping.final ? subject[fieldMapping.final] || 0 : 0;
+                    const total = fieldMapping.total ? subject[fieldMapping.total] || 0 : 0;
                     const grade = getGrade(total);
-                    
+
                     subjectsTableHTML += `
                         <tr>
-                            <td>${subject.name || 'غير محدد'}</td>
+                            <td style="text-align: right; font-weight: 600;">${subject.name || '---'}</td>
                             <td>${units}</td>
                             <td>${classwork}</td>
                             <td>${final}</td>
-                            <td><strong>${total}</strong></td>
+                            <td style="font-weight: 700; color: ${total >= 50 ? 'var(--accent)' : 'var(--danger)'};">${total}</td>
                             <td>${grade}</td>
                         </tr>
                     `;
                 });
-                
-                subjectsTableHTML += '</tbody></table>';
+
+                subjectsTableHTML += '</tbody></table></div>';
             }
-            
+
             resultDisplayDiv.innerHTML = `
                 <div class="student-card">
-                    <h3>📊 نتيجة الطالب</h3>
+                    <h3>📊 سجل الدرجات التفصيلي</h3>
                     <div class="student-info">
                         <div class="info-item">
-                            <strong>الرقم الدراسي:</strong>
-                            <p>${student.id || 'غير محدد'}</p>
+                            <strong>الاسم الكامل</strong>
+                            <p>${student.name || 'غير متوفر'}</p>
                         </div>
                         <div class="info-item">
-                            <strong>اسم الطالب:</strong>
-                            <p>${student.name || 'غير محدد'}</p>
+                            <strong>الرقم الدراسي</strong>
+                            <p>${student.id || '---'}</p>
                         </div>
                         <div class="info-item">
-                            <strong>القسم:</strong>
-                            <p>${student.department || 'غير محدد'}</p>
+                            <strong>القسم العلمي</strong>
+                            <p>${student.department || '---'}</p>
                         </div>
                         <div class="info-item">
-                            <strong>الفصل:</strong>
-                            <p>${student.semester || 'غير محدد'}</p>
+                            <strong>الفصل الدراسي</strong>
+                            <p>${student.semester || '---'}</p>
+                        </div>
+                        <div class="info-item" style="background: rgba(79, 70, 229, 0.1);">
+                            <strong>المعدل الفصلي</strong>
+                            <p style="color: var(--primary-light); font-size: 1.5rem;">${semesterGPA}</p>
                         </div>
                         <div class="info-item">
-                            <strong>المعدل:</strong>
-                            <p style="color: #007bff; font-weight: bold; font-size: 18px;">${semesterGPA}</p>
-                        </div>
-                        <div class="info-item">
-                            <strong>الحالة:</strong>
+                            <strong>حالة الطالب</strong>
                             <p><span class="status-badge ${studentStatus === 'راسب' ? 'status-failed' : 'status-passed'}">${studentStatus}</span></p>
-                        </div>
-                        <div class="info-item">
-                            <strong>المواد الناجحة:</strong>
-                            <p style="color: #28a745; font-weight: bold;">${passedSubjects}</p>
-                        </div>
-                        <div class="info-item">
-                            <strong>المواد الراسبة:</strong>
-                            <p style="color: #dc3545; font-weight: bold;">${failedSubjects}</p>
                         </div>
                     </div>
                     ${subjectsTableHTML}
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                        <div class="status-badge status-passed">المواد الناجحة: ${passedSubjects}</div>
+                        <div class="status-badge status-failed">المواد الراسبة: ${failedSubjects}</div>
+                    </div>
                 </div>
             `;
+
+            // Scroll to results
+            resultDisplayDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        
+
         // Get grade based on score
         function getGrade(score) {
             const numScore = parseFloat(score) || 0;
@@ -755,7 +953,7 @@
             if (numScore >= 50) return 'مقبول';
             return 'ضعيف';
         }
-        
+
         // Get evaluation based on GPA
         function getEvaluation(gpa) {
             const numGpa = parseFloat(gpa) || 0;
@@ -765,47 +963,268 @@
             if (numGpa >= 50) return 'مقبول';
             return 'ضعيف';
         }
-        
+
         // Initialize
-        window.onload = function() {
+        window.onload = function () {
             console.log('🎓 Student Search Page Loaded');
-            
+
             // Check for URL parameters first
             checkURLParameters();
-            
+
             // Auto-load students from localStorage
-            loadStudentsFromStorage();
+            // Force load from static file if no local data
+            if (typeof studentsData !== 'undefined' && Array.isArray(studentsData) && studentsData.length > 0) {
+                // If local storage is empty, populate it automatically
+                const currentLocal = localStorage.getItem('students');
+                if (!currentLocal || JSON.parse(currentLocal).length === 0) {
+                    students = studentsData;
+                    localStorage.setItem('students', JSON.stringify(students));
+                    console.log('✅ Auto-hydrated student search from static file');
+                }
+            }
+
+            // Auto-load students (Priority: URL Params -> students.json -> LocalStorage -> Cloud)
+
+            // 1. Try fetching students.json (The "Simple Database" approach)
+            fetch('students.json?v=' + new Date().getTime())
+                .then(response => {
+                    if (!response.ok) throw new Error("No JSON file");
+                    return response.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        students = data;
+                        localStorage.setItem('students', JSON.stringify(students)); // Cache it
+                        console.log('✅ Loaded data from students.json:', students.length);
+
+                        // Update diagnostics
+                        const statusEl = document.getElementById('dataStatus');
+                        if (statusEl) {
+                            statusEl.innerHTML = `✅ Server Data: ${students.length} students`;
+                            statusEl.style.color = '#4ade80';
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.log('⚠️ students.json not found', err);
+                    const statusEl = document.getElementById('dataStatus');
+                    if (statusEl) {
+                        statusEl.innerHTML = `❌ خطأ في التحميل: ${err.message}`;
+                        statusEl.style.color = '#f87171';
+                    }
+                    // Fallback to local storage logic is handled below
+                })
+                .finally(() => {
+                    loadStudentsFromStorage();
+                });
+
+            // Also try to sync from cloud if configured
+            if (db) {
+                fetchAllStudentsFromCloud();
+            }
         };
-        
+
+        // Show message when no data is available
+        function showNoDataMessage() {
+            const resultsDiv = document.getElementById('searchResults');
+            const hasFirebase = firebaseConfig.apiKey !== "API_KEY_HERE";
+
+            resultsDiv.innerHTML = `
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px; padding: 2rem; text-align: center; margin-top: 2rem;">
+                    <h3 style="color: #f87171; margin-bottom: 1rem;">📦 البيانات غير متوفرة</h3>
+                    <p style="color: var(--text-main); margin-bottom: 1.5rem;">
+                        ${hasFirebase ?
+                    'جاري محاولة تحميل البيانات من السحابة... إذا استمرت هذه الرسالة، تأكد من إضافة بيانات في صفحة الإدارة ومزامنتها.' :
+                    'يبدو أنك تستخدم جهازًا جديدًا. لعرض النتائج هنا، يجب عليك إما إعداد المزامنة السحابية (Firebase) أو استيراد البيانات يدويًا.'}
+                    </p>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="importDataFromExcel()" style="
+                            padding: 0.8rem 1.5rem;
+                            background: #10b981;
+                            color: white;
+                            border: none;
+                            border-radius: 12px;
+                            font-weight: 700;
+                            cursor: pointer;
+                        ">📊 استيراد ملف (Excel)</button>
+                        
+                        <button onclick="importDataFromFile()" style="
+                            padding: 0.8rem 1.5rem;
+                            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 12px;
+                            font-weight: 700;
+                            cursor: pointer;
+                        ">📁 استيراد ملف (JSON)</button>
+                        
+                        ${hasFirebase ?
+                    '<button onclick="fetchAllStudentsFromCloud()" style="padding: 0.8rem 1.5rem; background: #6366f1; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">🔄 تحديث من السحابة</button>' :
+                    ''}
+                    </div>
+
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1.5rem;">
+                        يمكنك استخدام ملف النتائج (Excel) الأصلي مباشرة هنا لتحديث البيانات على هاتفك
+                    </p>
+                </div>
+            `;
+        }
+
+        // Import data from Excel file directly
+        async function importDataFromExcel() {
+            try {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.xlsx, .xls';
+
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const resultsDiv = document.getElementById('searchResults');
+                    resultsDiv.innerHTML = '<div style="background: rgba(16, 185, 129, 0.1); border-radius: 16px; padding: 2rem; text-align: center;"><h4>⏳ جاري معالجة ملف Excel...</h4></div>';
+
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        try {
+                            const data = new Uint8Array(event.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const sheetName = workbook.SheetNames[0];
+                            const worksheet = workbook.Sheets[sheetName];
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                            if (jsonData.length < 2) throw new Error('الملف فارغ');
+
+                            const importedStudents = [];
+                            const studentMap = {};
+
+                            // Skip header
+                            for (let i = 1; i < jsonData.length; i++) {
+                                const row = jsonData[i];
+                                if (row.length < 9) continue;
+
+                                const sId = String(row[0] || '').trim();
+                                if (!sId) continue;
+
+                                if (!studentMap[sId]) {
+                                    studentMap[sId] = {
+                                        id: sId,
+                                        name: String(row[1] || '').trim(),
+                                        department: String(row[2] || '').trim(),
+                                        semester: String(row[3] || '').trim(),
+                                        subjects: []
+                                    };
+                                }
+
+                                studentMap[sId].subjects.push({
+                                    name: String(row[4] || '').trim(),
+                                    units: parseInt(row[5]) || 0,
+                                    classwork: String(row[6] || '').trim(),
+                                    final: String(row[7] || '').trim(),
+                                    total: String(row[8] || '').trim()
+                                });
+                            }
+
+                            const finalist = Object.values(studentMap);
+                            if (finalist.length === 0) throw new Error('لم يتم العثور على بيانات صحيحة');
+
+                            students = finalist;
+
+                            // Save
+                            if (typeof saveStudents === 'function') {
+                                await saveStudents(students);
+                            } else {
+                                localStorage.setItem('students', JSON.stringify(students));
+                            }
+
+                            resultsDiv.innerHTML = `
+                                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent); border-radius: 16px; padding: 2rem; text-align: center;">
+                                    <h4 style="color: var(--accent);">✅ تم الاستيراد بنجاح!</h4>
+                                    <p>تم تحميل بيانات ${finalist.length} طالب.</p>
+                                    <button onclick="location.reload()" style="margin-top:15px; padding:8px 16px; border-radius:8px; border:none; background:var(--accent); color:white; cursor:pointer;">ابدأ البحث</button>
+                                </div>
+                            `;
+                        } catch (err) {
+                            resultsDiv.innerHTML = `<div class="no-results"><h3>❌ خطأ: ${err.message}</h3></div>`;
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                };
+                input.click();
+            } catch (error) {
+                console.error('❌ Excel Import Error:', error);
+            }
+        }
+
+        // Import data from JSON file
+        async function importDataFromFile() {
+            try {
+                if (typeof uploadJSONFile !== 'function') {
+                    alert('وظيفة الاستيراد غير متوفرة. يرجى التأكد من تحميل db-helper.js');
+                    return;
+                }
+
+                const resultsDiv = document.getElementById('searchResults');
+                resultsDiv.innerHTML = `
+                    <div style="background: rgba(79, 70, 229, 0.1); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 16px; padding: 2rem; text-align: center;">
+                        <h4 style="color: var(--primary-light);">⏳ جاري استيراد البيانات...</h4>
+                    </div>
+                `;
+
+                await uploadJSONFile();
+
+                // Reload students
+                await loadStudentsFromStorage();
+
+                resultsDiv.innerHTML = `
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 16px; padding: 2rem; text-align: center;">
+                        <h4 style="color: var(--accent); margin-bottom: 0.5rem;">✅ تم استيراد البيانات بنجاح!</h4>
+                        <p style="color: var(--text-main);">تم العثور على سجلات ${students.length} طالب</p>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">يمكنك الآن البحث باستخدام الرقم الدراسي</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('❌ Error importing data:', error);
+                const resultsDiv = document.getElementById('searchResults');
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <h3>❌ فشل استيراد البيانات</h3>
+                        <p>${error.message || 'يرجى التأكد من اختيار ملف JSON صحيح'}</p>
+                    </div>
+                `;
+            }
+        }
+
         // Check URL parameters for data
         function checkURLParameters() {
             const urlParams = new URLSearchParams(window.location.search);
             const studentsData = urlParams.get('students');
-            
+
             if (studentsData) {
                 try {
                     const decodedData = decodeURIComponent(studentsData);
                     const parsedData = JSON.parse(decodedData);
-                    
+
                     if (Array.isArray(parsedData) && parsedData.length > 0) {
                         students = parsedData;
                         console.log('✅ Loaded students from URL parameters:', students.length);
-                        
+
                         // Save to storage
                         localStorage.setItem('students', JSON.stringify(students));
                         sessionStorage.setItem('students', JSON.stringify(students));
-                        
+
                         if (students.length > 0 && students[0].subjects) {
                             analyzeStudentStructure(students[0]);
                         }
-                        
+
                         // Show success message
                         const resultsDiv = document.getElementById('searchResults');
                         resultsDiv.innerHTML = `
-                            <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center;">
-                                <h4 style="color: #155724; margin-bottom: 10px;">✅ تم تحميل البيانات من الرابط!</h4>
-                                <p style="color: #155724;">عدد الطلاب: ${students.length}</p>
-                                <p style="color: #155724; font-size: 14px;">يمكنك الآن البحث عن الطلاب</p>
+                            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 16px; padding: 1.5rem; margin: 2rem 0; text-align: center;">
+                                <h4 style="color: var(--accent); margin-bottom: 0.5rem;">✅ تم تحميل البيانات بنجاح!</h4>
+                                <p style="color: var(--text-main);">تم العثور على سجلات ${students.length} طالب</p>
+                                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem;">يمكنك الآن الاستعلام باستخدام الرقم الدراسي</p>
                             </div>
                         `;
                     }
@@ -816,4 +1235,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزامنة بدون إنترنت</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+        }
+        
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #45a049;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+        }
+        
+        .btn-danger:hover {
+            background: #da190b;
+        }
+        
+        .btn-warning {
+            background: #ff9800;
+        }
+        
+        .btn-warning:hover {
+            background: #e68900;
+        }
+        
+        .btn-info {
+            background: #2196F3;
+        }
+        
+        .btn-info:hover {
+            background: #1976D2;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196F3;
+            color: #2196F3;
+        }
+        
+        .student-item {
+            background: #444;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .student-info {
+            flex: 1;
+        }
+        
+        .student-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .sync-method {
+            background: #555;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .sync-method h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .code-display {
+            background: #1a1a1a;
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔄 مزامنة بدون إنترنت</h1>
+    
+    <div class="section">
+        <h2>📊 حالة البيانات الحالية</h2>
+        <button class="btn" onclick="showCurrentData()">📊 عرض البيانات الحالية</button>
+        <div id="currentData"></div>
+    </div>
+    
+    <div class="section">
+        <h2>📤 تصدير البيانات</h2>
+        <p>تصدير البيانات لمشاركتها بين الأجهزة</p>
+        
+        <div class="sync-method">
+            <h4>🔗 الطريقة 1: رابط مشاركة</h4>
+            <p>إنشاء رابط لمشاركة البيانات مع الأجهزة الأخرى</p>
+            <button class="btn btn-info" onclick="generateShareLink()">🔗 إنشاء رابط مشاركة</button>
+            <div id="shareLink"></div>
+        </div>
+        
+        <div class="sync-method">
+            <h4>📋 الطريقة 2: نسخ البيانات</h4>
+            <p>نسخ البيانات لمشاركتها يدوياً</p>
+            <button class="btn" onclick="copyData()">📋 نسخ البيانات</button>
+            <button class="btn" onclick="downloadData()">⬇️ تحميل ملف</button>
+            <div id="copyStatus"></div>
+        </div>
+        
+        <div class="sync-method">
+            <h4>📱 الطريقة 3: كود QR</h4>
+            <p>إنشاء كود QR لمسح البيانات</p>
+            <button class="btn btn-warning" onclick="generateQRCode()">📱 إنشاء كود QR</button>
+            <div id="qrCode"></div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>📥 استيراد البيانات</h2>
+        <p>استيراد البيانات من الأجهزة الأخرى</p>
+        
+        <div class="sync-method">
+            <h4>🔗 من رابط المشاركة</h4>
+            <input type="text" id="shareUrl" placeholder="أدخل رابط المشاركة" style="width: 100%; padding: 10px; background: #444; color: white; border: 1px solid #666; border-radius: 5px; margin: 10px 0;">
+            <button class="btn btn-info" onclick="importFromUrl()">📥 استيراد من الرابط</button>
+            <div id="urlStatus"></div>
+        </div>
+        
+        <div class="sync-method">
+            <h4>📝 من البيانات المنسوخة</h4>
+            <textarea id="dataInput" placeholder='أدخل بيانات الطلاب (JSON) هنا'></textarea>
+            <button class="btn" onclick="importFromText()">📥 استيراد البيانات</button>
+            <button class="btn" onclick="loadSampleData()">📝 تحميل بيانات تجريبية</button>
+            <div id="importStatus"></div>
+        </div>
+        
+        <div class="sync-method">
+            <h4>📱 من كود QR</h4>
+            <input type="text" id="qrInput" placeholder="أدخل كود البيانات" style="width: 100%; padding: 10px; background: #444; color: white; border: 1px solid #666; border-radius: 5px; margin: 10px 0;">
+            <button class="btn btn-warning" onclick="importFromQR()">📱 استيراد من كود QR</button>
+            <div id="qrStatus"></div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>🔄 المزامنة مع المنظومة الرئيسية</h2>
+        <p>مزامنة البيانات مع المنظومة الرئيسية (index.html)</p>
+        
+        <button class="btn" onclick="syncWithMainSystem()">🔄 مزامنة مع المنظومة</button>
+        <button class="btn btn-warning" onclick="importFromMainSystem()">📥 استيراد من المنظومة</button>
+        <div id="mainSyncStatus"></div>
+    </div>
+
+    <script>
+        // Load current data
+        function loadCurrentData() {
+            return JSON.parse(localStorage.getItem('students') || '[]');
+        }
+
+        // Save data
+        function saveData(data) {
+            localStorage.setItem('students', JSON.stringify(data));
+        }
+
+        // Show current data
+        function showCurrentData() {
+            const data = loadCurrentData();
+            const container = document.getElementById('currentData');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="status info">لا توجد بيانات حالية</div>';
+                return;
+            }
+            
+            let html = `<p><strong>عدد الطلاب:</strong> ${data.length}</p>`;
+            
+            data.forEach((student, index) => {
+                html += `
+                    <div class="student-item">
+                        <div class="student-info">
+                            <strong>${student.name}</strong><br>
+                            <small>${student.id} - ${student.department} - ${student.semester}</small>
+                        </div>
+                        <div class="student-actions">
+                            <button class="btn btn-small btn-danger" onclick="deleteStudent(${index})">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Generate share link
+        function generateShareLink() {
+            const data = loadCurrentData();
+            const container = document.getElementById('shareLink');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="status error">لا توجد بيانات لمشاركتها</div>';
+                return;
+            }
+            
+            // Encode data
+            const encodedData = btoa(JSON.stringify(data));
+            const shareCode = `STUDENTS_${Date.now()}_${encodedData}`;
+            
+            // Create share URL
+            const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encodeURIComponent(shareCode)}`;
+            
+            container.innerHTML = `
+                <div class="status success">✅ تم إنشاء رابط المشاركة</div>
+                <div class="code-display">${shareUrl}</div>
+                <button class="btn btn-small" onclick="copyToClipboard('${shareUrl}')">📋 نسخ الرابط</button>
+            `;
+        }
+
+        // Copy data
+        function copyData() {
+            const data = loadCurrentData();
+            const container = document.getElementById('copyStatus');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="status error">لا توجد بيانات لنسخها</div>';
+                return;
+            }
+            
+            const jsonStr = JSON.stringify(data, null, 2);
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(jsonStr).then(() => {
+                    container.innerHTML = '<div class="status success">✅ تم نسخ البيانات إلى الحافظة</div>';
+                }).catch(() => {
+                    container.innerHTML = '<div class="status error">❌ فشل نسخ البيانات</div>';
+                });
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = jsonStr;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                container.innerHTML = '<div class="status success">✅ تم نسخ البيانات إلى الحافظة</div>';
+            }
+        }
+
+        // Download data
+        function downloadData() {
+            const data = loadCurrentData();
+            
+            if (data.length === 0) {
+                alert('لا توجد بيانات لتحميلها');
+                return;
+            }
+            
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `students_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Generate QR code (simplified version)
+        function generateQRCode() {
+            const data = loadCurrentData();
+            const container = document.getElementById('qrCode');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="status error">لا توجد بيانات لإنشاء كود QR</div>';
+                return;
+            }
+            
+            // Create a simple code (in real app, you'd use a QR library)
+            const encodedData = btoa(JSON.stringify(data));
+            const qrCode = `QR_${Date.now()}_${encodedData}`;
+            
+            container.innerHTML = `
+                <div class="status success">✅ تم إنشاء كود البيانات</div>
+                <div class="code-display">${qrCode}</div>
+                <button class="btn btn-small" onclick="copyToClipboard('${qrCode}')">📋 نسخ الكود</button>
+                <p><small>ملاحظة: هذا كود بسيط. في التطبيق الحقيقي، استخدم مكتبة QR.</small></p>
+            `;
+        }
+
+        // Import from URL
+        function importFromUrl() {
+            const url = document.getElementById('shareUrl').value.trim();
+            const container = document.getElementById('urlStatus');
+            
+            if (!url) {
+                container.innerHTML = '<div class="status error">الرجاء إدخال رابط المشاركة</div>';
+                return;
+            }
+            
+            try {
+                // Extract data from URL
+                const urlObj = new URL(url);
+                const dataCode = urlObj.searchParams.get('data');
+                
+                if (!dataCode) {
+                    container.innerHTML = '<div class="status error">الرابط غير صالح أو لا يحتوي على بيانات</div>';
+                    return;
+                }
+                
+                // Decode data
+                if (dataCode.startsWith('STUDENTS_')) {
+                    const parts = dataCode.split('_');
+                    if (parts.length >= 3) {
+                        const encodedData = parts.slice(2).join('_');
+                        const students = JSON.parse(atob(encodedData));
+                        
+                        if (Array.isArray(students) && students.length > 0) {
+                            saveData(students);
+                            showCurrentData();
+                            container.innerHTML = `<div class="status success">✅ تم استيراد ${students.length} طالب بنجاح</div>`;
+                        } else {
+                            container.innerHTML = '<div class="status error">البيانات المستوردة غير صالحة</div>';
+                        }
+                    }
+                } else {
+                    container.innerHTML = '<div class="status error">كود المشاركة غير صالح</div>';
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="status error">خطأ في استيراد البيانات: ${error.message}</div>`;
+            }
+        }
+
+        // Import from text
+        function importFromText() {
+            const input = document.getElementById('dataInput').value.trim();
+            const container = document.getElementById('importStatus');
+            
+            if (!input) {
+                container.innerHTML = '<div class="status error">الرجاء إدخال البيانات</div>';
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(input);
+                
+                if (!Array.isArray(data)) {
+                    throw new Error('البيانات يجب أن تكون مصفوفة');
+                }
+                
+                // Validate data
+                for (let i = 0; i < data.length; i++) {
+                    const student = data[i];
+                    if (!student.id || !student.name || !student.department || !student.semester) {
+                        throw new Error(`الطالب رقم ${i+1} غير مكتمل البيانات`);
+                    }
+                }
+                
+                saveData(data);
+                showCurrentData();
+                container.innerHTML = `<div class="status success">✅ تم استيراد ${data.length} طالب بنجاح</div>`;
+                
+            } catch (error) {
+                container.innerHTML = `<div class="status error">خطأ: ${error.message}</div>`;
+            }
+        }
+
+        // Import from QR code
+        function importFromQR() {
+            const code = document.getElementById('qrInput').value.trim();
+            const container = document.getElementById('qrStatus');
+            
+            if (!code) {
+                container.innerHTML = '<div class="status error">الرجاء إدخال كود البيانات</div>';
+                return;
+            }
+            
+            try {
+                if (code.startsWith('QR_')) {
+                    const parts = code.split('_');
+                    if (parts.length >= 3) {
+                        const encodedData = parts.slice(2).join('_');
+                        const students = JSON.parse(atob(encodedData));
+                        
+                        if (Array.isArray(students) && students.length > 0) {
+                            saveData(students);
+                            showCurrentData();
+                            container.innerHTML = `<div class="status success">✅ تم استيراد ${students.length} طالب بنجاح</div>`;
+                        } else {
+                            container.innerHTML = '<div class="status error">البيانات المستوردة غير صالحة</div>';
+                        }
+                    }
+                } else {
+                    container.innerHTML = '<div class="status error">كود QR غير صالح</div>';
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="status error">خطأ في استيراد البيانات: ${error.message}</div>`;
+            }
+        }
+
+        // Load sample data
+        function loadSampleData() {
+            const sampleData = [
+                {
+                    id: 'AC242037',
+                    name: 'أحمد محمد علي',
+                    department: 'علوم الحاسب',
+                    semester: 'السادس',
+                    subjects: [
+                        { name: 'برمجة متقدمة', degree: 85, status: 'نجح' },
+                        { name: 'شبكات', degree: 90, status: 'نجح' },
+                        { name: 'قواعد بيانات', degree: 78, status: 'نجح' }
+                    ]
+                },
+                {
+                    id: 'AC242038',
+                    name: 'فاطمة حسن إبراهيم',
+                    department: 'نظم معلومات',
+                    semester: 'الرابع',
+                    subjects: [
+                        { name: 'تحليل نظم', degree: 92, status: 'نجح' },
+                        { name: 'إدارة مشاريع', degree: 88, status: 'نجح' }
+                    ]
+                },
+                {
+                    id: 'AC242039',
+                    name: 'محمد عبدالله سالم',
+                    department: 'هندسة برمجيات',
+                    semester: 'الثامن',
+                    subjects: [
+                        { name: 'ذكاء اصطناعي', degree: 95, status: 'ممتاز' },
+                        { name: 'أمن معلومات', degree: 87, status: 'نجح' }
+                    ]
+                }
+            ];
+            
+            document.getElementById('dataInput').value = JSON.stringify(sampleData, null, 2);
+            document.getElementById('importStatus').innerHTML = '<div class="status info">📝 تم تحميل بيانات تجريبية. اضغط "استيراد البيانات" لحفظها</div>';
+        }
+
+        // Sync with main system
+        function syncWithMainSystem() {
+            const data = loadCurrentData();
+            const container = document.getElementById('mainSyncStatus');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="status error">لا توجد بيانات لمزامنتها</div>';
+                return;
+            }
+            
+            // Store data for main system to pick up
+            localStorage.setItem('offlineSyncData', JSON.stringify({
+                timestamp: Date.now(),
+                students: data,
+                source: 'offline_sync'
+            }));
+            
+            container.innerHTML = '<div class="status success">✅ تم تجهيز البيانات للمزامنة. افتح المنظومة الرئيسية واضغط "مزامنة بدون إنترنت".</div>';
+        }
+
+        // Import from main system
+        function importFromMainSystem() {
+            const syncData = localStorage.getItem('offlineSyncData');
+            const container = document.getElementById('mainSyncStatus');
+            
+            if (!syncData) {
+                container.innerHTML = '<div class="status error">لا توجد بيانات مزامنة من المنظومة الرئيسية</div>';
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(syncData);
+                
+                if (data.students && Array.isArray(data.students)) {
+                    saveData(data.students);
+                    showCurrentData();
+                    container.innerHTML = `<div class="status success">✅ تم استيراد ${data.students.length} طالب من المنظومة الرئيسية</div>`;
+                    
+                    // Clear sync data after successful import
+                    localStorage.removeItem('offlineSyncData');
+                } else {
+                    container.innerHTML = '<div class="status error">البيانات المستوردة غير صالحة</div>';
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="status error">خطأ في استيراد البيانات: ${error.message}</div>`;
+            }
+        }
+
+        // Delete student
+        function deleteStudent(index) {
+            if (confirm('هل أنت متأكد من حذف هذا الطالب؟')) {
+                const data = loadCurrentData();
+                data.splice(index, 1);
+                saveData(data);
+                showCurrentData();
+            }
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('تم النسخ إلى الحافظة');
+                }).catch(() => {
+                    alert('فشل النسخ');
+                });
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('تم النسخ إلى الحافظة');
+            }
+        }
+
+        // Check for URL data on load
+        window.onload = function() {
+            showCurrentData();
+            
+            // Check if there's data in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataCode = urlParams.get('data');
+            
+            if (dataCode) {
+                try {
+                    if (dataCode.startsWith('STUDENTS_')) {
+                        const parts = dataCode.split('_');
+                        if (parts.length >= 3) {
+                            const encodedData = parts.slice(2).join('_');
+                            const students = JSON.parse(atob(encodedData));
+                            
+                            if (Array.isArray(students) && students.length > 0) {
+                                saveData(students);
+                                showCurrentData();
+                                alert(`تم استيراد ${students.length} طالب بنجاح من الرابط`);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    alert('خطأ في استيراد البيانات من الرابط: ' + error.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>

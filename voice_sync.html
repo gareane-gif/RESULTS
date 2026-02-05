@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزامنة صوتية</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .voice-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #da190b);
+        }
+        
+        .btn-info {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #e68900);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            color: #f44336;
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            color: #2196F3;
+        }
+        
+        .voice-indicator {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+        
+        .voice-indicator.active {
+            animation: pulse 1s infinite;
+            background: linear-gradient(45deg, #f44336, #da190b);
+        }
+        
+        .voice-indicator.inactive {
+            animation: none;
+            background: #ccc;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .data-display {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .command-display {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .listening-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+            background: #f44336;
+            animation: blink 1s infinite;
+        }
+        
+        .listening-indicator.active {
+            background: #4CAF50;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 مزامنة صوتية</h1>
+        
+        <div class="voice-section">
+            <h3>🎤 التحكم الصوتي</h3>
+            <div class="voice-indicator" id="voiceIndicator">
+                🎤
+            </div>
+            <button class="btn" onclick="startVoiceRecognition()">
+                🎤 بدء الاستماع الصوتي
+            </button>
+            <button class="btn btn-danger" onclick="stopVoiceRecognition()">
+                ⏹️ إيقاف الاستماع
+            </button>
+            <button class="btn btn-info" onclick="startVoiceOutput()">
+                🔊 بدء القراءة الصوتية
+            </button>
+            <div id="voiceStatus"></div>
+        </div>
+        
+        <div class="voice-section">
+            <h3>📝 أوامر صوتية</h3>
+            <div class="command-display">
+                <h4>الأوامر المتاحة:</h4>
+                <ul>
+                    <li><strong>"أضف طالب"</strong> - لإضافة طالب جديد</li>
+                    <li><strong>"احذف طالب"</strong> - لحذف طالب</li>
+                    <li><strong>"عرض البيانات"</strong> - لعرض جميع البيانات</li>
+                    <li><strong>"مزامنة"</strong> - لمزامنة البيانات</li>
+                    <li><strong>"تصدير"</strong> - لتصدير البيانات</li>
+                    <li><strong>"استيراد"</strong> - لاستيراد البيانات</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="voice-section">
+            <h3>📊 عرض البيانات</h3>
+            <button class="btn btn-info" onclick="showCurrentData()">
+                📊 عرض البيانات الحالية
+            </button>
+            <div id="dataDisplay" class="data-display" style="display: none;"></div>
+        </div>
+        
+        <div class="voice-section">
+            <h3>🔄 مزامنة سريعة</h3>
+            <button class="btn btn-warning" onclick="quickSync()">
+                ⚡ مزامنة سريعة
+            </button>
+            <button class="btn btn-info" onclick="generateVoiceCommand()">
+                🎤 إنشاء أمر صوتي
+            </button>
+            <div id="syncResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let recognition;
+        let synthesis;
+        let isListening = false;
+        let currentData = [];
+        
+        // Initialize
+        window.onload = function() {
+            loadData();
+            initializeSpeechAPIs();
+            updateVoiceStatus();
+        };
+        
+        // Initialize speech APIs
+        function initializeSpeechAPIs() {
+            // Check for speech recognition
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'ar-SA';
+                
+                recognition.onresult = handleVoiceResult;
+                recognition.onerror = handleVoiceError;
+                recognition.onend = handleVoiceEnd;
+                
+                console.log('✅ Speech recognition initialized');
+            } else {
+                console.log('❌ Speech recognition not supported');
+                showStatus('🔇 المتصفح لا يدعم التعرف الصوتي', 'error');
+            }
+            
+            // Check for speech synthesis
+            if ('speechSynthesis' in window) {
+                synthesis = window.speechSynthesis;
+                console.log('✅ Speech synthesis initialized');
+            } else {
+                console.log('❌ Speech synthesis not supported');
+            }
+        }
+        
+        // Load data from localStorage
+        function loadData() {
+            try {
+                currentData = JSON.parse(localStorage.getItem('students') || '[]');
+                console.log('Loaded data:', currentData.length, 'students');
+            } catch (error) {
+                console.error('Error loading data:', error);
+                currentData = [];
+            }
+        }
+        
+        // Start voice recognition
+        function startVoiceRecognition() {
+            if (!recognition) {
+                showStatus('🔇 التعرف الصوتي غير مدعوم', 'error');
+                return;
+            }
+            
+            if (isListening) {
+                showStatus('🎤 الاستماع الصوتي يعمل بالفعل', 'warning');
+                return;
+            }
+            
+            try {
+                recognition.start();
+                isListening = true;
+                updateVoiceStatus();
+                showStatus('🎤 بدء الاستماع الصوتي...', 'info');
+            } catch (error) {
+                showStatus('❌ خطأ في بدء الاستماع: ' + error.message, 'error');
+            }
+        }
+        
+        // Stop voice recognition
+        function stopVoiceRecognition() {
+            if (!recognition || !isListening) {
+                showStatus('⏹️ الاستماع الصوتي متوقف بالفعل', 'warning');
+                return;
+            }
+            
+            try {
+                recognition.stop();
+                isListening = false;
+                updateVoiceStatus();
+                showStatus('⏹️ تم إيقاف الاستماع الصوتي', 'info');
+            } catch (error) {
+                showStatus('❌ خطأ في إيقاف الاستماع: ' + error.message, 'error');
+            }
+        }
+        
+        // Start voice output
+        function startVoiceOutput() {
+            if (!synthesis) {
+                showStatus('🔇 التوليف الصوتي غير مدعوم', 'error');
+                return;
+            }
+            
+            speak('تم تفعيل القراءة الصوتية. يمكنك الآن سماع البيانات.');
+        }
+        
+        // Handle voice recognition results
+        function handleVoiceResult(event) {
+            const last = event.results.length - 1;
+            const transcript = event.results[last][0].transcript.toLowerCase().trim();
+            
+            console.log('Voice result:', transcript);
+            
+            // Process voice commands
+            processVoiceCommand(transcript);
+        }
+        
+        // Handle voice recognition errors
+        function handleVoiceError(event) {
+            console.error('Voice recognition error:', event.error);
+            showStatus('❌ خطأ في التعرف الصوتي: ' + event.error, 'error');
+        }
+        
+        // Handle voice recognition end
+        function handleVoiceEnd() {
+            if (isListening) {
+                // Restart recognition if it was stopped automatically
+                setTimeout(() => {
+                    if (isListening) {
+                        recognition.start();
+                    }
+                }, 100);
+            }
+        }
+        
+        // Process voice commands
+        function processVoiceCommand(command) {
+            console.log('Processing command:', command);
+            
+            if (command.includes('أضف طالب') || command.includes('إضافة طالب')) {
+                addStudentByVoice();
+            } else if (command.includes('احذف طالب') || command.includes('حذف طالب')) {
+                deleteStudentByVoice();
+            } else if (command.includes('عرض البيانات') || command.includes('عرض البيان')) {
+                showCurrentData();
+            } else if (command.includes('مزامنة') || command.includes('مزامن')) {
+                quickSync();
+            } else if (command.includes('تصدير') || command.includes('تصدير')) {
+                exportDataByVoice();
+            } else if (command.includes('استيراد') || command.includes('استورد')) {
+                importDataByVoice();
+            } else {
+                console.log('Unknown command:', command);
+            }
+        }
+        
+        // Add student by voice
+        function addStudentByVoice() {
+            speak('يرجى قول اسم الطالب والرقم الدراسي والقسم');
+            
+            // In a real implementation, you'd collect more voice input
+            // For demo, we'll add a sample student
+            const newStudent = {
+                id: 'VOICE' + Date.now(),
+                name: 'طالب صوتي',
+                department: 'قسم صوتي',
+                semester: 'صوتي',
+                subjects: [
+                    { name: 'مادة صوتية', degree: 85, status: 'نجح' }
+                ],
+                addedDate: new Date().toISOString()
+            };
+            
+            currentData.push(newStudent);
+            saveData();
+            
+            speak(`تم إضافة الطالب ${newStudent.name} بنجاح`);
+            showStatus(`✅ تم إضافة طالب صوتي بنجاح`, 'success');
+        }
+        
+        // Delete student by voice
+        function deleteStudentByVoice() {
+            if (currentData.length === 0) {
+                speak('لا توجد طلاب للحذف');
+                return;
+            }
+            
+            const deletedStudent = currentData.pop();
+            saveData();
+            
+            speak(`تم حذف الطالب ${deletedStudent.name} بنجاح`);
+            showStatus(`✅ تم حذف طالب بنجاح`, 'success');
+        }
+        
+        // Export data by voice
+        function exportDataByVoice() {
+            if (currentData.length === 0) {
+                speak('لا توجد بيانات للتصدير');
+                return;
+            }
+            
+            const jsonStr = JSON.stringify(currentData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `students_voice_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            speak(`تم تصدير ${currentData.length} طالب بنجاح`);
+            showStatus(`✅ تم تصدير البيانات بنجاح`, 'success');
+        }
+        
+        // Import data by voice
+        function importDataByVoice() {
+            speak('يرجى لصق بيانات JSON في مربع النص');
+            
+            // Create input for data
+            const input = document.createElement('textarea');
+            input.placeholder = 'ألصق بيانات JSON هنا';
+            input.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 200px; background: white; color: black; border: 2px solid #4CAF50; border-radius: 10px; padding: 15px; font-size: 14px; z-index: 1000;';
+            
+            const button = document.createElement('button');
+            button.textContent = 'استيراد';
+            button.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, 50px); background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; z-index: 1000;';
+            
+            button.onclick = function() {
+                try {
+                    const data = JSON.parse(input.value);
+                    if (Array.isArray(data)) {
+                        currentData = data;
+                        saveData();
+                        document.body.removeChild(input);
+                        document.body.removeChild(button);
+                        speak(`تم استيراد ${data.length} طالب بنجاح`);
+                        showStatus(`✅ تم استيراد البيانات بنجاح`, 'success');
+                    }
+                } catch (error) {
+                    speak('خطأ في البيانات المستوردة');
+                    showStatus('❌ خطأ في استيراد البيانات', 'error');
+                }
+            };
+            
+            document.body.appendChild(input);
+            document.body.appendChild(button);
+            input.focus();
+        }
+        
+        // Quick sync
+        function quickSync() {
+            try {
+                // Create sync data
+                const syncData = {
+                    type: 'voice_sync',
+                    timestamp: Date.now(),
+                    data: currentData
+                };
+                
+                // Store for other systems
+                localStorage.setItem('voiceSyncData', JSON.stringify(syncData));
+                
+                speak(`تم مزامنة ${currentData.length} طالب بنجاح`);
+                showStatus(`✅ تم مزامنة البيانات صوتياً`, 'success');
+                
+            } catch (error) {
+                speak('خطأ في المزامنة');
+                showStatus('❌ خطأ في المزامنة', 'error');
+            }
+        }
+        
+        // Generate voice command
+        function generateVoiceCommand() {
+            const commands = [
+                'أضف طالب جديد',
+                'احذف الطالب الأخير',
+                'عرض جميع البيانات',
+                'مزامنة البيانات',
+                'تصدير البيانات',
+                'استيراد البيانات'
+            ];
+            
+            const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+            speak(`يمكنك قول: ${randomCommand}`);
+            showStatus(`🎤 أمر مقترح: ${randomCommand}`, 'info');
+        }
+        
+        // Show current data
+        function showCurrentData() {
+            const display = document.getElementById('dataDisplay');
+            
+            if (currentData.length === 0) {
+                display.innerHTML = '<div style="text-align: center; color: #ccc;">لا توجد بيانات حالية</div>';
+                display.style.display = 'block';
+                speak('لا توجد بيانات حالية');
+                return;
+            }
+            
+            let html = `<strong>عدد الطلاب: ${currentData.length}</strong><br><br>`;
+            
+            currentData.forEach((student, index) => {
+                html += `
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>${index + 1}. ${student.name}</strong><br>
+                        <small style="color: #ccc;">
+                            ${student.id} | ${student.department} | ${student.semester}
+                            ${student.subjects ? `| ${student.subjects.length} مواد` : ''}
+                        </small>
+                    </div>
+                `;
+            });
+            
+            display.innerHTML = html;
+            display.style.display = 'block';
+            
+            speak(`يوجد ${currentData.length} طالب في البيانات`);
+        }
+        
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('students', JSON.stringify(currentData));
+            
+            // Trigger storage event for other tabs
+            window.dispatchEvent(new Event('storage'));
+        }
+        
+        // Text-to-speech
+        function speak(text) {
+            if (!synthesis) {
+                console.log('Speech synthesis not available');
+                return;
+            }
+            
+            // Cancel any ongoing speech
+            synthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            synthesis.speak(utterance);
+            console.log('Speaking:', text);
+        }
+        
+        // Update voice status
+        function updateVoiceStatus() {
+            const indicator = document.getElementById('voiceIndicator');
+            const status = document.getElementById('voiceStatus');
+            
+            if (isListening) {
+                indicator.className = 'voice-indicator active';
+                status.innerHTML = '<div class="status info">🎤 جاري الاستماع الصوتي...</div>';
+            } else {
+                indicator.className = 'voice-indicator inactive';
+                status.innerHTML = '<div class="status info">⏹️ الاستماع الصوتي متوقف</div>';
+            }
+        }
+        
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; max-width: 300px;';
+            
+            document.body.appendChild(statusDiv);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                if (statusDiv.parentNode) {
+                    statusDiv.parentNode.removeChild(statusDiv);
+                }
+            }, 5000);
+        }
+        
+        // Check for voice sync data on load
+        window.addEventListener('load', function() {
+            const voiceSyncData = localStorage.getItem('voiceSyncData');
+            if (voiceSyncData) {
+                try {
+                    const data = JSON.parse(voiceSyncData);
+                    if (data.type === 'voice_sync' && data.data) {
+                        currentData = data.data;
+                        saveData();
+                        showStatus(`✅ تم استيراد ${currentData.length} طالب من المزامنة الصوتية`, 'success');
+                        localStorage.removeItem('voiceSyncData');
+                    }
+                } catch (error) {
+                    console.error('Error importing voice sync data:', error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

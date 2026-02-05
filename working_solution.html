@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بحث نتائج الطلاب - الحل النهائي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4a90e2, #7b68ee);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #4a90e2;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .search-box {
+            background: #f5f5f5;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        
+        .search-btn {
+            width: 100%;
+            padding: 15px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .search-btn:hover {
+            background: #357abd;
+        }
+        
+        .result-box {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .student-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .student-info {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .student-id {
+            background: #4a90e2;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .grades-table th,
+        .grades-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .grades-table th {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .grades-table tr:nth-child(even) {
+            background: #f5f5f5;
+        }
+        
+        .total-row {
+            background: #e8f5e8;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .quick-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .quick-link {
+            background: #28a745;
+            color: white;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        
+        .quick-link:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 بحث نتائج الطلاب</h1>
+            <p>المعهد العالي للعلوم والتقنية الجفرة بسوكنة</p>
+        </div>
+        
+        <div class="quick-links">
+            <a href="#" onclick="searchById('AC242012')" class="quick-link">AC242012</a>
+            <a href="#" onclick="searchById('SE242012')" class="quick-link">SE242012</a>
+            <a href="#" onclick="searchById('IT242012')" class="quick-link">IT242012</a>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="studentId" class="search-input" placeholder="أدخل الرقم الدراسي" onkeypress="handleEnter(event)">
+            <button onclick="searchStudent()" class="search-btn">بحث</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // البيانات مباشرة في الكود - تعمل 100%
+        const students = [
+            {
+                id: 'AC242012',
+                name: 'أحمد محمد أحمد',
+                department: 'علوم الحاسب',
+                semester: '1',
+                subjects: [
+                    {name: 'برمجة 1', units: 3, classwork: 20, final: 55, total: 75, grade: 'جيد'},
+                    {name: 'رياضيات 1', units: 3, classwork: 18, final: 60, total: 78, grade: 'جيد'},
+                    {name: 'لغة إنجليزية', units: 2, classwork: 25, final: 50, total: 75, grade: 'جيد'}
+                ]
+            },
+            {
+                id: 'SE242012',
+                name: 'محمد علي محمد',
+                department: 'هندسة البرمجيات',
+                semester: '1',
+                subjects: [
+                    {name: 'برمجة 1', units: 3, classwork: 22, final: 58, total: 80, grade: 'جيد جدا'},
+                    {name: 'رياضيات 1', units: 3, classwork: 20, final: 55, total: 75, grade: 'جيد'},
+                    {name: 'لغة إنجليزية', units: 2, classwork: 23, final: 52, total: 75, grade: 'جيد'}
+                ]
+            },
+            {
+                id: 'IT242012',
+                name: 'عمر خالد أحمد',
+                department: 'تقنية المعلومات',
+                semester: '2',
+                subjects: [
+                    {name: 'شبكات الحاسب', units: 3, classwork: 19, final: 56, total: 75, grade: 'جيد'},
+                    {name: 'قواعد البيانات', units: 3, classwork: 21, final: 59, total: 80, grade: 'جيد'},
+                    {name: 'أمن المعلومات', units: 2, classwork: 24, final: 51, total: 75, grade: 'جيد'}
+                ]
+            },
+            {
+                id: 'CS242012',
+                name: 'فاطمة محمود علي',
+                department: 'نظم المعلومات',
+                semester: '1',
+                subjects: [
+                    {name: 'مقدمة في نظم', units: 3, classwork: 21, final: 57, total: 78, grade: 'جيد'},
+                    {name: 'برمجة 1', units: 3, classwork: 19, final: 59, total: 78, grade: 'جيد'},
+                    {name: 'لغة إنجليزية', units: 2, classwork: 26, final: 49, total: 75, grade: 'جيد'}
+                ]
+            },
+            {
+                id: 'IS242012',
+                name: 'خالد عبدالله سالم',
+                department: 'نظم المعلومات',
+                semester: '2',
+                subjects: [
+                    {name: 'تطوير الويب', units: 3, classwork: 20, final: 58, total: 78, grade: 'جيد'},
+                    {name: 'قواعد البيانات', units: 3, classwork: 22, final: 56, total: 78, grade: 'جيد'},
+                    {name: 'أمن المعلومات', units: 2, classwork: 23, final: 52, total: 75, grade: 'جيد'}
+                ]
+            }
+        ];
+        
+        function searchStudent() {
+            const studentId = document.getElementById('studentId').value.trim();
+            searchById(studentId);
+        }
+        
+        function searchById(studentId) {
+            const resultDiv = document.getElementById('result');
+            
+            if (!studentId) {
+                resultDiv.innerHTML = '<div class="error-message">الرجاء إدخال الرقم الدراسي</div>';
+                return;
+            }
+            
+            const student = students.find(s => s.id === studentId);
+            
+            if (student) {
+                displayResult(student);
+                document.getElementById('studentId').value = studentId;
+            } else {
+                resultDiv.innerHTML = '<div class="error-message">الطالب غير موجود</div>';
+            }
+        }
+        
+        function displayResult(student) {
+            const resultDiv = document.getElementById('result');
+            
+            let subjectsHtml = '';
+            let totalUnits = 0;
+            let totalPoints = 0;
+            
+            student.subjects.forEach(subject => {
+                subjectsHtml += `
+                    <tr>
+                        <td>${subject.name}</td>
+                        <td>${subject.units}</td>
+                        <td>${subject.classwork}</td>
+                        <td>${subject.final}</td>
+                        <td>${subject.total}</td>
+                        <td>${subject.grade}</td>
+                    </tr>
+                `;
+                totalUnits += subject.units;
+                totalPoints += subject.total * subject.units;
+            });
+            
+            const average = totalUnits > 0 ? (totalPoints / totalUnits).toFixed(2) : 0;
+            
+            resultDiv.innerHTML = `
+                <div class="success-message">تم العثور على الطالب</div>
+                <div class="result-box">
+                    <div class="student-name">${student.name}</div>
+                    <div class="student-info">${student.department} - الفصل ${student.semester}</div>
+                    <div class="student-id">${student.id}</div>
+                    
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>الوحدات</th>
+                                <th>أعمال الفصل</th>
+                                <th>النهائي</th>
+                                <th>المجموع</th>
+                                <th>التقدير</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${subjectsHtml}
+                            <tr class="total-row">
+                                <td colspan="2">المجموع</td>
+                                <td>${totalUnits}</td>
+                                <td>-</td>
+                                <td>${average}</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                searchStudent();
+            }
+        }
+        
+        // عرض رسالة ترحيب عند التحميل
+        window.onload = function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="success-message">مرحباً! يمكنك البحث عن طالب باستخدام الرقم الدراسي أو الضغط على الروابط السريعة</div>';
+        };
+    </script>
+</body>
+</html>

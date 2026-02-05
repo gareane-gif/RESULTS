@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مزامنة تلقائية</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .sync-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sync-panel h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #da190b);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #e68900);
+        }
+        
+        .btn-info {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            color: #f44336;
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            color: #2196F3;
+        }
+        
+        .status.warning {
+            background: rgba(255, 152, 0, 0.2);
+            border: 2px solid #ff9800;
+            color: #ff9800;
+        }
+        
+        .data-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .sync-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .method-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .method-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .method-card h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .method-card p {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .auto-sync-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        .auto-sync-indicator.active {
+            background: #4CAF50;
+        }
+        
+        .auto-sync-indicator.inactive {
+            background: #f44336;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .stat-label {
+            color: #ccc;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 مزامنة تلقائية ذكية</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="studentCount">0</div>
+                <div class="stat-label">عدد الطلاب</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="syncStatus">🔴</div>
+                <div class="stat-label">حالة المزامنة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lastSync">لم يتم</div>
+                <div class="stat-label">آخر مزامنة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="connectionStatus">🔴</div>
+                <div class="stat-label">الاتصال</div>
+            </div>
+        </div>
+        
+        <div class="sync-panel">
+            <h3>🚀 مزامنة فورية</h3>
+            <button class="btn btn-success" onclick="startAutoSync()">
+                🔄 بدء المزامنة التلقائية
+                <span class="auto-sync-indicator inactive" id="syncIndicator"></span>
+            </button>
+            <button class="btn btn-warning" onclick="stopAutoSync()">
+                ⏸️ إيقاف المزامنة
+            </button>
+            <button class="btn btn-info" onclick="forceSyncNow()">
+                ⚡ مزامنة الآن
+            </button>
+            <button class="btn btn-danger" onclick="clearAllData()">
+                🗑️ مسح كل البيانات
+            </button>
+            <div id="syncStatusMessage"></div>
+        </div>
+        
+        <div class="sync-methods">
+            <div class="method-card">
+                <h4>🌐 المزامنة عبر الإنترنت</h4>
+                <p>مزامنة البيانات عبر Firebase عند توفر الإنترنت</p>
+                <button class="btn btn-info" onclick="enableFirebaseSync()">
+                    🔥 تفعيل Firebase
+                </button>
+            </div>
+            
+            <div class="method-card">
+                <h4>📱 المزامنة بدون إنترنت</h4>
+                <p>مزامنة البيانات عبر localStorage والروابط المشتركة</p>
+                <button class="btn btn-success" onclick="enableOfflineSync()">
+                    📱 تفعيل المزامنة بدون إنترنت
+                </button>
+            </div>
+            
+            <div class="method-card">
+                <h4>🔗 المزامنة عبر الروابط</h4>
+                <p>مشاركة البيانات عبر روابط قصيرة وأكواد</p>
+                <button class="btn btn-warning" onclick="generateShareLink()">
+                    🔗 إنشاء رابط مشاركة
+                </button>
+            </div>
+            
+            <div class="method-card">
+                <h4>📤 المزامنة عبر الملفات</h4>
+                <p>تصدير واستيراد البيانات عبر ملفات JSON</p>
+                <button class="btn btn-info" onclick="exportToFile()">
+                    📤 تصدير البيانات
+                </button>
+                <button class="btn btn-success" onclick="importFromFile()">
+                    📥 استيراد البيانات
+                </button>
+            </div>
+        </div>
+        
+        <div class="sync-panel">
+            <h3>📊 عرض البيانات الحالية</h3>
+            <button class="btn btn-info" onclick="showCurrentData()">
+                📊 عرض البيانات
+            </button>
+            <div id="dataDisplay" class="data-display" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let autoSyncInterval;
+        let isAutoSyncing = false;
+        
+        // Initialize
+        window.onload = function() {
+            updateStats();
+            checkConnectionStatus();
+            setupEventListeners();
+        };
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Listen for online/offline events
+            window.addEventListener('online', function() {
+                document.getElementById('connectionStatus').textContent = '🟢';
+                document.getElementById('syncStatus').textContent = '🟡';
+                showStatus('🌐 تم استعادة الاتصال بالإنترنت', 'success');
+                
+                // Try to sync if auto-sync is active
+                if (isAutoSyncing) {
+                    setTimeout(() => {
+                        if (navigator.onLine) {
+                            syncWithMainSystem();
+                        }
+                    }, 2000);
+                }
+            });
+            
+            window.addEventListener('offline', function() {
+                document.getElementById('connectionStatus').textContent = '🔴';
+                document.getElementById('syncStatus').textContent = '🔴';
+                showStatus('📴 فقدان الاتصال بالإنترنت - العمل بدون إنترنت', 'warning');
+            });
+            
+            // Listen for storage changes (from other tabs)
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'students') {
+                    updateStats();
+                }
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            document.getElementById('studentCount').textContent = students.length;
+            
+            const lastSyncTime = localStorage.getItem('lastSyncTime');
+            if (lastSyncTime) {
+                const date = new Date(parseInt(lastSyncTime));
+                document.getElementById('lastSync').textContent = date.toLocaleTimeString('ar-EG');
+            }
+        }
+        
+        // Check connection status
+        function checkConnectionStatus() {
+            const status = navigator.onLine ? '🟢' : '🔴';
+            document.getElementById('connectionStatus').textContent = status;
+        }
+        
+        // Start auto sync
+        function startAutoSync() {
+            if (isAutoSyncing) {
+                showStatus('المزامنة التلقائية تعمل بالفعل', 'warning');
+                return;
+            }
+            
+            isAutoSyncing = true;
+            document.getElementById('syncIndicator').className = 'auto-sync-indicator active';
+            document.getElementById('syncStatus').textContent = '🟡';
+            
+            showStatus('🔄 بدء المزامنة التلقائية', 'success');
+            
+            // Sync every 30 seconds
+            autoSyncInterval = setInterval(() => {
+                if (navigator.onLine) {
+                    syncWithMainSystem();
+                } else {
+                    console.log('⏸️ Offline - skipping sync');
+                }
+            }, 30000);
+            
+            // Try immediate sync
+            if (navigator.onLine) {
+                setTimeout(() => syncWithMainSystem(), 1000);
+            }
+        }
+        
+        // Stop auto sync
+        function stopAutoSync() {
+            if (!isAutoSyncing) {
+                showStatus('المزامنة التلقائية متوقفة بالفعل', 'warning');
+                return;
+            }
+            
+            isAutoSyncing = false;
+            document.getElementById('syncIndicator').className = 'auto-sync-indicator inactive';
+            document.getElementById('syncStatus').textContent = '🔴';
+            
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+            }
+            
+            showStatus('⏸️ تم إيقاف المزامنة التلقائية', 'warning');
+        }
+        
+        // Force sync now
+        function forceSyncNow() {
+            showStatus('⚡ بدء المزامنة الفورية...', 'info');
+            
+            if (navigator.onLine) {
+                syncWithMainSystem();
+            } else {
+                syncOffline();
+            }
+        }
+        
+        // Sync with main system
+        function syncWithMainSystem() {
+            try {
+                // Get current data
+                const currentData = JSON.parse(localStorage.getItem('students') || '[]');
+                
+                // Store for main system
+                localStorage.setItem('autoSyncData', JSON.stringify({
+                    timestamp: Date.now(),
+                    students: currentData,
+                    source: 'auto_sync'
+                }));
+                
+                // Update last sync time
+                localStorage.setItem('lastSyncTime', Date.now().toString());
+                
+                // Update stats
+                updateStats();
+                
+                showStatus(`✅ تم مزامنة ${currentData.length} طالب بنجاح`, 'success');
+                document.getElementById('syncStatus').textContent = '🟢';
+                
+                console.log('✅ Auto sync completed:', currentData.length, 'students');
+                
+            } catch (error) {
+                showStatus('❌ خطأ في المزامنة: ' + error.message, 'error');
+                console.error('Sync error:', error);
+            }
+        }
+        
+        // Offline sync
+        function syncOffline() {
+            try {
+                const currentData = JSON.parse(localStorage.getItem('students') || '[]');
+                
+                // Store for offline sync
+                localStorage.setItem('offlineSyncData', JSON.stringify({
+                    timestamp: Date.now(),
+                    students: currentData,
+                    source: 'offline_sync'
+                }));
+                
+                showStatus(`✅ تم حفظ ${currentData.length} طالب للمزامنة بدون إنترنت`, 'success');
+                
+            } catch (error) {
+                showStatus('❌ خطأ في الحفظ المحلي: ' + error.message, 'error');
+            }
+        }
+        
+        // Enable Firebase sync
+        function enableFirebaseSync() {
+            window.open('firebase_sync.html', '_blank');
+            showStatus('🔥 تم فتح صفحة Firebase للمزامنة', 'info');
+        }
+        
+        // Enable offline sync
+        function enableOfflineSync() {
+            window.open('offline_sync.html', '_blank');
+            showStatus('📱 تم فتح صفحة المزامنة بدون إنترنت', 'info');
+        }
+        
+        // Generate share link
+        function generateShareLink() {
+            const data = JSON.parse(localStorage.getItem('students') || '[]');
+            
+            if (data.length === 0) {
+                showStatus('❌ لا توجد بيانات لمشاركتها', 'error');
+                return;
+            }
+            
+            // Create shareable link
+            const encodedData = btoa(JSON.stringify(data));
+            const shareUrl = `${window.location.origin}${window.location.pathname}?sync_data=${encodeURIComponent(encodedData)}&t=${Date.now()}`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showStatus('✅ تم نسخ رابط المشاركة', 'success');
+            }).catch(() => {
+                showStatus('❌ فشل نسخ الرابط', 'error');
+            });
+            
+            console.log('Share link:', shareUrl);
+        }
+        
+        // Export to file
+        function exportToFile() {
+            const data = JSON.parse(localStorage.getItem('students') || '[]');
+            
+            if (data.length === 0) {
+                showStatus('❌ لا توجد بيانات لتصديرها', 'error');
+                return;
+            }
+            
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `students_auto_sync_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus(`✅ تم تصدير ${data.length} طالب`, 'success');
+        }
+        
+        // Import from file
+        function importFromFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (!Array.isArray(data)) {
+                            throw new Error('الملف يجب أن يحتوي على مصفوفة من الطلاب');
+                        }
+                        
+                        // Validate data
+                        for (let i = 0; i < data.length; i++) {
+                            const student = data[i];
+                            if (!student.id || !student.name || !student.department || !student.semester) {
+                                throw new Error(`الطالب رقم ${i+1} غير مكتمل البيانات`);
+                            }
+                        }
+                        
+                        // Save data
+                        localStorage.setItem('students', JSON.stringify(data));
+                        updateStats();
+                        
+                        showStatus(`✅ تم استيراد ${data.length} طالب بنجاح`, 'success');
+                        
+                    } catch (error) {
+                        showStatus('❌ خطأ في استيراد الملف: ' + error.message, 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        // Show current data
+        function showCurrentData() {
+            const data = JSON.parse(localStorage.getItem('students') || '[]');
+            const display = document.getElementById('dataDisplay');
+            
+            if (data.length === 0) {
+                display.innerHTML = '<div style="text-align: center; color: #ccc;">لا توجد بيانات حالية</div>';
+                display.style.display = 'block';
+                return;
+            }
+            
+            let html = `<strong>عدد الطلاب: ${data.length}</strong><br><br>`;
+            
+            data.forEach((student, index) => {
+                html += `
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>${index + 1}. ${student.name}</strong><br>
+                        <small style="color: #ccc;">
+                            ${student.id} | ${student.department} | ${student.semester}
+                            ${student.subjects ? `| ${student.subjects.length} مواد` : ''}
+                        </small>
+                    </div>
+                `;
+            });
+            
+            display.innerHTML = html;
+            display.style.display = 'block';
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            if (!confirm('هل أنت متأكد من مسح جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+                return;
+            }
+            
+            localStorage.removeItem('students');
+            localStorage.removeItem('autoSyncData');
+            localStorage.removeItem('offlineSyncData');
+            localStorage.removeItem('lastSyncTime');
+            
+            updateStats();
+            showStatus('🗑️ تم مسح جميع البيانات', 'warning');
+            
+            if (document.getElementById('dataDisplay').style.display === 'block') {
+                document.getElementById('dataDisplay').style.display = 'none';
+            }
+        }
+        
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('syncStatusMessage');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Check for sync data on load
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const syncData = urlParams.get('sync_data');
+            
+            if (syncData) {
+                try {
+                    const data = JSON.parse(atob(syncData));
+                    
+                    if (Array.isArray(data) && data.length > 0) {
+                        localStorage.setItem('students', JSON.stringify(data));
+                        updateStats();
+                        showStatus(`✅ تم استيراد ${data.length} طالب من الرابط المشترك`, 'success');
+                    }
+                } catch (error) {
+                    showStatus('❌ خطأ في استيراد البيانات من الرابط', 'error');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

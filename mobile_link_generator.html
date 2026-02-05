@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد الروابط للهاتف</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .button.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: #212529;
+        }
+        
+        .result {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        
+        .result h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .result .link {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .sample-data {
+            background: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .sample-data h4 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .sample-data pre {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 مولد الروابط للهاتف</h1>
+            <p>إنشاء روابط تعمل على جميع الأجهزة بعد رفعها على GitHub Pages</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="githubUrl">رابط GitHub Pages:</label>
+            <input type="text" id="githubUrl" placeholder="https://username.github.io/repository/student_search.html">
+        </div>
+        
+        <div class="form-group">
+            <label for="studentsData">بيانات الطلاب (JSON):</label>
+            <textarea id="studentsData" placeholder='[
+  {
+    "id": "AC242012",
+    "name": "أحمد محمد أحمد",
+    "department": "علوم الحاسب",
+    "semester": "1",
+    "subjects": [
+      {"name": "برمجة 1", "units": 3, "classwork": 20, "final": 55, "total": 75}
+    ]
+  }
+]'></textarea>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="generateLink()" class="button success">🔗 إنشاء رابط للهاتف</button>
+            <button onclick="loadSampleData()" class="button warning">📝 تحميل بيانات تجريبية</button>
+            <button onclick="clearAll()" class="button">🗑️ مسح الكل</button>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div id="result" style="display: none;" class="result">
+            <h3>🔗 الرابط المحمّل بالبيانات:</h3>
+            <div id="generatedLink" class="link"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button onclick="copyLink()" class="button">📋 نسخ الرابط</button>
+                <button onclick="testLink()" class="button">🧪 اختبار الرابط</button>
+            </div>
+        </div>
+        
+        <div class="sample-data">
+            <h4>📝 مثال بيانات تجريبية:</h4>
+            <pre>[
+  {
+    "id": "AC242012",
+    "name": "أحمد محمد أحمد",
+    "department": "علوم الحاسب",
+    "semester": "1",
+    "subjects": [
+      {"name": "برمجة 1", "units": 3, "classwork": 20, "final": 55, "total": 75},
+      {"name": "رياضيات 1", "units": 3, "classwork": 18, "final": 60, "total": 78},
+      {"name": "لغة إنجليزية", "units": 2, "classwork": 25, "final": 50, "total": 75}
+    ]
+  },
+  {
+    "id": "SE242012",
+    "name": "محمد علي محمد",
+    "department": "هندسة البرمجيات",
+    "semester": "1",
+    "subjects": [
+      {"name": "برمجة 1", "units": 3, "classwork": 22, "final": 58, "total": 80},
+      {"name": "رياضيات 1", "units": 3, "classwork": 20, "final": 55, "total": 75},
+      {"name": "لغة إنجليزية", "units": 2, "classwork": 23, "final": 52, "total": 75}
+    ]
+  }
+]</pre>
+            <button onclick="useSampleData()" class="button success" style="margin-top: 10px;">📋 استخدام هذا المثال</button>
+        </div>
+    </div>
+
+    <script>
+        // Generate mobile link
+        function generateLink() {
+            const githubUrl = document.getElementById('githubUrl').value.trim();
+            const studentsData = document.getElementById('studentsData').value.trim();
+            
+            if (!githubUrl) {
+                showStatus('❌ الرجاء إدخال رابط GitHub Pages', 'error');
+                return;
+            }
+            
+            if (!studentsData) {
+                showStatus('❌ الرجاء إدخال بيانات الطلاب', 'error');
+                return;
+            }
+            
+            try {
+                // Parse JSON to validate
+                const parsedData = JSON.parse(studentsData);
+                
+                if (!Array.isArray(parsedData) || parsedData.length === 0) {
+                    showStatus('❌ بيانات الطلاب يجب أن تكون مصفوفة غير فارغة', 'error');
+                    return;
+                }
+                
+                // Encode the data
+                const encodedData = encodeURIComponent(JSON.stringify(parsedData));
+                const mobileUrl = `${githubUrl}?students=${encodedData}`;
+                
+                // Display the result
+                document.getElementById('generatedLink').textContent = mobileUrl;
+                document.getElementById('result').style.display = 'block';
+                
+                showStatus('✅ تم إنشاء الرابط بنجاح! يعمل على جميع الأجهزة', 'success');
+                
+            } catch (error) {
+                showStatus('❌ خطأ في تحليل بيانات JSON: ' + error.message, 'error');
+            }
+        }
+        
+        // Load sample data
+        function loadSampleData() {
+            const sampleData = [
+                {
+                    id: 'AC242012',
+                    name: 'أحمد محمد أحمد',
+                    department: 'علوم الحاسب',
+                    semester: '1',
+                    subjects: [
+                        {name: 'برمجة 1', units: 3, classwork: 20, final: 55, total: 75},
+                        {name: 'رياضيات 1', units: 3, classwork: 18, final: 60, total: 78},
+                        {name: 'لغة إنجليزية', units: 2, classwork: 25, final: 50, total: 75}
+                    ]
+                },
+                {
+                    id: 'SE242012',
+                    name: 'محمد علي محمد',
+                    department: 'هندسة البرمجيات',
+                    semester: '1',
+                    subjects: [
+                        {name: 'برمجة 1', units: 3, classwork: 22, final: 58, total: 80},
+                        {name: 'رياضيات 1', units: 3, classwork: 20, final: 55, total: 75},
+                        {name: 'لغة إنجليزية', units: 2, classwork: 23, final: 52, total: 75}
+                    ]
+                }
+            ];
+            
+            document.getElementById('studentsData').value = JSON.stringify(sampleData, null, 2);
+            showStatus('✅ تم تحميل البيانات التجريبية', 'success');
+        }
+        
+        // Use sample data from the example
+        function useSampleData() {
+            const sampleData = [
+                {
+                    id: 'AC242012',
+                    name: 'أحمد محمد أحمد',
+                    department: 'علوم الحاسب',
+                    semester: '1',
+                    subjects: [
+                        {name: 'برمجة 1', units: 3, classwork: 20, final: 55, total: 75},
+                        {name: 'رياضيات 1', units: 3, classwork: 18, final: 60, total: 78},
+                        {name: 'لغة إنجليزية', units: 2, classwork: 25, final: 50, total: 75}
+                    ]
+                },
+                {
+                    id: 'SE242012',
+                    name: 'محمد علي محمد',
+                    department: 'هندسة البرمجيات',
+                    semester: '1',
+                    subjects: [
+                        {name: 'برمجة 1', units: 3, classwork: 22, final: 58, total: 80},
+                        {name: 'رياضيات 1', units: 3, classwork: 20, final: 55, total: 75},
+                        {name: 'لغة إنجليزية', units: 2, classwork: 23, final: 52, total: 75}
+                    ]
+                }
+            ];
+            
+            document.getElementById('studentsData').value = JSON.stringify(sampleData, null, 2);
+            showStatus('✅ تم استخدام البيانات التجريبية', 'success');
+        }
+        
+        // Copy link
+        function copyLink() {
+            const link = document.getElementById('generatedLink').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                showStatus('✅ تم نسخ الرابط إلى الحافظة', 'success');
+            }).catch(() => {
+                showStatus('❌ فشل نسخ الرابط', 'error');
+            });
+        }
+        
+        // Test link
+        function testLink() {
+            const link = document.getElementById('generatedLink').textContent;
+            window.open(link, '_blank');
+        }
+        
+        // Clear all
+        function clearAll() {
+            document.getElementById('githubUrl').value = '';
+            document.getElementById('studentsData').value = '';
+            document.getElementById('result').style.display = 'none';
+            showStatus('✅ تم مسح جميع البيانات', 'info');
+        }
+        
+        // Show status
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Auto-fill GitHub URL from URL parameter
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const github = urlParams.get('github');
+            if (github) {
+                document.getElementById('githubUrl').value = decodeURIComponent(github);
+            }
+        };
+    </script>
+</body>
+</html>

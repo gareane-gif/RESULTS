@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار بسيط للهاتف</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .student {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>اختبار عرض الطلاب</h1>
+    <button class="btn" onclick="loadStudents()">تحميل الطلاب</button>
+    <button class="btn" onclick="addTestStudents()">إضافة طلاب تجريبيين</button>
+    <div id="studentsList"></div>
+
+    <script>
+        function loadStudents() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const div = document.getElementById('studentsList');
+            
+            if (students.length === 0) {
+                div.innerHTML = '<p>لا يوجد طلاب</p>';
+                return;
+            }
+            
+            let html = '';
+            students.forEach(s => {
+                html += `<div class="student">
+                    <h3>${s.name}</h3>
+                    <p>الرقم: ${s.id}</p>
+                    <p>القسم: ${s.department}</p>
+                </div>`;
+            });
+            
+            div.innerHTML = html;
+        }
+
+        function addTestStudents() {
+            const testStudents = [
+                {id: 'AC242037', name: 'أحمد محمد', department: 'الحاسوب'},
+                {id: 'AC242038', name: 'فاطمة علي', department: 'التمويل'}
+            ];
+            localStorage.setItem('students', JSON.stringify(testStudents));
+            loadStudents();
+        }
+
+        window.onload = loadStudents;
+    </script>
+</body>
+</html>
